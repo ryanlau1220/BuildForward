@@ -1,32 +1,33 @@
-# Malaysian role-profile skill signal
+# DOSM occupation demand and BuildForward skill mapping
 
-BuildForward includes a small locally stored market signal from the Institute of Labour Market Information and Analysis (ILMIA), an agency of DOSM. The six sampled MyJobProfile profiles cover MASCO 2511 (Computer Systems Analysts), 2512 (Software Developers), 2514 (Application Programmers), 2519 (Software QA/testing roles), 2521 (Database Designers and Administrators), and 2522 (IT System Administrators). Each profile identifies skills for the occupation; the profile pages cite Q1 2024 Job Market Insights as their source.
+BuildForward uses two separately stored inputs:
 
-The CSV at `services/api/data/malaysia_role_skill_signals.csv` records three skill mappings. Database design is listed in four of six selected profiles (67%). JUnit or software testing is listed in two of six profiles (33%). Cloud computing, used as a related signal for deployment, is listed in two of six profiles (33%). These values are computed as the proportion of this **selected profile sample** containing a matching skill tag.
+1. **Market demand:** DOSM [Job Market Insights, Q2 2026](https://www.dosm.gov.my/portal-main/release-content/big-data-analytics-job-market-insights-q22026) reports **19,899 online job offerings for Software Developers** out of **555,509 online job offerings overall**. DOSM says the quarterly release draws on offerings advertised through major private recruitment platforms. The count is for the occupation, not for any particular skill.
+2. **Skill mapping:** BuildForward maps selected curriculum skills to that occupation in `services/api/data/buildforward_skill_occupation_map.csv`. These links are our documented judgement; DOSM did not publish the skill counts or the mapping used by BuildForward.
 
-This is not a representative sample of job advertisements and these percentages do not mean that 67%, 33%, or 33% of Malaysian software job ads require each skill. Skill mappings are deliberately small and explicit. CI/CD, containerisation, web APIs, and authentication have no mapped signal in this dataset; BuildForward labels those as unavailable and does not treat missing data as zero market demand.
+The DOSM values are stored in `services/api/data/dosm_occupation_demand.csv`. The [DOSM occupation classification](https://www.dosm.gov.my/uploads/content-downloads/file_20220920113610.pdf) describes Software Developers as designing, developing, testing and maintaining software. It supports a broad relationship to software testing; the narrower links below are BuildForward interpretations.
 
-## Source profiles
+| BuildForward skill | Linked occupation | Relationship | Why this link is limited |
+| --- | --- | --- | --- |
+| Unit Testing | Software Developers | Related | DOSM describes software testing as occupation work, but does not count postings requiring unit testing. |
+| Database Design | Software Developers | Adjacent | Data-backed software can involve database design, but the Q2 2026 occupation count does not establish that requirement. |
+| Deployment | Software Developers | Adjacent | Delivering software can involve deployment, but the occupation count does not establish that requirement. |
 
-- [Computer Systems Analysts (2511)](https://www.ilmia.gov.my/bda-myjobprofile/job/2511/computer-systems-analysts)
-- [Software Developers (2512)](https://www.ilmia.gov.my/bda-myjobprofile/job/2512/software-developers)
-- [Application Programmers (2514)](https://www.ilmia.gov.my/bda-myjobprofile/job/2514/application-programmers)
-- [Software and Application Developers and Analysts n.e.c. (2519)](https://www.ilmia.gov.my/bda-myjobprofile/job/2519/software-and-application-developers-and-analysts-not-elsewhere-classified)
-- [Database Designers and Administrators (2521)](https://www.ilmia.gov.my/bda-myjobprofile/job/2521/database-designers-and-administrators)
-- [Information Technology System Administrators (2522)](https://www.ilmia.gov.my/bda-myjobprofile/job/2522/information-technology-system-administrators)
-
-ILMIA describes MyJobProfile as part of its Labour Market Information Data Warehouse. DOSM says its online job-market insight releases draw on job offers advertised through major private recruitment platforms; the Q2 2025 release reported 281,736 online offerings overall. That overall count is context only and is not used as a denominator for this role-profile signal. See [ILMIA](https://www.ilmia.gov.my/bda-myjobprofile/) and the [DOSM Q2 2025 release](https://www.dosm.gov.my/portal-main/release-content/big-data-analytics-job-market-insights-and-my-job-profile-second-quarter-of-).
+CI/CD, containerisation, web APIs, and authentication have no mapping in this small sample. BuildForward marks their market signal unavailable rather than treating missing data as zero demand. All three mapped skills currently receive the **same occupation demand weight**, so the market input does not distinguish their relative demand.
 
 ## Priority formula
 
-For skills with a mapped role-profile signal, the forecast uses:
-
 ```text
+occupation share = 19,899 Software Developer online offerings / 555,509 total online offerings
+                 = 0.0358 (3.6%)
+
 priority score = expected skill gap at graduation
-               × selected role-profile coverage
+               × occupation share
                × future learning opportunities factor
 
 future learning opportunities factor = 1 / (1 + number of future learning opportunities)
 ```
 
-The score is an ordering aid for planning. It is not a probability or a validated labour-market forecast. Fewer future learning opportunities raises the score. Skills without a mapped market signal appear after skills with evidence and are ordered by expected gap alone. Student-intake figures and the 70% target remain illustrative.
+The 3.6% figure is the share of DOSM's **online offerings for the selected occupation**, not the share of jobs requiring a mapped skill and not a share of all Malaysian jobs. The score is only an ordering aid for educator review; it is not a probability, an effect estimate, or a validated labour-market forecast. Skills without a mapped occupation follow mapped skills and are ordered by expected gap alone. Student-intake coverage and the 70% target remain illustrative.
+
+The DOSM source is a fixed Q2 2026 snapshot loaded locally. The demo does not query DOSM live. The two CSVs keep the published count and BuildForward's interpretation auditable.

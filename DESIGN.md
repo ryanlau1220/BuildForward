@@ -14,7 +14,7 @@ The product presents evidence and projections for human review. It does not make
 The application opens directly into the working interface. It is not a marketing site, pitch deck, LMS, or general analytics dashboard.
 
 - **Project Reuse Check** — compare an existing student project with a selected future module; inspect project evidence, learning outcomes, prerequisites, missing skills, the trained model’s reuse decision, and its simple baseline.
-- **Graduation Skills Forecast** — review a student intake’s expected skill coverage at graduation, ranked with a small DOSM/ILMIA role-profile signal where mapped, and explore a possible action using an explicit assumed gain.
+- **Graduation Skills Forecast** — review a student intake’s expected skill coverage at graduation, ranked with a DOSM occupation-demand signal where BuildForward has documented a skill mapping, and explore a possible action using an explicit assumed gain.
 - **Data Sources** — review coursework candidates, inspect project evidence, import a public GitHub repository or ZIP, and confirm extracted information.
 
 A **student intake** is a group or batch of students progressing through the programme together. It is not a semester. Programme, student-intake, and project selectors stay available in the workspace header. Keep navigation limited to these work areas. Add a new area only when it directly supports a core decision or its evidence.
@@ -31,7 +31,7 @@ Current CSS tokens live in `apps/web/src/app/globals.css`. Preserve the existing
 - A confirmation records that source details were reviewed; it does not prove programme alignment, project quality, successful tests, or individual proficiency.
 - Keep Degree OODJ material separate from the five Semester 1–5 briefs unless a person verifies their programme relationship. The Semester 1 visual programming brief identifies Diploma coursework.
 - Do not imply the five briefs form a verified curriculum sequence. Their semester labels are source context only; prerequisites and mappings remain provisional until verified.
-- Keep simulated student-intake data, sample programme data, synthetic project-reuse training labels, and DOSM/ILMIA market-data scope visibly labelled. Show market-data age, selected profile coverage, and missing signals near results. Forecast assumptions and the illustrative target must remain legible near results.
+- Keep simulated student-intake data, sample programme data, synthetic project-reuse training labels, and DOSM market-data scope visibly labelled. Show the market-data period, occupation count, BuildForward mapping, and missing signals near results. Forecast assumptions and the illustrative target must remain legible near results.
 - Show project evidence and reasons alongside reuse decisions. Display the model's training provenance, grouped holdout metric, and baseline. Never present model output or scores as calibrated probability.
 - Show a deterministic educator action suggestion only when a ranked skill gap is targeted by the selected future module, the matching project-reuse result supports reuse, and the project does not yet demonstrate that skill. Explain the evidence and model result. The educator remains responsible for deciding whether to act.
 - Keep an assumed coverage gain separate from the action suggestion. The slider explores a user-set scenario, not a predicted or observed intervention effect.
