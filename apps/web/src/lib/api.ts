@@ -13,6 +13,13 @@ export type Project = {
 };
 export type Continuity = {
   project_id: string; module_id: string; decision: string; method: string;
+  prediction_source: "trained_model";
+  model: {
+    name: string; training_data_source: string; training_dataset: string;
+    training_rows: number; anchor_groups: number; dataset_sha256: string;
+    held_out_macro_f1: number; baseline_macro_f1: number; claim_limit: string;
+  };
+  heuristic_baseline_decision: string;
   prerequisite_coverage: number; matched_prerequisites: string[];
   missing_prerequisites: string[]; reuse_signals: string[];
   target_already_met: string[]; target_to_develop: string[];

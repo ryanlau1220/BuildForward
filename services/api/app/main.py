@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from .analyze import MAX_ARCHIVE_BYTES, analyze_zip
 from .db import Base, engine, get_db
-from .intelligence import continuity, forecast
+from .intelligence import continuity, forecast, load_continuity_model
 from .models import Cohort, Module, Programme, Project
 from .schemas import CohortIn, ContinuityRequest, ForecastRequest, ProgrammeIn, ProjectOriginIn
 from .seed import seed_sample, seed_source_candidates
@@ -20,6 +20,7 @@ from .seed import seed_sample, seed_source_candidates
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    load_continuity_model()
     Base.metadata.create_all(engine)
     with Session(engine) as session:
         seed_sample(session)

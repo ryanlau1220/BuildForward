@@ -101,6 +101,8 @@ button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible
 .inline-hint { margin: 11px 0 0; border-left: 3px solid #bf872a; background: var(--amber-soft); padding: 8px 10px; color: #67470e; font-size: 11px; line-height: 1.45; }
 .result-block { margin-top: 17px; border-top: 1px solid var(--line); padding-top: 15px; }
 .result-topline { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.model-name { margin: 4px 0 0; color: var(--muted); font-size: 11px; text-transform: capitalize; }
+.model-baseline { margin: 12px 0 0; border-radius: 4px; background: var(--soft); padding: 8px 10px; color: #43554f; font-size: 11px; line-height: 1.5; }
 .decision-badge { border-radius: 4px; background: var(--green-soft); padding: 5px 9px; color: #21553f; font-size: 12px; font-weight: 750; letter-spacing: .3px; text-transform: uppercase; }
 .decision-badge.reset { background: var(--red-soft); color: var(--red); }
 .decision-badge.partial_reuse { background: var(--amber-soft); color: #735110; }

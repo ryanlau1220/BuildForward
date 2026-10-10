@@ -49,7 +49,12 @@ def test_sample_predictions_are_explained_and_scenario_is_labelled():
             json={"project_id": "sample-record-app", "module_id": "testing"},
         ).json()
         assert continuity["decision"] == "CONTINUE"
-        assert "calibrated" in continuity["method"]
+        assert continuity["prediction_source"] == "trained_model"
+        assert continuity["model"]["name"] == "random_forest"
+        assert continuity["model"]["training_data_source"] == "synthetic_rubric_scenarios"
+        assert continuity["model"]["training_rows"] == 72
+        assert continuity["heuristic_baseline_decision"] == "CONTINUE"
+        assert len(continuity["model"]["dataset_sha256"]) == 64
         assert continuity["matched_prerequisites"] == ["modularity", "object-oriented-design"]
         assert continuity["human_decision_required"] is True
 

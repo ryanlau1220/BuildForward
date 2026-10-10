@@ -13,7 +13,7 @@ The product presents evidence and projections for human review. It does not make
 
 The application opens directly into the working interface. It is not a marketing site, pitch deck, LMS, or general analytics dashboard.
 
-- **Project continuity** — compare a selected repository with a later reviewed module; inspect detected evidence, learning outcomes, prerequisites, missing skills, and the heuristic decision.
+- **Project continuity** — compare a selected repository with a later reviewed module; inspect detected evidence, learning outcomes, prerequisites, missing skills, the trained classifier output, and its heuristic baseline.
 - **Cohort outlook** — inspect ranked competency gaps through graduation and model a scenario using an explicit assumed gain.
 - **Sources** — review coursework candidates, inspect repository evidence, import a public GitHub repository or ZIP, and confirm extracted information.
 
@@ -31,8 +31,8 @@ Current CSS tokens live in `apps/web/src/app/globals.css`. Preserve the existing
 - A confirmation records that source details were reviewed; it does not prove programme alignment, project quality, successful tests, or individual proficiency.
 - Keep Degree OODJ material separate from the five Semester 1–5 briefs unless a person verifies their programme relationship. The Semester 1 visual programming brief identifies Diploma coursework.
 - Do not imply the five briefs form a verified curriculum sequence. Their semester labels are source context only; prerequisites and mappings remain provisional until verified.
-- Keep simulated cohort data and sample programme data visibly labelled. Forecast assumptions, heuristic method, and lack of market evidence must remain legible near results.
-- Show detected evidence and reasons alongside continuity outcomes. Never present an uncalibrated heuristic score as a probability.
+- Keep simulated cohort data, sample programme data, and synthetic continuity training labels visibly labelled. Forecast assumptions, heuristic method, and lack of market evidence must remain legible near results.
+- Show detected evidence and reasons alongside continuity outcomes. Display the model's training provenance, grouped holdout metric, and baseline. Never present model output or scores as calibrated probability.
 - Intervention comparisons are scenarios, not observed impact or validated recommendations. The educator remains responsible for the decision.
 
 ## Interaction and states

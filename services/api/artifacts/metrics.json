@@ -1,0 +1,148 @@
+{
+  "selected_model": "random_forest",
+  "selection_method": "3-fold GroupKFold on the training partition; holdout not used for model selection",
+  "rows": 72,
+  "anchor_groups": 12,
+  "train_anchor_groups": [
+    "synthetic_anchor_02",
+    "synthetic_anchor_03",
+    "synthetic_anchor_04",
+    "synthetic_anchor_05",
+    "synthetic_anchor_06",
+    "synthetic_anchor_07",
+    "synthetic_anchor_08",
+    "synthetic_anchor_09",
+    "synthetic_anchor_12"
+  ],
+  "test_anchor_groups": [
+    "synthetic_anchor_01",
+    "synthetic_anchor_10",
+    "synthetic_anchor_11"
+  ],
+  "label_sources": {
+    "synthetic_rubric_v1": 72
+  },
+  "dataset_sha256": "4e4388f80c744da3b7ff8cec8429d7d9ef2f7c70eec5454d98fac171da1eb7a8",
+  "baseline_macro_f1": 1.0,
+  "results": {
+    "logistic_regression": {
+      "group_cv_macro_f1": 0.886017686017686,
+      "group_cv_fold_macro_f1": [
+        0.9440559440559441,
+        0.8222222222222223,
+        0.8917748917748917
+      ],
+      "macro_f1": 0.9440559440559441,
+      "classification_report": {
+        "CONTINUE": {
+          "precision": 1.0,
+          "recall": 0.8333333333333334,
+          "f1-score": 0.9090909090909091,
+          "support": 6.0
+        },
+        "PARTIAL_REUSE": {
+          "precision": 0.8571428571428571,
+          "recall": 1.0,
+          "f1-score": 0.9230769230769231,
+          "support": 6.0
+        },
+        "RESET": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 6.0
+        },
+        "accuracy": 0.9444444444444444,
+        "macro avg": {
+          "precision": 0.9523809523809524,
+          "recall": 0.9444444444444445,
+          "f1-score": 0.9440559440559441,
+          "support": 18.0
+        },
+        "weighted avg": {
+          "precision": 0.9523809523809523,
+          "recall": 0.9444444444444444,
+          "f1-score": 0.9440559440559441,
+          "support": 18.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          5,
+          1,
+          0
+        ],
+        [
+          0,
+          6,
+          0
+        ],
+        [
+          0,
+          0,
+          6
+        ]
+      ]
+    },
+    "random_forest": {
+      "group_cv_macro_f1": 0.9813519813519814,
+      "group_cv_fold_macro_f1": [
+        1.0,
+        1.0,
+        0.9440559440559441
+      ],
+      "macro_f1": 1.0,
+      "classification_report": {
+        "CONTINUE": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 6.0
+        },
+        "PARTIAL_REUSE": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 6.0
+        },
+        "RESET": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 6.0
+        },
+        "accuracy": 1.0,
+        "macro avg": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 18.0
+        },
+        "weighted avg": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 18.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          0,
+          6,
+          0
+        ],
+        [
+          0,
+          0,
+          6
+        ]
+      ]
+    }
+  },
+  "claim_limit": "Synthetic rubric labels measure agreement with the scenario rubric, not institutional predictive validity."
+}

@@ -42,9 +42,11 @@ The demo data is seeded on first startup. Deleting the local `services/api/build
 - Cohort coverage JSON import and explicit confirmation.
 - Public GitHub repository or ZIP analysis through static file inspection.
 - Evidence review and confirmation before new project data enters predictions.
-- Project-to-module continuity comparison with reasons and missing prerequisites.
+- Project-to-module continuity comparison using a trained classifier, with its heuristic baseline, reasons, and missing prerequisites.
 - Ranked graduation gaps and a with/without intervention scenario.
 - Source provenance and uncertainty labels throughout the interface.
+
+The continuity model is a proof of concept trained on synthetic rubric scenarios, not historical student data. The interface reports that source and its grouped holdout macro-F1; this measures agreement with the scenario rubric rather than institutional predictive validity. See [ml/README.md](ml/README.md) for the dataset method and reproducible training commands.
 
 The interface has three focused work areas: **Project continuity**, **Cohort outlook**, and **Sources**. See [DESIGN.md](DESIGN.md) for the interaction and scope rules.
 

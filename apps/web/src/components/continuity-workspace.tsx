@@ -58,7 +58,7 @@ export function ContinuityWorkspace({
         <button className="primary-button" type="button" disabled={busy || !selectedModule || project.provenance === "EXTRACTED_CANDIDATE"} onClick={onCompare} aria-busy={busy}>{busy ? "Comparing…" : "Run continuity comparison"}</button>
 
         {continuity ? <div className="result-block" aria-live="polite">
-          <div className="result-topline"><span className="eyebrow">RULE-BASED SIGNAL</span><span className={`decision-badge ${continuity.decision.toLowerCase()}`}>{continuity.decision.replaceAll("_", " ")}</span></div>
+          <div className="result-topline"><div><span className="eyebrow">TRAINED MODEL OUTPUT</span><p className="model-name">{continuity.model.name.replaceAll("_", " ")} · {continuity.model.training_rows} synthetic rubric scenarios</p></div><span className={`decision-badge ${continuity.decision.toLowerCase()}`}>{continuity.decision.replaceAll("_", " ")}</span></div>
           <p className="result-reason">{continuity.reason}</p>
           <dl className="result-details">
             <div><dt>Prerequisite coverage</dt><dd>{Math.round(continuity.prerequisite_coverage * 100)}%</dd></div>
@@ -66,7 +66,8 @@ export function ContinuityWorkspace({
             <div><dt>Still to develop</dt><dd>{continuity.target_to_develop.length ? continuity.target_to_develop.map(label).join(", ") : "No additional targets identified"}</dd></div>
             <div><dt>Missing prerequisites</dt><dd>{continuity.missing_prerequisites.length ? continuity.missing_prerequisites.map(label).join(", ") : "None listed"}</dd></div>
           </dl>
-          <p className="small-note">This is a transparent prototype heuristic, not a trained or validated prediction. An educator makes the final decision.</p>
+          <p className="model-baseline">Heuristic baseline: <strong>{continuity.heuristic_baseline_decision.replaceAll("_", " ")}</strong> · grouped holdout macro-F1: {continuity.model.held_out_macro_f1.toFixed(2)} (baseline {continuity.model.baseline_macro_f1.toFixed(2)}).</p>
+          <p className="small-note">{continuity.model.claim_limit} An educator makes the final decision.</p>
         </div> : <div className="result-placeholder"><strong>Comparison result will appear here</strong><span>Run the comparison to review the signal and supporting evidence.</span></div>}
       </section>
     </div>

@@ -11,6 +11,8 @@ dependencies = [
   "python-multipart>=0.0.20",
   "httpx>=0.28",
   "scalar-fastapi>=1.9.1",
+  "joblib==1.6.0",
+  "scikit-learn==1.9.1",
 ]
 
 [dependency-groups]

@@ -1,10 +1,43 @@
 from collections import Counter
+from functools import lru_cache
+from pathlib import Path
+
+import joblib
+import numpy as np
 
 from .models import Cohort, Module, Project
 from .schemas import Intervention
 
 MIN_COVERAGE = 0.70
 ASSUMED_MODULE_GAIN = 0.22
+CONTINUITY_FEATURES = [
+    "prerequisite_coverage",
+    "reuse_signal_count",
+    "target_overlap",
+    "evidence_count",
+    "files_scanned",
+]
+CONTINUITY_ARTIFACT = Path(__file__).resolve().parents[1] / "artifacts" / "continuity.joblib"
+
+
+@lru_cache(maxsize=1)
+def load_continuity_model() -> dict:
+    if not CONTINUITY_ARTIFACT.is_file():
+        raise RuntimeError(f"Continuity model artifact not found: {CONTINUITY_ARTIFACT}")
+    artifact = joblib.load(CONTINUITY_ARTIFACT)
+    if artifact.get("features") != CONTINUITY_FEATURES:
+        raise RuntimeError("Continuity model features do not match the API feature contract")
+    if not {"model", "labels", "metadata"} <= artifact.keys():
+        raise RuntimeError("Continuity model artifact is missing required metadata")
+    return artifact
+
+
+def _heuristic_decision(evidence_count: int, coverage: float, reuse_count: int) -> str:
+    if evidence_count == 0 or coverage < 0.5:
+        return "RESET"
+    if coverage >= 0.75 and reuse_count > 0:
+        return "CONTINUE"
+    return "PARTIAL_REUSE"
 
 
 def continuity(project: Project, module: Module) -> dict:
@@ -16,24 +49,43 @@ def continuity(project: Project, module: Module) -> dict:
     reuse = sorted(found & set(module.reuse_signals))
     target_already_met = sorted(found & set(module.target_competencies))
 
-    if not project.evidence or prerequisite_coverage < 0.5:
-        decision = "RESET"
-        reason = "The artifact lacks enough verified structure or prerequisite evidence."
-    elif prerequisite_coverage >= 0.75 and reuse:
-        decision = "CONTINUE"
-        reason = "Prerequisite evidence and a reusable project signal support extending this artifact."
-    elif prerequisite_coverage >= 0.5 or reuse:
-        decision = "PARTIAL_REUSE"
-        reason = "Some project work is relevant, but significant adaptation is needed."
-    else:
-        decision = "RESET"
-        reason = "The project does not provide a useful starting point for this module."
+    targets = set(module.target_competencies)
+    target_overlap = len(found & targets) / len(targets) if targets else 0.0
+    feature_values = [[
+        prerequisite_coverage,
+        len(reuse),
+        target_overlap,
+        len(project.evidence),
+        project.files_scanned or 0,
+    ]]
+    artifact = load_continuity_model()
+    decision = str(artifact["model"].predict(np.asarray(feature_values, dtype=float))[0])
+    baseline = _heuristic_decision(len(project.evidence), prerequisite_coverage, len(reuse))
+    metadata = artifact["metadata"]
+    model_summary = {
+        "name": metadata["model_name"],
+        "training_data_source": metadata["training_data_source"],
+        "training_dataset": metadata["training_dataset"],
+        "training_rows": metadata["training_rows"],
+        "anchor_groups": metadata["anchor_groups"],
+        "dataset_sha256": metadata["dataset_sha256"],
+        "held_out_macro_f1": metadata["evaluation"]["holdout_macro_f1"],
+        "baseline_macro_f1": metadata["evaluation"]["baseline_macro_f1"],
+        "claim_limit": metadata["claim_limit"],
+    }
+    reason = (
+        f"The trained classifier assigns {decision.replace('_', ' ')} from five project-module "
+        "features. Review the measured evidence and compare the baseline before deciding."
+    )
 
     return {
         "project_id": project.id,
         "module_id": module.id,
         "decision": decision,
-        "method": "transparent heuristic baseline; not a trained or calibrated model",
+        "prediction_source": "trained_model",
+        "method": f"{metadata['model_name']} trained classifier",
+        "model": model_summary,
+        "heuristic_baseline_decision": baseline,
         "prerequisite_coverage": round(prerequisite_coverage, 2),
         "matched_prerequisites": matched,
         "missing_prerequisites": missing,

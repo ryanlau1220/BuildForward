@@ -19,8 +19,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "joblib", specifier = ">=1.4" },
-    { name = "scikit-learn", specifier = ">=1.6" },
+    { name = "joblib", specifier = "==1.6.0" },
+    { name = "scikit-learn", specifier = "==1.9.1" },
 ]
 
 [package.metadata.requires-dev]
