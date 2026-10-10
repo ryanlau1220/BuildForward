@@ -7,7 +7,7 @@ from training.train_continuity import summarize_external_validation
 
 def test_candidate_features_keep_unmapped_prerequisites_blank():
     module = {
-        "required_competencies": [],
+        "required_competencies": None,
         "target_competencies": ["unit-testing"],
         "reuse_signals": ["unit-testing"],
     }
@@ -17,6 +17,12 @@ def test_candidate_features_keep_unmapped_prerequisites_blank():
     assert values["reuse_signal_count"] == 1
     assert values["target_overlap"] == 1
     assert values["evidence_count"] == 2
+
+
+def test_explicitly_empty_prerequisite_map_is_full_coverage():
+    module = {"required_competencies": [], "target_competencies": [], "reuse_signals": []}
+    analysis = {"competencies": [], "evidence": [], "files_scanned": 0}
+    assert feature_values(module, analysis)["prerequisite_coverage"] == 1.0
 
 
 def test_repository_scan_uses_shared_safe_file_rules(tmp_path):

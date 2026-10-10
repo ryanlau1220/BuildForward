@@ -66,13 +66,14 @@ def analyze_repository(root: Path) -> dict:
 
 def feature_values(module: dict, analysis: dict) -> dict[str, str | int]:
     found = set(analysis["competencies"])
-    required = module.get("required_competencies", [])
+    required = module.get("required_competencies")
     targets = module.get("target_competencies", [])
     reuse_signals = module.get("reuse_signals", [])
     return {
-        # Empty candidate requirements mean unknown/unmapped, not full coverage.
+        # Null means unknown; an explicit empty list means no skills are required.
         "prerequisite_coverage": (
-            round(len(found & set(required)) / len(required), 4) if required else ""
+            "" if required is None else
+            round(len(found & set(required)) / len(required), 4) if required else 1.0
         ),
         "reuse_signal_count": len(found & set(reuse_signals)),
         "target_overlap": round(len(found & set(targets)) / len(targets), 4) if targets else 0,

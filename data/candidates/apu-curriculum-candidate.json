@@ -1,0 +1,114 @@
+{
+  "id": "apu-coursework-sequence",
+  "name": "APU coursework materials (user-labeled Semesters 1–5)",
+  "source_label": "User-provided materials ordered as Semesters 1–5. The Semester 1 brief identifies Diploma coursework; programme alignment is not independently verified.",
+  "modules": [
+    {
+      "id": "apu-sem1-visual-interactive",
+      "name": "Introduction to Visual and Interactive Programming",
+      "semester": 1,
+      "prerequisites": [],
+      "required_competencies": null,
+      "target_competencies": [
+        "computational-thinking",
+        "visual-programming",
+        "interactive-application-design",
+        "input-validation"
+      ],
+      "reuse_signals": [],
+      "outcomes": [
+        "Apply computational thinking to solve a problem",
+        "Use visual interactive programming tools to develop an application"
+      ],
+      "assignment": "Group project: create an interactive SNAP! application from one of two case studies; game applications are excluded."
+    },
+    {
+      "id": "apu-sem2-database-management",
+      "name": "Database Management",
+      "semester": 2,
+      "prerequisites": [],
+      "required_competencies": null,
+      "target_competencies": [
+        "database-design",
+        "normalization",
+        "sql-dml",
+        "sql-ddl",
+        "data-modelling"
+      ],
+      "reuse_signals": [],
+      "outcomes": [
+        "Apply redundancy control in designing a database",
+        "Demonstrate a database solution using an appropriate tool based on a case study"
+      ],
+      "assignment": "Design, implement and document an E-Library Management System database, including schema, ERD, normalization and SQL queries."
+    },
+    {
+      "id": "apu-sem3-programming-python",
+      "name": "Programming with Python",
+      "semester": 3,
+      "prerequisites": [],
+      "required_competencies": null,
+      "target_competencies": [
+        "python-programming",
+        "modularity",
+        "file-persistence",
+        "input-validation",
+        "role-based-access",
+        "business-logic"
+      ],
+      "reuse_signals": [],
+      "outcomes": [
+        "Build a Python software solution for a business case with distinct functional areas",
+        "Organize customer, user and inventory management into separately maintained areas"
+      ],
+      "assignment": "Group assignment: implement a computer sales and repair transaction system with customer, user and inventory management."
+    },
+    {
+      "id": "apu-sem4-responsive-web",
+      "name": "Responsive Web Design and Development",
+      "semester": 4,
+      "prerequisites": [],
+      "required_competencies": null,
+      "target_competencies": [
+        "html",
+        "css",
+        "javascript",
+        "php",
+        "mysql",
+        "responsive-design",
+        "hci",
+        "crud",
+        "form-validation"
+      ],
+      "reuse_signals": [],
+      "outcomes": [
+        "Explain internet infrastructure and web page development",
+        "Develop a responsive website using client-side scripting and HCI principles for multiple user clients"
+      ],
+      "assignment": "Build a responsive web application for online assessment activities using HTML, CSS, JavaScript, PHP and MySQL."
+    },
+    {
+      "id": "apu-sem5-capstone",
+      "name": "Capstone Project",
+      "semester": 5,
+      "prerequisites": [],
+      "required_competencies": null,
+      "target_competencies": [
+        "requirements-analysis",
+        "system-design",
+        "software-development",
+        "testing",
+        "documentation",
+        "teamwork",
+        "presentation"
+      ],
+      "reuse_signals": [],
+      "outcomes": [
+        "Design, develop, test and implement an extensive application",
+        "Develop teamwork and coordination competency within a set period",
+        "Present a software development project professionally"
+      ],
+      "assignment": "Fourteen-week group software project spanning proposal, development, documentation and presentation deliverables."
+    }
+  ]
+}

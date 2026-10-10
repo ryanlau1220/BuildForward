@@ -6,7 +6,9 @@ class ModuleIn(BaseModel):
     name: str
     semester: int = Field(ge=1, le=20)
     prerequisites: list[str] = []
-    required_competencies: list[str] = []
+    # Omitted/null means the source has not established a competency map.
+    # An explicit empty list means a reviewer confirmed that none are required.
+    required_competencies: list[str] | None = None
     target_competencies: list[str] = []
     reuse_signals: list[str] = []
     outcomes: list[str] = []

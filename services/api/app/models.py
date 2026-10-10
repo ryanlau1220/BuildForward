@@ -21,7 +21,7 @@ class Module(Base):
     name: Mapped[str] = mapped_column(String(200))
     semester: Mapped[int] = mapped_column(Integer)
     prerequisites: Mapped[list] = mapped_column(JSON)
-    required_competencies: Mapped[list] = mapped_column(JSON)
+    required_competencies: Mapped[list | None] = mapped_column(JSON)
     target_competencies: Mapped[list] = mapped_column(JSON)
     reuse_signals: Mapped[list] = mapped_column(JSON)
     outcomes: Mapped[list] = mapped_column(JSON)

@@ -37,13 +37,13 @@
       "id": "apu-software-testing",
       "name": "Software Testing",
       "source_label": "User-provided Software Testing assignment brief; module order is a candidate, not independently verified",
-      "definition_file": "data/imports/oodj-coursework-candidate.json"
+      "definition_file": "data/candidates/oodj-coursework-candidate.json"
     },
     {
       "id": "apu-sem5-capstone",
       "name": "Capstone Project",
       "source_label": "User-provided Capstone Project brief; reuse policy and programme alignment require educator confirmation",
-      "definition_file": "data/imports/apu-curriculum-candidate.json"
+      "definition_file": "data/candidates/apu-curriculum-candidate.json"
     },
     {
       "id": "apu-degree-sem2-data-structure",

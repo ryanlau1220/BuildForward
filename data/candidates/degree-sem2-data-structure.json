@@ -8,7 +8,7 @@
       "name": "Data Structure (CT077-3-2-DSTR)",
       "semester": 2,
       "prerequisites": [],
-      "required_competencies": [],
+      "required_competencies": null,
       "target_competencies": [
         "cpp-programming",
         "custom-array",

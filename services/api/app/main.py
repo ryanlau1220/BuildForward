@@ -52,10 +52,24 @@ app.add_middleware(
 
 
 def module_out(m: Module) -> dict:
+    if m.required_competencies is None:
+        mapping_status = "UNKNOWN"
+    elif m.required_competencies:
+        mapping_status = "MAPPED"
+    elif m.provenance == "CONFIRMED_FACT":
+        mapping_status = "CONFIRMED_NONE"
+    elif m.provenance in {"SAMPLE", "SIMULATED"}:
+        mapping_status = "ILLUSTRATIVE"
+    else:
+        mapping_status = "NONE_RECORDED"
     return {
         "id": m.id, "name": m.name, "semester": m.semester,
         "prerequisites": m.prerequisites,
-        "required_competencies": m.required_competencies,
+        "required_competencies": (
+            None if m.required_competencies is None
+            else m.required_competencies
+        ),
+        "prerequisite_mapping_status": mapping_status,
         "target_competencies": m.target_competencies,
         "reuse_signals": m.reuse_signals,
         "outcomes": m.outcomes, "assignment": m.assignment,
@@ -136,8 +150,13 @@ def workspace(
     modules = db.scalars(
         select(Module).where(Module.programme_id == programme.id).order_by(Module.semester)
     ).all()
-    if any(m.provenance == "EXTRACTED_CANDIDATE" for m in modules):
-        raise HTTPException(409, "Confirm curriculum data before prediction")
+    unresolved = [m for m in modules if m.provenance == "EXTRACTED_CANDIDATE"]
+    if unresolved:
+        unknown = [m.name for m in unresolved
+                   if m.required_competencies is None]
+        detail = ("Map or explicitly confirm no required skills for: " + ", ".join(unknown)
+                  if unknown else "Confirm curriculum data before prediction")
+        raise HTTPException(409, detail)
     next_module = next((m for m in modules if m.semester > cohort.current_semester), None)
     return {
         "notice": (
@@ -167,7 +186,11 @@ def import_programme(payload: ProgrammeIn, db: Session = Depends(get_db)) -> dic
     db.add(Programme(id=payload.id, name=payload.name, source_label=payload.source_label,
                      provenance="EXTRACTED_CANDIDATE"))
     for item in payload.modules:
-        db.add(Module(**item.model_dump(), programme_id=payload.id, provenance="EXTRACTED_CANDIDATE"))
+        db.add(Module(
+            **item.model_dump(),
+            programme_id=payload.id,
+            provenance="EXTRACTED_CANDIDATE",
+        ))
     db.commit()
     return {"id": payload.id, "provenance": "EXTRACTED_CANDIDATE",
             "next_step": "Review imported modules and call confirm before prediction"}
@@ -190,12 +213,25 @@ def confirm_programme(programme_id: str, db: Session = Depends(get_db)) -> dict:
         raise HTTPException(404, "Programme not found")
     if programme.provenance != "EXTRACTED_CANDIDATE":
         raise HTTPException(409, "Only imported candidates can be confirmed")
-    programme.provenance = "CONFIRMED_FACT"
     modules = db.scalars(select(Module).where(Module.programme_id == programme_id)).all()
+    unmapped = [module.name for module in modules
+                if module.required_competencies is None]
+    if unmapped:
+        raise HTTPException(
+            409,
+            "Required-skill mapping is unknown for: " + ", ".join(unmapped)
+            + ". Provide required_competencies or explicitly confirm an empty list.",
+        )
+    programme.provenance = "CONFIRMED_FACT"
     for module in modules:
-        module.provenance = "CONFIRMED_FACT"
+        if module.provenance == "EXTRACTED_CANDIDATE":
+            module.provenance = "CONFIRMED_FACT"
     db.commit()
-    return {"id": programme_id, "provenance": "CONFIRMED_FACT"}
+    return {
+        "id": programme_id,
+        "provenance": "CONFIRMED_FACT",
+        "next_step": "Reviewed curriculum is ready for prediction",
+    }
 
 
 @app.post("/api/v1/cohorts/import", status_code=201)
@@ -334,6 +370,8 @@ def predict_continuity(payload: ContinuityRequest, db: Session = Depends(get_db)
     if not project or not module:
         raise HTTPException(404, "Project or module not found")
     require_confirmed(project.provenance)
+    if module.required_competencies is None:
+        raise HTTPException(409, "Map required skills or explicitly confirm none before prediction")
     require_confirmed(module.provenance)
     return continuity(project, module)
 
@@ -345,6 +383,11 @@ def predict_gap(payload: ForecastRequest, db: Session = Depends(get_db)) -> dict
         raise HTTPException(404, "Cohort not found")
     require_confirmed(cohort.provenance)
     modules = db.scalars(select(Module).where(Module.programme_id == cohort.programme_id)).all()
-    if any(module.provenance == "EXTRACTED_CANDIDATE" for module in modules):
-        raise HTTPException(409, "Confirm curriculum data before prediction")
+    unresolved = [module for module in modules if module.provenance == "EXTRACTED_CANDIDATE"]
+    if unresolved:
+        unknown = [module.name for module in unresolved
+                   if module.required_competencies is None]
+        detail = ("Map or explicitly confirm no required skills for: " + ", ".join(unknown)
+                  if unknown else "Confirm curriculum data before prediction")
+        raise HTTPException(409, detail)
     return forecast(cohort, modules, payload.intervention)

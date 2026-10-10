@@ -3,6 +3,7 @@ import os
 import tempfile
 import uuid
 import zipfile
+from types import SimpleNamespace
 
 from fastapi.testclient import TestClient
 
@@ -104,6 +105,35 @@ def test_sample_predictions_are_explained_and_scenario_is_labelled():
         )
 
 
+def test_out_of_training_range_count_features_can_change_model_decision():
+    from app.intelligence import load_continuity_model
+
+    model = load_continuity_model()["model"]
+    ordinary = model.predict([[0.0, 1, 0.5, 1, 8]])[0]
+    outlier = model.predict([[0.0, 1, 0.5, 2000, 2000]])[0]
+    assert ordinary == "PARTIAL_REUSE"
+    assert outlier == "RESET"
+
+
+def test_sparse_project_emits_a_low_evidence_signal_without_probability_claim():
+    from app.intelligence import continuity
+
+    project = SimpleNamespace(
+        id="sparse-project", competencies=[], evidence=[], files_scanned=0,
+        provenance="CONFIRMED_FACT",
+    )
+    module = SimpleNamespace(
+        id="future-module", required_competencies=[], target_competencies=[],
+        reuse_signals=[],
+    )
+    result = continuity(project, module)
+    assert result["model_features"]["evidence_count"] == 0
+    assert result["model_features"]["files_scanned"] == 0
+    assert result["decision"] in {"CONTINUE", "PARTIAL_REUSE", "RESET"}
+    assert result["human_decision_required"] is True
+    assert "probability" not in result
+
+
 def test_supplied_material_candidates_are_seeded_but_not_confirmed():
     with TestClient(app) as client:
         curriculum = client.get("/api/v1/programmes/apu-coursework-sequence").json()
@@ -119,7 +149,8 @@ def test_supplied_material_candidates_are_seeded_but_not_confirmed():
         dstr_module = next(m for m in dstr["modules"]
                            if m["id"] == "apu-degree-sem2-data-structure")
         assert dstr_module["semester"] == 2
-        assert dstr_module["required_competencies"] == []
+        assert dstr_module["required_competencies"] is None
+        assert dstr_module["prerequisite_mapping_status"] == "UNKNOWN"
         assert "custom-array" in dstr_module["target_competencies"]
         assert "singly-linked-list" in dstr_module["target_competencies"]
         assert [module["semester"] for module in oodj["modules"]] == [1, 2]
@@ -240,6 +271,7 @@ def test_imported_curriculum_and_cohort_are_blocked_until_reviewed():
             "id": programme_id, "name": "Reviewed test pathway", "source_label": "test fixture",
             "modules": [
                 {"id": f"foundation-{suffix}", "name": "Foundation", "semester": 1,
+                 "required_competencies": [],
                  "target_competencies": ["object-oriented-design"]},
                 {"id": f"testing-{suffix}", "name": "Testing", "semester": 2,
                  "prerequisites": [f"foundation-{suffix}"],
@@ -268,3 +300,28 @@ def test_imported_curriculum_and_cohort_are_blocked_until_reviewed():
         assert ready.status_code == 200
         assert ready.json()["programme"]["provenance"] == "CONFIRMED_FACT"
         assert ready.json()["continuity"]["module_id"] == f"testing-{suffix}"
+
+
+def test_unknown_prerequisite_mapping_cannot_be_confirmed_as_no_requirements():
+    suffix = uuid.uuid4().hex[:8]
+    programme_id = f"unmapped-{suffix}"
+    with TestClient(app) as client:
+        imported = client.post("/api/v1/programmes/import", json={
+            "id": programme_id,
+            "name": "Unmapped pathway",
+            "source_label": "review fixture",
+            "modules": [{
+                "id": f"module-{suffix}", "name": "Unmapped Module", "semester": 1,
+                "target_competencies": ["unit-testing"],
+            }],
+        })
+        assert imported.status_code == 201
+        module = next(m for m in client.get("/api/v1/modules").json()
+                      if m["id"] == f"module-{suffix}")
+        assert module["required_competencies"] is None
+        assert module["prerequisite_mapping_status"] == "UNKNOWN"
+        assert module["provenance"] == "EXTRACTED_CANDIDATE"
+
+        confirmed = client.post(f"/api/v1/programmes/{programme_id}/confirm")
+        assert confirmed.status_code == 409
+        assert "required-skill mapping is unknown" in confirmed.json()["detail"].lower()

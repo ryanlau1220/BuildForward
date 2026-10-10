@@ -1,0 +1,87 @@
+[
+  {
+    "id": "submission-ivip-hotel-reservation",
+    "name": "Hotel Reservation System — IVIP project submission",
+    "source_label": "User-supplied data/submissions/IVIP_Assignment.docx; report summary only, source code not scanned or run.",
+    "originating_module_id": "apu-sem1-visual-interactive",
+    "competencies": ["interactive-application-design", "visual-programming", "input-validation"],
+    "evidence": [
+      {"competency": "interactive-application-design", "source": "IVIP_Assignment.docx · project overview", "detail": "The report describes a hotel reservation application with customer and administrator functions."},
+      {"competency": "visual-programming", "source": "IVIP_Assignment.docx · programming concepts", "detail": "The report includes a visual-programming coursework project; implementation files were not supplied as a repository."},
+      {"competency": "input-validation", "source": "IVIP_Assignment.docx · project report", "detail": "Input and interaction behavior is described in the coursework report; runtime behavior was not verified."}
+    ],
+    "languages": [],
+    "files_scanned": 0
+  },
+  {
+    "id": "submission-dbm-elibrary",
+    "name": "E-Library Management System — DBM project submission",
+    "source_label": "User-supplied data/submissions/DBM_Assignment.docx; report summary only, source code not scanned or run.",
+    "originating_module_id": "apu-sem2-database-management",
+    "competencies": ["database-design", "normalization", "data-modelling", "sql-ddl", "sql-dml"],
+    "evidence": [
+      {"competency": "database-design", "source": "DBM_Assignment.docx · coursework", "detail": "The report documents an E-Library Management System database design."},
+      {"competency": "normalization", "source": "DBM_Assignment.docx · normalization section", "detail": "The report presents normalization from UNF through 3NF."},
+      {"competency": "data-modelling", "source": "DBM_Assignment.docx · ERD section", "detail": "The report includes an entity-relationship model."},
+      {"competency": "sql-ddl", "source": "DBM_Assignment.docx · database schema", "detail": "The report documents a database schema and table definitions."},
+      {"competency": "sql-dml", "source": "DBM_Assignment.docx · query section", "detail": "The report includes data-manipulation queries and results."}
+    ],
+    "languages": ["SQL"],
+    "files_scanned": 0
+  },
+  {
+    "id": "submission-pwp-business-system",
+    "name": "Customer and Inventory System — PWP project submission",
+    "source_label": "User-supplied data/submissions/PWP_Assignment.docx; report summary only, source code not scanned or run.",
+    "originating_module_id": "apu-sem3-programming-python",
+    "competencies": ["python-programming", "modularity", "file-persistence", "input-validation", "role-based-access", "business-logic"],
+    "evidence": [
+      {"competency": "python-programming", "source": "PWP_Assignment.docx · source code section", "detail": "The report documents a Python business application."},
+      {"competency": "modularity", "source": "PWP_Assignment.docx · contents", "detail": "Separate customer, inventory, administrator and super-user areas are documented."},
+      {"competency": "file-persistence", "source": "PWP_Assignment.docx · additional features", "detail": "The report documents reading and writing application records to files."},
+      {"competency": "input-validation", "source": "PWP_Assignment.docx · source code section", "detail": "Validation helpers and input handling are described in the report."},
+      {"competency": "role-based-access", "source": "PWP_Assignment.docx · user management", "detail": "Customer, inventory staff, administrator and super-user roles are documented."},
+      {"competency": "business-logic", "source": "PWP_Assignment.docx · project functions", "detail": "Customer orders, inventory and payment flows are documented."}
+    ],
+    "languages": ["Python"],
+    "files_scanned": 0
+  },
+  {
+    "id": "submission-rwdd-quizitup",
+    "name": "QuizItUp — RWDD project submission",
+    "source_label": "User-supplied data/submissions/RWDD_Assignment.docx; report summary only, source code not scanned or run.",
+    "originating_module_id": "apu-sem4-responsive-web",
+    "competencies": ["html", "css", "javascript", "php", "mysql", "responsive-design", "crud", "form-validation"],
+    "evidence": [
+      {"competency": "responsive-design", "source": "RWDD_Assignment.docx · project report", "detail": "The report documents desktop and mobile layouts for the QuizItUp website."},
+      {"competency": "php", "source": "RWDD_Assignment.docx · implementation section", "detail": "PHP pages and server-side handlers are documented."},
+      {"competency": "javascript", "source": "RWDD_Assignment.docx · implementation section", "detail": "Client-side JavaScript interactions are documented."},
+      {"competency": "mysql", "source": "RWDD_Assignment.docx · implementation section", "detail": "The report describes MySQL-backed application data."},
+      {"competency": "crud", "source": "RWDD_Assignment.docx · admin functions", "detail": "Quiz and learning-material create, view, update and delete flows are documented."},
+      {"competency": "form-validation", "source": "RWDD_Assignment.docx · implementation section", "detail": "Form and account-input handling are described; execution was not verified."}
+    ],
+    "languages": ["HTML", "CSS", "JavaScript", "PHP"],
+    "files_scanned": 0
+  },
+  {
+    "id": "submission-capstone-nextgen-fitness",
+    "name": "NextGen Fitness - Capstone Project submission",
+    "source_label": "User-supplied data/submissions/CapstoneProject_Assignment.docx; report summary only, source code not scanned or run.",
+    "originating_module_id": "apu-sem5-capstone",
+    "competencies": ["requirements-analysis", "system-design", "software-development", "testing", "documentation", "teamwork", "presentation", "python-programming", "mobile-application-development", "api-integration"],
+    "evidence": [
+      {"competency": "requirements-analysis", "source": "CapstoneProject_Assignment.docx · project report", "detail": "The report documents project context, requirements and scope."},
+      {"competency": "system-design", "source": "CapstoneProject_Assignment.docx · design sections", "detail": "The report documents application design and architecture."},
+      {"competency": "software-development", "source": "CapstoneProject_Assignment.docx · implementation sections", "detail": "The report describes a fitness application with a Flutter client and Python backend."},
+      {"competency": "testing", "source": "CapstoneProject_Assignment.docx · evaluation sections", "detail": "The report documents user acceptance testing; test execution was not independently verified."},
+      {"competency": "documentation", "source": "CapstoneProject_Assignment.docx", "detail": "A capstone project report was supplied."},
+      {"competency": "teamwork", "source": "CapstoneProject_Assignment.docx · project report", "detail": "The report includes group planning and workload documentation."},
+      {"competency": "presentation", "source": "CapstoneProject_Assignment.docx · capstone brief", "detail": "The report follows a capstone project with a presentation deliverable."},
+      {"competency": "python-programming", "source": "CapstoneProject_Assignment.docx · technical overview", "detail": "The report describes a Python backend."},
+      {"competency": "mobile-application-development", "source": "CapstoneProject_Assignment.docx · technical overview", "detail": "The report describes a Flutter mobile client."},
+      {"competency": "api-integration", "source": "CapstoneProject_Assignment.docx · technical overview", "detail": "The report describes frontend and backend integration; behavior was not run or verified."}
+    ],
+    "languages": ["Python", "Dart"],
+    "files_scanned": 0
+  }
+]
