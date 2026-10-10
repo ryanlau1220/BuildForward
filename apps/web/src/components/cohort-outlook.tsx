@@ -11,6 +11,11 @@ function CoverageBar({ current, projected, target }: { current: number; projecte
 
 function Percent({ value }: { value: number }) { return <>{Math.round(value * 100)}%</>; }
 
+function chooseScenarioSkill(skill: string, onSkillChange: (skill: string) => void) {
+  onSkillChange(skill);
+  document.getElementById("scenario-skill")?.focus({ preventScroll: true });
+}
+
 export function CohortOutlook({
   demo, positiveGaps, interventionSkill, gain, busy, linkedFocus, activeIntervention,
   onSkillChange, onGainChange, onCompare,
@@ -37,7 +42,7 @@ export function CohortOutlook({
         <div className="surface-heading"><div><p className="eyebrow">SKILLS TO REVIEW</p><h3 id="gaps-title">Predicted Skill Gaps at Graduation</h3></div><span className="target-legend"><i />Illustrative target</span></div>
         {positiveGaps.length ? <div className="gap-list">
           {positiveGaps.map((finding, index) => <article className="gap-row" key={finding.competency}>
-            <div className="gap-heading"><span className="rank-number">{String(index + 1).padStart(2, "0")}</span><strong>{label(finding.competency)}</strong><span className={`priority ${finding.priority_score !== null ? "market" : "gap-only"}`} title="Planning score, not a probability">{finding.priority_score !== null ? `Score ${finding.priority_score.toFixed(3)}` : "Gap only"}</span></div>
+            <div className="gap-heading"><span className="rank-number">{String(index + 1).padStart(2, "0")}</span><button className="skill-select-link" type="button" onClick={() => chooseScenarioSkill(finding.competency, onSkillChange)} aria-label={`Use ${label(finding.competency)} in the recommended action scenario`}>{label(finding.competency)}</button><span className={`priority ${finding.priority_score !== null ? "market" : "gap-only"}`} title="Planning score, not a probability">{finding.priority_score !== null ? `Score ${finding.priority_score.toFixed(3)}` : "Gap only"}</span></div>
             <CoverageBar current={finding.current_coverage} projected={finding.projected_graduation_coverage} target={finding.programme_target} />
             <div className="coverage-labels"><span><b><Percent value={finding.current_coverage} /></b> current</span><span><b><Percent value={finding.projected_graduation_coverage} /></b> expected skill coverage at graduation</span><span><b>{finding.future_module_opportunities}</b> future learning opportunities</span></div>
             {finding.market_evidence ? <p className="market-signal">

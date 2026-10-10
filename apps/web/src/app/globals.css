@@ -134,6 +134,9 @@ button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible
 .gap-heading { display: flex; align-items: center; gap: 9px; }
 .rank-number { color: #74857c; font-size: 10px; font-variant-numeric: tabular-nums; }
 .gap-heading strong { font-size: 12px; font-weight: 680; }
+.skill-select-link { border: 0; background: transparent; padding: 0; color: var(--ink); font-size: 12px; font-weight: 680; text-align: left; text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 3px; }
+.skill-select-link:hover { color: var(--green-dark); text-decoration-color: currentColor; }
+.skill-select-link:focus-visible { border-radius: 2px; }
 .priority { margin-left: auto; border-radius: 99px; background: var(--amber-soft); padding: 3px 7px; color: #67470e; font-size: 10px; font-weight: 690; text-transform: capitalize; }
 .priority.market { background: #e5f0ea; color: #24523f; }
 .priority.gap-only { background: #eef0ed; color: var(--muted); }
