@@ -1,6 +1,6 @@
 # Model and repository robustness review
 
-This review records concrete behavior of the current static analyzer and Project Reuse Check model. It is a focused proof-of-concept evaluation, not a measured real-world false-alarm rate. The real project-module set has 15 candidates and zero human-reviewed labels, so false positives and false negatives on real reuse decisions cannot yet be estimated.
+This review records concrete behavior of the current static analyzer and Project Reuse Check model. It is a focused proof-of-concept evaluation, not a measured real-world false-alarm rate. The real-repository set has 15 hypothetical pairings: 13 AI-proposed labels approved by the project owner, 9 with complete model features, 4 unscored Capstone labels, and 2 same-module submissions excluded from reuse labeling. Agreement on the 9 scored pairs is macro-F1 0.62 for the model and 0.46 for the simple baseline. This measures agreement with hypothetical judgments, not false positives or negatives on observed student reuse decisions.
 
 ## Scenarios checked
 
@@ -29,6 +29,7 @@ This confirms that out-of-training-range counts can affect decisions. It does no
 - Missing prerequisite data is blocked rather than imputed. An explicit empty requirement list is accepted only as a reviewed assertion.
 - Static repository evidence does not prove code quality, successful tests, student proficiency, project ownership, or educational suitability.
 - Human review remains required before acting on a prediction.
+- The external review labels are project-owner-approved AI proposals, not independent educator judgments. The model disagrees on three Software Testing pairs: OODJ is predicted PARTIAL_REUSE against CONTINUE, while FlowQuest and Java Sem 5 HRMS are predicted RESET against PARTIAL_REUSE. Nine scored pairs are too few to estimate generalisation or to justify tuning the model to them.
 
 ## Reproduction
 
