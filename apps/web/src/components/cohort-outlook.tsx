@@ -1,10 +1,13 @@
 import { label, projectReuseDecisionLabel, studentIntakeLabel, type Continuity, type Demo, type Finding, type Project } from "@/lib/api";
 
 function CoverageBar({ current, projected, target }: { current: number; projected: number; target: number }) {
-  return <div className="coverage-track" role="img" aria-label={`Current skill coverage ${Math.round(current * 100)} percent, expected skill coverage at graduation ${Math.round(projected * 100)} percent, illustrative target ${Math.round(target * 100)} percent`}>
+  const valuesClose = projected - current < 0.1;
+  return <div className={`coverage-track${valuesClose ? " coverage-values-close" : ""}`} role="img" aria-label={`Current skill coverage ${Math.round(current * 100)} percent, expected skill coverage at graduation ${Math.round(projected * 100)} percent, illustrative target ${Math.round(target * 100)} percent`}>
     <span className="coverage-current" style={{ width: `${current * 100}%` }} />
     <span className="coverage-future" style={{ left: `${current * 100}%`, width: `${Math.max(0, projected - current) * 100}%` }} />
     <span className="coverage-target" style={{ left: `${target * 100}%` }} />
+    <span className="coverage-value coverage-value-current" style={{ left: `clamp(20px, ${current * 100}%, calc(100% - 20px))` }} aria-hidden="true">{Math.round(current * 100)}%</span>
+    <span className="coverage-value coverage-value-projected" style={{ left: `clamp(20px, ${projected * 100}%, calc(100% - 20px))` }} aria-hidden="true">{Math.round(projected * 100)}%</span>
   </div>;
 }
 
@@ -62,12 +65,12 @@ export function CohortOutlook({
     <p className="small-note">A student intake is a group of students progressing through this programme together. It is not a semester.</p>
     <div className="outlook-grid">
       <section className="surface gap-panel" aria-labelledby="gaps-title">
-        <div className="surface-heading"><div><p className="eyebrow">SKILLS TO REVIEW</p><h3 id="gaps-title">Predicted Skill Gaps at Graduation</h3></div><span className="target-legend"><i />Illustrative target</span></div>
+        <div className="surface-heading"><div><p className="eyebrow">SKILLS TO REVIEW</p><h3 id="gaps-title">Predicted Skill Gaps at Graduation</h3></div><span className="target-legend"><i />{positiveGaps[0] ? `${Math.round(positiveGaps[0].programme_target * 100)}% illustrative target` : "Illustrative target"}</span></div>
         {positiveGaps.length ? <div className="gap-list">
           {positiveGaps.map((finding, index) => <article className="gap-row" key={finding.competency}>
             <div className="gap-heading"><span className="rank-number">{String(index + 1).padStart(2, "0")}</span><button className="skill-select-link" type="button" onClick={() => chooseScenarioSkill(finding.competency, onSkillChange)} aria-label={`Use ${label(finding.competency)} in the recommended action scenario`}>{label(finding.competency)}</button><span className={`priority ${finding.priority_score !== null ? "market" : "gap-only"}`} title="Planning score, not a probability">{finding.priority_score !== null ? `Score ${finding.priority_score.toFixed(4)}` : "Gap only"}</span></div>
             <CoverageBar current={finding.current_coverage} projected={finding.projected_graduation_coverage} target={finding.programme_target} />
-            <div className="coverage-labels"><span><b><Percent value={finding.current_coverage} /></b> current</span><span><b><Percent value={finding.projected_graduation_coverage} /></b> expected skill coverage at graduation</span><span><b>{finding.future_module_opportunities}</b> future learning opportunities</span></div>
+            <div className="coverage-labels"><span className="coverage-label-current">Current coverage</span><span className="coverage-label-projected">Expected skill coverage at graduation</span><span><b>{finding.future_module_opportunities}</b> future learning opportunities</span></div>
             {finding.market_evidence ? <p className="market-signal">
               <strong>{finding.market_evidence.occupation.online_offerings.toLocaleString()}</strong> DOSM online job offerings for <a href={finding.market_evidence.occupation.source} target="_blank" rel="noreferrer">{finding.market_evidence.occupation.name}</a> in Q2 2026
               <span>{((finding.market_relevance ?? 0) * 100).toFixed(1)}% of {finding.market_evidence.occupation.total_online_offerings.toLocaleString()} online offerings were for this occupation, not this skill.</span>

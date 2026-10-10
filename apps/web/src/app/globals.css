@@ -137,13 +137,22 @@ button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible
 .priority { margin-left: auto; border-radius: 99px; background: var(--amber-soft); padding: 3px 7px; color: #67470e; font-size: 10px; font-weight: 690; text-transform: capitalize; }
 .priority.market { background: #e5f0ea; color: #24523f; }
 .priority.gap-only { background: #eef0ed; color: var(--muted); }
-.coverage-track { position: relative; height: 8px; margin: 12px 0 7px; border-radius: 99px; background: #e8eeea; }
-.coverage-current, .coverage-future { position: absolute; top: 0; height: 8px; }
+.coverage-track { position: relative; height: 26px; margin: 12px 0 7px; border-radius: 99px; background: #e8eeea; }
+.coverage-current, .coverage-future { position: absolute; top: 0; height: 100%; }
 .coverage-current { left: 0; border-radius: 99px 0 0 99px; background: var(--green); }
 .coverage-future { background: #a7c9b3; }
-.coverage-target { position: absolute; top: -4px; height: 16px; border-left: 2px dashed var(--amber); }
+.coverage-target { position: absolute; z-index: 2; top: -4px; height: calc(100% + 8px); border-left: 2px dashed var(--amber); }
+.coverage-value { position: absolute; z-index: 1; top: 50%; display: grid; min-width: 36px; height: 20px; place-items: center; border-radius: 99px; padding: 0 4px; font-size: 10px; font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1; transform: translate(-50%, -50%); }
+.coverage-value-current { background: var(--green-dark); color: #fff; }
+.coverage-value-projected { background: #e7f2ed; color: #174d3f; box-shadow: 0 0 0 1px #7ea68c; }
+.coverage-values-close { height: 36px; }
+.coverage-values-close .coverage-value-current { top: 28%; }
+.coverage-values-close .coverage-value-projected { top: 72%; }
 .coverage-labels { display: flex; flex-wrap: wrap; gap: 5px 15px; color: var(--muted); font-size: 10px; }
 .coverage-labels b { color: var(--ink); font-weight: 700; }
+.coverage-label-current::before, .coverage-label-projected::before { display: inline-block; width: 7px; height: 7px; margin-right: 5px; border-radius: 50%; content: ""; }
+.coverage-label-current::before { background: var(--green); }
+.coverage-label-projected::before { background: #a7c9b3; }
 .priority-reason { margin: 7px 0 0; color: var(--muted); font-size: 11px; line-height: 1.45; }
 .market-signal { display: flex; flex-wrap: wrap; gap: 3px 6px; margin: 7px 0 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
 .market-signal strong { color: var(--green); }
