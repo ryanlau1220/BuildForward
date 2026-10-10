@@ -27,6 +27,13 @@ def test_scalar_docs_replace_swagger_and_redoc():
         assert "/docs" not in client.get("/openapi.json").json()["paths"]
 
 
+def test_project_choices_include_coursework_link():
+    with TestClient(app) as client:
+        projects = client.get("/api/v1/projects").json()
+        sample = next(project for project in projects if project["id"] == "sample-record-app")
+        assert sample["originating_module_id"] == "oop"
+
+
 def archive(files: dict[str, str]) -> bytes:
     output = io.BytesIO()
     with zipfile.ZipFile(output, "w") as zipped:

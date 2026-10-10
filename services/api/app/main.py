@@ -110,7 +110,8 @@ def list_modules(db: Session = Depends(get_db)) -> list[dict]:
 
 @app.get("/api/v1/projects")
 def list_projects(db: Session = Depends(get_db)) -> list[dict]:
-    return [{"id": p.id, "name": p.name, "provenance": p.provenance}
+    return [{"id": p.id, "name": p.name, "provenance": p.provenance,
+             "originating_module_id": p.originating_module_id}
             for p in db.scalars(select(Project).order_by(Project.name)).all()]
 
 

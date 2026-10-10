@@ -3,71 +3,223 @@
 import { useEffect, useMemo, useState } from "react";
 import { api, label, type Continuity, type Demo, type Forecast, type Project } from "@/lib/api";
 
-type View = "overview" | "continuity" | "evidence" | "sources";
-type Choice = { id: string; name: string; provenance: string; programme_id?: string };
-type ModuleChoice = { id: string; name: string; semester: number; provenance: string; programme_name: string; outcomes: string[] };
-type CurriculumCandidate = { id: string; name: string; source_label: string; provenance: string; modules: { id: string; name: string; semester: number; outcomes: string[]; assignment: string; provenance: string }[] };
-const views: { id: View; name: string; number: string }[] = [
-  { id: "overview", name: "Overview", number: "01" },
-  { id: "continuity", name: "Project continuity", number: "02" },
-  { id: "evidence", name: "Evidence", number: "03" },
-  { id: "sources", name: "Sources & import", number: "04" },
-];
+type Choice = {
+  id: string;
+  name: string;
+  provenance: string;
+  programme_id?: string;
+  originating_module_id?: string | null;
+};
+type ModuleChoice = {
+  id: string;
+  name: string;
+  semester: number;
+  provenance: string;
+  programme_id: string;
+  programme_name: string;
+  outcomes: string[];
+  target_competencies?: string[];
+};
+type CurriculumCandidate = {
+  id: string;
+  name: string;
+  source_label: string;
+  provenance: string;
+  modules: {
+    id: string;
+    name: string;
+    semester: number;
+    outcomes: string[];
+    assignment: string;
+    provenance: string;
+  }[];
+};
+
+function Provenance({ value }: { value: string }) {
+  const text = value.replaceAll("_", " ").toLowerCase();
+  return <span className={`provenance ${value.toLowerCase()}`}>{text}</span>;
+}
 
 function Percent({ value }: { value: number }) {
   return <>{Math.round(value * 100)}%</>;
 }
 
-function Provenance({ value }: { value: string }) {
-  return <span className={`provenance ${value.toLowerCase()}`}>{value.replaceAll("_", " ")}</span>;
-}
-
-function CoverageBar({ current, projected, target = 0.7 }: { current: number; projected: number; target?: number }) {
-  return <div className="coverage-track">
+function CoverageBar({ current, projected, target }: { current: number; projected: number; target: number }) {
+  return <div
+    className="coverage-track"
+    role="img"
+    aria-label={`Current ${Math.round(current * 100)} percent; projected ${Math.round(projected * 100)} percent; target ${Math.round(target * 100)} percent`}
+  >
     <span className="coverage-current" style={{ width: `${current * 100}%` }} />
     <span className="coverage-future" style={{ left: `${current * 100}%`, width: `${Math.max(0, projected - current) * 100}%` }} />
-    <span className="coverage-target" style={{ left: `${target * 100}%` }} title={`Programme target ${Math.round(target * 100)}%`} />
+    <span className="coverage-target" style={{ left: `${target * 100}%` }} />
   </div>;
 }
 
 export default function Home() {
   const [demo, setDemo] = useState<Demo | null>(null);
-  const [view, setView] = useState<View>("overview");
   const [project, setProject] = useState<Project | null>(null);
-  const [moduleId, setModuleId] = useState("testing");
   const [continuity, setContinuity] = useState<Continuity | null>(null);
   const [forecast, setForecast] = useState<Forecast | null>(null);
+  const [moduleId, setModuleId] = useState("");
   const [interventionSkill, setInterventionSkill] = useState("");
   const [gain, setGain] = useState(0.18);
-  const [repoUrl, setRepoUrl] = useState("");
   const [programmes, setProgrammes] = useState<Choice[]>([]);
-  const [availableModules, setAvailableModules] = useState<ModuleChoice[]>([]);
-  const [curriculumCandidate, setCurriculumCandidate] = useState<CurriculumCandidate | null>(null);
   const [cohorts, setCohorts] = useState<Choice[]>([]);
   const [projects, setProjects] = useState<Choice[]>([]);
-  const [workspaceIds, setWorkspaceIds] = useState({ programme_id: "sample-se", cohort_id: "sample-cohort", project_id: "sample-record-app" });
+  const [modules, setModules] = useState<ModuleChoice[]>([]);
+  const [workspaceIds, setWorkspaceIds] = useState({
+    programme_id: "sample-se",
+    cohort_id: "sample-cohort",
+    project_id: "sample-record-app",
+  });
+  const [curriculumCandidate, setCurriculumCandidate] = useState<CurriculumCandidate | null>(null);
+  const [candidateProject, setCandidateProject] = useState<Project | null>(null);
+  const [repoUrl, setRepoUrl] = useState("");
+  const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
+  const programmeModules = useMemo(() => {
+    if (!demo) return [];
+    return modules
+      .filter(m => m.programme_id === demo.programme.id && m.provenance !== "EXTRACTED_CANDIDATE")
+      .filter(m => m.semester > demo.cohort.current_semester)
+      .sort((a, b) => a.semester - b.semester);
+  }, [demo, modules]);
+  const selectedModule = programmeModules.find(m => m.id === moduleId);
+  const positiveGaps = forecast?.ranked_findings.filter(f => f.projected_gap > 0) || [];
+  const linkedFocus = selectedModule && continuity
+    ? positiveGaps.find(f =>
+      continuity.target_to_develop.includes(f.competency)
+      && selectedModule.target_competencies?.includes(f.competency),
+    )?.competency
+    : undefined;
+  const selectedLinkedFocus = selectedModule && continuity
+    && continuity.target_to_develop.includes(interventionSkill)
+    && selectedModule.target_competencies?.includes(interventionSkill)
+    ? interventionSkill
+    : undefined;
+  const activeIntervention = forecast?.intervention
+    ? forecast.ranked_findings.find(f => f.competency === forecast.intervention?.competency)
+    : undefined;
+  const illustrative = demo?.programme.provenance === "SAMPLE" || demo?.cohort.provenance === "SIMULATED";
+
   function applyWorkspace(data: Demo) {
-      setDemo(data);
-      setProject(data.project);
-      setContinuity(data.continuity);
-      setForecast(data.forecast);
-      setModuleId(data.continuity?.module_id || data.modules[0]?.id || "");
-      setInterventionSkill(data.forecast.ranked_findings[0]?.competency || "");
-      setWorkspaceIds({programme_id: data.programme.id, cohort_id: data.cohort.id, project_id: data.project.id});
+    setDemo(data);
+    setProject(data.project);
+    setContinuity(data.continuity);
+    setForecast(data.forecast);
+    setModuleId(data.continuity?.module_id || "");
+    const targetModule = data.modules.find(m => m.id === data.continuity?.module_id);
+    setInterventionSkill(data.forecast.ranked_findings.find(f =>
+      f.projected_gap > 0 && data.continuity?.target_to_develop.includes(f.competency)
+      && targetModule?.target_competencies.includes(f.competency),
+    )?.competency || data.forecast.ranked_findings.find(f => f.projected_gap > 0)?.competency || "");
+    setWorkspaceIds({
+      programme_id: data.programme.id,
+      cohort_id: data.cohort.id,
+      project_id: data.project.id,
+    });
   }
 
   async function refreshChoices() {
-    const [p, c, r, m] = await Promise.all([
+    const [programmesResponse, cohortsResponse, projectsResponse, modulesResponse] = await Promise.all([
       api<Choice[]>("/api/v1/programmes"),
       api<Choice[]>("/api/v1/cohorts"),
       api<Choice[]>("/api/v1/projects"),
       api<ModuleChoice[]>("/api/v1/modules"),
     ]);
-    setProgrammes(p); setCohorts(c); setProjects(r); setAvailableModules(m);
+    setProgrammes(programmesResponse);
+    setCohorts(cohortsResponse);
+    setProjects(projectsResponse);
+    setModules(modulesResponse);
+  }
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const choicesPromise = refreshChoices();
+        let data: Demo;
+        const saved = window.localStorage.getItem("buildforward-workspace");
+        if (saved) {
+          try {
+            data = await api<Demo>(`/api/v1/workspace?${new URLSearchParams(JSON.parse(saved))}`);
+          } catch {
+            window.localStorage.removeItem("buildforward-workspace");
+            data = await api<Demo>("/api/v1/demo");
+          }
+        } else {
+          data = await api<Demo>("/api/v1/demo");
+        }
+        await choicesPromise;
+        if (!cancelled) applyWorkspace(data);
+      } catch (e) {
+        if (!cancelled) setError((e as Error).message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    void load();
+    return () => { cancelled = true; };
+  }, []);
+
+  async function loadWorkspace() {
+    setBusy(true);
+    try {
+      const data = await api<Demo>(`/api/v1/workspace?${new URLSearchParams(workspaceIds)}`);
+      applyWorkspace(data);
+      window.localStorage.setItem("buildforward-workspace", JSON.stringify(workspaceIds));
+      setMessage("Decision inputs updated.");
+      setError("");
+    } catch (e) { setError((e as Error).message); }
+    finally { setBusy(false); }
+  }
+
+  async function runContinuity() {
+    if (!project || !selectedModule) return;
+    setBusy(true);
+    try {
+      const result = await api<Continuity>("/api/v1/predictions/continuity", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ project_id: project.id, module_id: selectedModule.id }),
+      });
+      setContinuity(result);
+      const suggested = positiveGaps.find(f =>
+        result.target_to_develop.includes(f.competency)
+        && selectedModule.target_competencies?.includes(f.competency),
+      )?.competency;
+      if (suggested) setInterventionSkill(suggested);
+      setMessage("Comparison complete. Review the evidence behind the result.");
+      setError("");
+    } catch (e) { setError((e as Error).message); }
+    finally { setBusy(false); }
+  }
+
+  async function runScenario() {
+    if (!demo || !interventionSkill) return;
+    setBusy(true);
+    try {
+      const result = await api<Forecast>("/api/v1/predictions/cohort-gap", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cohort_id: demo.cohort.id,
+          intervention: {
+            competency: interventionSkill,
+            assumed_gain: gain,
+            description: "Proposed project work to reinforce this competency",
+          },
+        }),
+      });
+      setForecast(result);
+      setMessage("Scenario updated using your assumed gain.");
+      setError("");
+    } catch (e) { setError((e as Error).message); }
+    finally { setBusy(false); }
   }
 
   async function inspectCurriculum(id: string) {
@@ -77,211 +229,275 @@ export default function Home() {
     } catch (e) { setError((e as Error).message); }
   }
 
-  async function inspectProjectCandidate(id: string) {
-    try {
-      setProject(await api<Project>(`/api/v1/projects/${id}`));
-      setView("evidence");
-      setError("");
-    } catch (e) { setError((e as Error).message); }
-  }
-
   async function confirmCurriculum() {
     if (!curriculumCandidate) return;
     setBusy(true);
     try {
       await api(`/api/v1/programmes/${curriculumCandidate.id}/confirm`, { method: "POST" });
-      setMessage("Curriculum candidate confirmed. Predictions can now use its module outcomes.");
       setCurriculumCandidate(null);
       await refreshChoices();
+      setMessage("Curriculum source confirmed. It can now be selected where matching cohort data exists.");
       setError("");
     } catch (e) { setError((e as Error).message); }
     finally { setBusy(false); }
   }
 
-  useEffect(() => {
-    const saved = window.localStorage.getItem("buildforward-workspace");
-    let path = "/api/v1/demo";
-    if (saved) {
-      try { path = `/api/v1/workspace?${new URLSearchParams(JSON.parse(saved))}`; }
-      catch { window.localStorage.removeItem("buildforward-workspace"); }
-    }
-    api<Demo>(path).catch(() => api<Demo>("/api/v1/demo")).then(applyWorkspace)
-      .catch(e => setError(e.message));
-    void refreshChoices().catch(e => setError(e.message));
-  }, []);
-
-  async function loadWorkspace() {
-    setBusy(true);
+  async function inspectProject(id: string) {
     try {
-      const data = await api<Demo>(`/api/v1/workspace?${new URLSearchParams(workspaceIds)}`);
-      applyWorkspace(data);
-      window.localStorage.setItem("buildforward-workspace", JSON.stringify(workspaceIds));
-      setMessage("Workspace loaded.");
-      setError("");
-      setView("overview");
-    } catch (e) { setError((e as Error).message); }
-    finally { setBusy(false); }
-  }
-
-  const selectedModule = availableModules.find(m => m.id === moduleId);
-  const top = forecast?.ranked_findings[0];
-  const activeIntervention = forecast?.ranked_findings.find(f => f.competency === forecast.intervention?.competency);
-  const gapCount = useMemo(() => forecast?.ranked_findings.filter(f => f.projected_gap > 0).length || 0, [forecast]);
-
-  async function runContinuity(nextProject = project, nextModuleId = moduleId) {
-    if (!nextProject) return;
-    try {
-      const result = await api<Continuity>("/api/v1/predictions/continuity", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ project_id: nextProject.id, module_id: nextModuleId }),
-      });
-      setContinuity(result);
+      setCandidateProject(await api<Project>(`/api/v1/projects/${id}`));
       setError("");
     } catch (e) { setError((e as Error).message); }
-  }
-
-  async function runScenario() {
-    if (!demo || !interventionSkill) return;
-    setBusy(true);
-    try {
-      const result = await api<Forecast>("/api/v1/predictions/cohort-gap", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          cohort_id: demo.cohort.id,
-          intervention: {
-            competency: interventionSkill,
-            assumed_gain: gain,
-            description: "Proposed additional project work in a later module",
-          },
-        }),
-      });
-      setForecast(result);
-      setError("");
-      setMessage("Scenario recalculated. The gain is an assumption, not a measured result.");
-    } catch (e) { setError((e as Error).message); }
-    finally { setBusy(false); }
   }
 
   async function importZip(file: File) {
-    setBusy(true); setMessage("");
+    setBusy(true);
     try {
       const form = new FormData();
       form.append("file", file);
-      const candidate = await api<Project>("/api/v1/projects/analyze", { method: "POST", body: form });
-      setProject(candidate);
+      setCandidateProject(await api<Project>("/api/v1/projects/analyze", { method: "POST", body: form }));
       await refreshChoices();
-      setView("evidence");
-      setMessage("Repository scanned. Review the candidate evidence, then confirm it.");
+      setMessage("Project scanned. Review its evidence below before confirming it.");
       setError("");
     } catch (e) { setError((e as Error).message); }
     finally { setBusy(false); }
   }
 
   async function importGithub() {
-    setBusy(true); setMessage("");
+    setBusy(true);
     try {
-      const candidate = await api<Project>("/api/v1/projects/analyze-github", {
-        method: "POST", headers: { "Content-Type": "application/json" },
+      setCandidateProject(await api<Project>("/api/v1/projects/analyze-github", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: repoUrl }),
-      });
-      setProject(candidate);
+      }));
       await refreshChoices();
-      setView("evidence");
-      setMessage("Public repository scanned. Review the candidate evidence, then confirm it.");
+      setMessage("Repository scanned. Review its evidence below before confirming it.");
       setError("");
     } catch (e) { setError((e as Error).message); }
     finally { setBusy(false); }
+  }
+
+  async function setProjectOrigin(originModuleId: string) {
+    if (!candidateProject) return;
+    try {
+      setCandidateProject(await api<Project>(`/api/v1/projects/${candidateProject.id}/origin`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ module_id: originModuleId }),
+      }));
+      setMessage("Coursework link saved as candidate context; confirm it only if verified.");
+      setError("");
+    } catch (e) { setError((e as Error).message); }
   }
 
   async function confirmProject() {
-    if (!project) return;
+    if (!candidateProject) return;
     setBusy(true);
     try {
-      const confirmed = await api<Project>(`/api/v1/projects/${project.id}/confirm`, { method: "POST" });
-      setProject(confirmed);
-      setContinuity(null);
+      setCandidateProject(await api<Project>(`/api/v1/projects/${candidateProject.id}/confirm`, { method: "POST" }));
       await refreshChoices();
-      setMessage("Project evidence confirmed. Select a confirmed module before running a continuity comparison.");
-      setView("continuity");
+      setMessage("Project evidence confirmed. It remains separate from the active scenario until selected in a matching workspace.");
       setError("");
     } catch (e) { setError((e as Error).message); }
     finally { setBusy(false); }
   }
 
-  async function setProjectOrigin(moduleId: string) {
-    if (!project) return;
-    try {
-      const updated = await api<Project>(`/api/v1/projects/${project.id}/origin`, {
-        method: "PATCH", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ module_id: moduleId }),
-      });
-      setProject(updated);
-      setMessage("Originating module linked. Review the relationship before confirming the project.");
-      setError("");
-    } catch (e) { setError((e as Error).message); }
-  }
+  const candidateProgrammes = programmes.filter(p => p.provenance === "EXTRACTED_CANDIDATE");
+  const candidateProjects = projects.filter(p => p.provenance === "EXTRACTED_CANDIDATE");
+  const compatibleCohorts = cohorts.filter(c => c.programme_id === workspaceIds.programme_id && c.provenance !== "EXTRACTED_CANDIDATE");
+  const compatibleModules = modules.filter(m => m.programme_id === workspaceIds.programme_id);
+  const compatibleProjects = projects.filter(p => p.provenance !== "EXTRACTED_CANDIDATE"
+    && (!p.originating_module_id || compatibleModules.some(m => m.id === p.originating_module_id && m.provenance !== "EXTRACTED_CANDIDATE")));
 
-  return <div className="shell">
-    <aside className="sidebar">
-      <div className="brand"><span className="brand-mark">↗</span><div><strong>BuildForward</strong><small>CURRICULUM INTELLIGENCE</small></div></div>
-      <div className="side-rule" />
-      <div className="side-label">WORKSPACE</div>
-      <nav aria-label="Main navigation">
-        {views.map(item => <button key={item.id} className={`nav-item ${view === item.id ? "active" : ""}`} onClick={() => setView(item.id)}>
-          <span className="nav-number">{item.number}</span><span>{item.name}</span><span className="nav-arrow">↗</span>
-        </button>)}
+  if (loading) return <main className="loading">Loading the decision workflow…</main>;
+
+  return <main className="app-shell">
+    <header className="masthead">
+      <a className="wordmark" href="#top" aria-label="BuildForward home"><span className="wordmark-mark">B<span>↗</span></span><strong>BuildForward</strong></a>
+      <span className="masthead-note">A curriculum decision, grounded in student work</span>
+    </header>
+
+    {error && <div className="notice notice-error" role="alert"><span>{error}</span><button onClick={() => setError("")} aria-label="Dismiss error">×</button></div>}
+    {message && <div className="notice notice-success" role="status"><span>{message}</span><button onClick={() => setMessage("")} aria-label="Dismiss message">×</button></div>}
+
+    {!demo || !forecast || !project ? <section className="empty-workspace"><p>BuildForward needs an API connection to load the decision inputs.</p><span>Start the API, then refresh this page.</span></section> : <>
+      <section className="intro" id="top">
+        <div className="intro-copy">
+          <p className="kicker"><span className="kicker-rule" /> THE DECISION WALKTHROUGH</p>
+          <h1>Can last semester’s work<br /><em>move the next one forward?</em></h1>
+          <p className="intro-deck">Compare a project with the next module, then see which cohort skill may need attention before graduation.</p>
+        </div>
+        <div className="data-note">
+          <span className="data-note-icon">i</span>
+          <p><strong>{illustrative ? "Illustrative scenario" : "Reviewed source scenario"}</strong><br />{illustrative ? "The programme and cohort figures below are sample data, not verified university results." : "The sources were reviewed, but the forecast still uses unvalidated assumptions."}</p>
+        </div>
+      </section>
+
+      <nav className="flow-nav" aria-label="Decision walkthrough">
+        <a href="#continuity"><span>01</span> Project continuity</a>
+        <i aria-hidden="true" />
+        <a href="#cohort-outlook"><span>02</span> Cohort outlook</a>
       </nav>
-      <div className="sidebar-bottom">
-        <div className="sidebar-note"><span className="note-spark">✳</span><span>Decisions stay with educators. BuildForward only predicts, explains and recommends.</span></div>
-        <div className="sidebar-footer">PREDICT EARLY · DECIDE BETTER</div>
-      </div>
-    </aside>
 
-    <main className="main">
-      <header className="topbar"><div className="breadcrumb">PROGRAMME INTELLIGENCE <span>/</span> {views.find(v => v.id === view)?.name.toUpperCase()}</div><div className="top-actions"><span className="live-dot" /> PROOF OF CONCEPT <span className="top-separator" /> <span className="avatar">BF</span></div></header>
-      {error && <div className="alert error" role="alert"><strong>Action needed</strong><span>{error}</span><button onClick={() => setError("")}>×</button></div>}
-      {message && <div className="alert success" role="status"><strong>Updated</strong><span>{message}</span><button onClick={() => setMessage("")}>×</button></div>}
-      {!demo || !forecast || !project ? <div className="loading">Loading the curriculum workspace…</div> : <>
-        {view === "overview" && <>
-          <section className="hero"><div className="hero-copy"><div className="eyebrow"><span className="eyebrow-line" /> THE EARLY SIGNAL</div><h1>See the gap <em>before</em><br /> graduation.</h1><p>Turn the work students have already built into evidence for better curriculum decisions.</p><button className="primary-button" onClick={() => setView("continuity")}>Explore the decision <span>↗</span></button></div><div className="hero-graphic" aria-hidden="true"><div className="orbit orbit-one" /><div className="orbit orbit-two" /><div className="orbit orbit-three" /><div className="orbit-center"><span>BF</span><small>INSIGHT ENGINE</small></div><span className="orbit-point p1" /><span className="orbit-point p2" /><span className="orbit-point p3" /></div></section>
-          <div className="context-strip"><div><span className="context-label">PROGRAMME</span><strong>{demo.programme.name}</strong></div><div><span className="context-label">COHORT</span><strong>{demo.cohort.name}</strong></div><div><span className="context-label">DATA STATUS</span><Provenance value={demo.cohort.provenance} /></div></div>
-          <div className="section-heading"><div><div className="eyebrow dark">01 / FORECAST</div><h2>Graduation outlook</h2></div><div className="section-intro">Scenario-based forecast from current coverage and remaining modules. Programme target: <strong>70%</strong>.</div></div>
-          <div className="metrics"><article className="metric-card"><span className="metric-icon">↘</span><span className="metric-label">TOP PROJECTED GAP</span><strong>{top ? label(top.competency) : "—"}</strong><span className="metric-foot">{top ? `${Math.round(top.projected_gap * 100)} percentage points below target` : "No gap"}</span></article><article className="metric-card"><span className="metric-icon">◎</span><span className="metric-label">SKILLS BELOW TARGET</span><strong>{gapCount.toString().padStart(2, "0")}</strong><span className="metric-foot">At projected graduation</span></article><article className="metric-card"><span className="metric-icon">↗</span><span className="metric-label">FUTURE MODULES</span><strong>{demo.modules.filter(m => m.semester > demo.cohort.current_semester).length.toString().padStart(2, "0")}</strong><span className="metric-foot">Opportunities to intervene</span></article></div>
-          <div className="dashboard-grid"><section className="paper-card coverage-card"><div className="card-title"><div><span className="mini-label">RANKED FINDINGS</span><h3>Where to focus first</h3></div><span className="legend"><i /> Current <i /> Projected</span></div><div className="skill-list">{forecast.ranked_findings.slice(0, 5).map((f, i) => <div className="skill-row" key={f.competency}><div className="skill-title"><span className="rank">{String(i + 1).padStart(2, "0")}</span><strong>{label(f.competency)}</strong><span className={`risk ${f.priority.toLowerCase()}`}>{f.priority}</span></div><CoverageBar current={f.current_coverage} projected={f.projected_graduation_coverage} /><div className="skill-meta"><span><Percent value={f.current_coverage} /> now</span><span><Percent value={f.projected_graduation_coverage} /> projected</span><span>{f.priority_reason}</span></div></div>)}</div><div className="card-footer"><span>│</span> Dashed marker = 70% programme target · Ranked by projected gap</div></section><section className="paper-card opportunity-card"><div className="mini-label">02 / NEXT DECISION</div><h3>One project.<br /><em>Another chapter.</em></h3><p>Before setting a new assignment, compare an existing artifact with the next module.</p><div className="decision-preview"><div><small>EXISTING WORK</small><strong>{project.name}</strong></div><span className="flow-arrow">→</span><div><small>UPCOMING MODULE</small><strong>{selectedModule?.name}</strong></div></div><div className="decision-preview-footer"><span className={`decision-badge ${continuity?.decision.toLowerCase()}`}>{continuity?.decision.replaceAll("_", " ")}</span><button className="text-button" onClick={() => setView("continuity")}>View evidence ↗</button></div></section></div>
-          <section className="scenario-card"><div className="scenario-intro"><span className="mini-label">03 / INTERVENTION SCENARIO</span><h3>What if we reinforce a skill?</h3><p>Set an assumed coverage gain to see how the projected graduation gap could change. This is a planning scenario, not measured impact.</p></div><div className="scenario-controls"><label htmlFor="scenario-skill">COMPETENCY</label><select id="scenario-skill" value={interventionSkill} onChange={e => setInterventionSkill(e.target.value)}>{forecast.ranked_findings.filter(f => f.projected_gap > 0).map(f => <option value={f.competency} key={f.competency}>{label(f.competency)}</option>)}</select><label htmlFor="scenario-gain">ASSUMED COVERAGE GAIN <strong>+{Math.round(gain * 100)} points</strong></label><input id="scenario-gain" type="range" min="0" max="0.4" step="0.01" value={gain} onChange={e => setGain(Number(e.target.value))} /><button className="primary-button" disabled={busy} onClick={runScenario}>Compare scenarios <span>↗</span></button></div><div className="scenario-result"><span className="mini-label">PROJECTED GRADUATION GAP</span>{activeIntervention ? <><div><small>WITHOUT</small><strong><Percent value={activeIntervention.projected_gap} /></strong></div><span className="scenario-arrow">→</span><div><small>WITH PROPOSED WORK</small><strong><Percent value={activeIntervention.with_intervention_gap} /></strong></div><p>Potential reduction: <strong>{Math.round(activeIntervention.potential_gap_reduction * 100)} percentage points</strong> under your assumption.</p></> : <p>Choose a competency and compare the two projections.</p>}</div></section>
-          <div className="method-note"><strong>Read this forecast carefully.</strong> {forecast.method}. Each remaining module is assumed to add 22 percentage points of coverage for its target competencies. These are scenario assumptions, not measured student outcomes. No market data has been added yet.</div>
-        </>}
+      <section className="flow-section continuity-section" id="continuity">
+        <div className="section-heading">
+          <p className="step-label">01 <span>PROJECT CONTINUITY</span></p>
+          <h2>Is there something worth carrying forward?</h2>
+          <p>Match evidence from existing work against the next module’s prerequisites and reusable skills.</p>
+        </div>
 
-        {view === "continuity" && <>
-          <div className="page-intro"><div className="eyebrow dark">02 / PROJECT CONTINUITY</div><h1>Should this work <em>carry forward?</em></h1><p>Compare project evidence with the outcomes of an upcoming module. The final teaching decision remains yours.</p></div>
-          <div className="compare-controls"><div><label htmlFor="project-select">PROJECT ARTIFACT</label><strong id="project-select">{project.name}</strong><Provenance value={project.provenance} /></div><span>×</span><div><label htmlFor="module-select">TARGET MODULE</label><select id="module-select" value={moduleId} onChange={e => { setModuleId(e.target.value); setContinuity(null); }}>{availableModules.filter(m => m.provenance !== "EXTRACTED_CANDIDATE").map(m => <option value={m.id} key={m.id}>{m.name} · S{m.semester} · {m.programme_name}</option>)}</select></div><button className="primary-button" disabled={project.provenance === "EXTRACTED_CANDIDATE" || !availableModules.length} onClick={() => void runContinuity()}>Run comparison ↗</button></div>
-          <div className="result-grid"><div className="result-main"><div className="mini-label">RECOMMENDATION · HEURISTIC BASELINE</div><div className="result-word">{continuity?.decision.replaceAll("_", " ")}</div><p>{continuity?.reason}</p><div className="score-row"><div><span>Prerequisites evidenced</span><strong><Percent value={continuity?.prerequisite_coverage || 0} /></strong></div><div><span>Reusable signals</span><strong>{continuity?.reuse_signals.length || 0}</strong></div><div><span>To develop next</span><strong>{continuity?.target_to_develop.length || 0}</strong></div></div></div><div className="result-side"><span className="mini-label">WHY THIS RESULT</span><h3>Evidence before opinion.</h3><div className="factor-list"><div><span className="factor-symbol positive">+</span><span>Matched prerequisites</span><strong>{continuity?.matched_prerequisites.map(label).join(", ") || "None"}</strong></div><div><span className="factor-symbol positive">+</span><span>Reusable signals</span><strong>{continuity?.reuse_signals.map(label).join(", ") || "None"}</strong></div><div><span className="factor-symbol negative">−</span><span>Missing prerequisites</span><strong>{continuity?.missing_prerequisites.map(label).join(", ") || "None"}</strong></div></div><button className="outline-button" onClick={() => setView("evidence")}>Inspect source evidence ↗</button></div></div>
-          <div className="two-column"><section className="paper-card"><span className="mini-label">NEXT MODULE OUTCOMES</span><h3>{selectedModule?.name}</h3><ul className="outcome-list">{selectedModule?.outcomes.map(item => <li key={item}>{item}</li>)}</ul></section><section className="paper-card"><span className="mini-label">POSSIBLE EVOLUTION</span><h3>Build on what exists</h3><p>Target the skills this project has not yet demonstrated:</p><div className="tag-list">{continuity?.target_to_develop.map(skill => <span key={skill}>{label(skill)}</span>)}</div></section></div>
-          <div className="method-note">{continuity?.method}. The label supports lecturer review; it does not authorize changing an assignment.</div>
-        </>}
+        <div className="decision-layout">
+          <section className="project-card" aria-label="Project evidence">
+            <div className="card-topline"><span>EXISTING PROJECT</span><Provenance value={project.provenance} /></div>
+            <h3>{project.name}</h3>
+            <p className="project-source">{project.source_label}</p>
+            <div className="project-facts">
+              <div><strong>{project.evidence.length}</strong><span>evidence signals</span></div>
+              <div><strong>{project.languages.length ? project.languages.map(label).join(", ") : "—"}</strong><span>language detected</span></div>
+            </div>
+            <details className="evidence-details">
+              <summary>Inspect evidence from this project</summary>
+              {project.evidence.length ? <ul>{project.evidence.map((e, i) => <li key={`${e.source}-${i}`}><strong>{label(e.competency)}</strong><span>{e.detail}</span><code>{e.source}</code></li>)}</ul>
+                : <p>No static evidence was found. Review the source manually before relying on a comparison.</p>}
+            </details>
+          </section>
 
-        {view === "evidence" && <>
-          <div className="page-intro"><div className="eyebrow dark">03 / ARTIFACT EVIDENCE</div><h1>Trace every <em>claim.</em></h1><p>Static repository signals remain candidates until a person reviews and confirms them.</p></div>
-          <div className="evidence-summary"><div><span className="mini-label">ARTIFACT</span><h2>{project.name}</h2><p>{project.source_label}</p></div><div className="evidence-stats"><div><strong>{project.files_scanned}</strong><span>files scanned</span></div><div><strong>{project.competencies.length}</strong><span>candidate skills</span></div><div><strong>{project.languages.join(", ") || "—"}</strong><span>languages</span></div></div></div>
-          {project.provenance === "EXTRACTED_CANDIDATE" && <div className="origin-review"><label htmlFor="origin-module">ORIGINATING MODULE (REVIEW)</label><select id="origin-module" value={project.originating_module_id || ""} onChange={e => { if (e.target.value) void setProjectOrigin(e.target.value); }}><option value="">Choose if known</option>{availableModules.map(m => <option key={m.id} value={m.id}>{m.name} · S{m.semester} · {m.programme_name} · {m.provenance.replaceAll("_", " ")}</option>)}</select><p>Link the artifact to its source coursework when the relationship is known. Candidate modules still require separate confirmation.</p></div>}
-          <div className="evidence-header"><h3>Competency evidence</h3><Provenance value={project.provenance} /></div>
-          <div className="evidence-table"><div className="table-head"><span>COMPETENCY</span><span>SOURCE</span><span>OBSERVATION</span></div>{project.evidence.map((e, i) => <div className="evidence-row" key={i}><strong>{label(e.competency)}</strong><code>{e.source}</code><span>{e.detail}</span></div>)}</div>
-          {project.evidence.length === 0 && <div className="empty-state">No supported signals found. Review the repository manually before drawing a conclusion.</div>}
-          {project.provenance === "EXTRACTED_CANDIDATE" && <div className="review-box"><div><strong>Human review required</strong><p>Confirm only if these observations are accurate. This action promotes candidate evidence into the prediction pipeline.</p></div><button className="primary-button" disabled={busy} onClick={confirmProject}>Confirm evidence ↗</button></div>}
-          <div className="method-note">Static inspection cannot prove proficiency, code quality, successful test execution, or deployment. Review source files and project context before relying on this evidence.</div>
-        </>}
+          <section className="decision-card" aria-label="Continuity decision">
+            <div className="comparison-fields">
+              <div><span>PROGRAMME</span><strong>{demo.programme.name}</strong></div>
+              <label htmlFor="module-select"><span>NEXT MODULE</span>
+                <select id="module-select" value={moduleId} onChange={e => { setModuleId(e.target.value); setContinuity(null); }}>
+                  {programmeModules.length === 0 && <option value="">No later confirmed modules</option>}
+                  {programmeModules.map(m => <option value={m.id} key={m.id}>{m.name} · Semester {m.semester}</option>)}
+                </select>
+              </label>
+            </div>
+            <button className="primary-button" disabled={busy || !selectedModule || project.provenance === "EXTRACTED_CANDIDATE"} onClick={() => void runContinuity()}>
+              {continuity ? "Run comparison again" : "Compare project with module"}<span aria-hidden="true">↗</span>
+            </button>
+            {project.provenance === "EXTRACTED_CANDIDATE" && <p className="inline-hint">Review and confirm this project in source materials before comparing it.</p>}
+            {!programmeModules.length && <p className="inline-hint">No later confirmed modules are available in this programme.</p>}
 
-        {view === "sources" && <>
-          <div className="page-intro"><div className="eyebrow dark">04 / DATA SOURCES</div><h1>Ground the model <em>in real work.</em></h1><p>Import an actual project to replace the illustrative artifact. Extracted signals are held for review before prediction.</p></div>
-          <div className="source-grid"><section className="source-card"><span className="source-icon">↗</span><span className="mini-label">PUBLIC REPOSITORY</span><h3>Connect GitHub</h3><p>Analyze a public repository’s source tree, tests, workflows and dependency files.</p><label htmlFor="repo-url">REPOSITORY URL</label><input id="repo-url" type="url" placeholder="https://github.com/owner/repo" value={repoUrl} onChange={e => setRepoUrl(e.target.value)} /><button className="primary-button" disabled={busy || !repoUrl} onClick={importGithub}>Analyze repository <span>↗</span></button></section><section className="source-card"><span className="source-icon">▤</span><span className="mini-label">LOCAL ARTIFACT</span><h3>Upload ZIP</h3><p>Inspect a project archive without running its code. Maximum compressed size: 20 MB.</p><label className="upload-zone" htmlFor="zip-upload"><span>＋</span><strong>Choose a ZIP archive</strong><small>Files remain candidate evidence until confirmed</small></label><input id="zip-upload" className="sr-only" type="file" accept=".zip,application/zip" disabled={busy} onChange={e => { const file = e.target.files?.[0]; if (file) void importZip(file); }} /></section></div>
-          <div className="workspace-picker"><div><span className="mini-label">ACTIVE WORKSPACE</span><h3>Choose the evidence set</h3><p>Confirmed sources can be paired for a new comparison. The cohort must belong to the selected programme.</p></div><label>PROGRAMME<select value={workspaceIds.programme_id} onChange={e => {const id=e.target.value; const cohort=cohorts.find(c => c.programme_id===id);setWorkspaceIds(w=>({...w,programme_id:id,cohort_id:cohort?.id||""}));}}>{programmes.filter(p=>p.provenance!=="EXTRACTED_CANDIDATE").map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label><label>COHORT<select value={workspaceIds.cohort_id} onChange={e=>setWorkspaceIds(w=>({...w,cohort_id:e.target.value}))}>{cohorts.filter(c=>c.programme_id===workspaceIds.programme_id&&c.provenance!=="EXTRACTED_CANDIDATE").map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label><label>PROJECT<select value={workspaceIds.project_id} onChange={e=>setWorkspaceIds(w=>({...w,project_id:e.target.value}))}>{projects.filter(p=>p.provenance!=="EXTRACTED_CANDIDATE").map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label><button className="primary-button" disabled={busy||!workspaceIds.cohort_id} onClick={loadWorkspace}>Load workspace ↗</button></div>
-          {programmes.some(p => p.provenance === "EXTRACTED_CANDIDATE") && <section className="paper-card curriculum-review"><div className="card-title"><div><span className="mini-label">CURRICULUM CANDIDATE</span><h3>Review imported module material</h3></div><Provenance value="EXTRACTED_CANDIDATE" /></div><div className="candidate-list">{programmes.filter(p => p.provenance === "EXTRACTED_CANDIDATE").map(p => <button className="outline-button" key={p.id} onClick={() => void inspectCurriculum(p.id)}>{p.name} · inspect ↗</button>)}</div>{curriculumCandidate && <><p className="method-note">{curriculumCandidate.source_label}</p><div className="candidate-modules">{curriculumCandidate.modules.map(m => <article key={m.id}><span className="mini-label">SEMESTER {m.semester}</span><h4>{m.name}</h4><strong>Learning outcomes</strong><ul className="outcome-list">{m.outcomes.map(outcome => <li key={outcome}>{outcome}</li>)}</ul><strong>Assignment summary</strong><p>{m.assignment}</p></article>)}</div>{curriculumCandidate.provenance === "EXTRACTED_CANDIDATE" && <div className="review-box"><div><strong>Educator review required</strong><p>Check module names, semester order, outcomes and summaries against the supplied source files before confirming this full set.</p></div><button className="primary-button" disabled={busy} onClick={() => void confirmCurriculum()}>Confirm curriculum ↗</button></div>}</>}</section>}
-          {projects.some(p => p.provenance === "EXTRACTED_CANDIDATE") && <section className="paper-card curriculum-review"><div className="card-title"><div><span className="mini-label">PROJECT CANDIDATE</span><h3>Review repository evidence</h3></div><Provenance value="EXTRACTED_CANDIDATE" /></div><p>Inspect static evidence for the supplied public repository. Its OODJ source module is linked as a candidate relationship.</p><div className="candidate-list">{projects.filter(p => p.provenance === "EXTRACTED_CANDIDATE").map(p => <button className="outline-button" key={p.id} onClick={() => void inspectProjectCandidate(p.id)}>{p.name} · inspect evidence ↗</button>)}</div></section>}
-          <div className="source-status"><div><span className="mini-label">CURRENT SOURCE REGISTER</span><h3>What this demo is using</h3></div><div><span>Curriculum</span><Provenance value={demo.programme.provenance} /></div><div><span>Project</span><Provenance value={project.provenance} /></div><div><span>Cohort</span><Provenance value={demo.cohort.provenance} /></div><div><span>Market signals</span><strong>Not supplied</strong></div></div>
-          <div className="method-note">Curriculum import is available through <code>POST /api/v1/programmes/import</code> and must be confirmed before it is used. The OpenAPI schema is available at <a href="http://localhost:8000/docs" target="_blank" rel="noreferrer">API documentation ↗</a>.</div>
-        </>}
-      </>}
-      <footer className="footer"><span>BUILDFORWARD / PREDICTIVE CURRICULUM INTELLIGENCE</span><span>Human decision required for every recommendation.</span></footer>
-    </main>
-  </div>;
+            {continuity ? <div className="decision-result" aria-live="polite">
+              <div className="decision-result-heading">
+                <div><span className="result-caption">HEURISTIC RESULT</span><strong className={`decision-word ${continuity.decision.toLowerCase()}`}>{continuity.decision.replaceAll("_", " ")}</strong></div>
+                <span className="decision-arrow" aria-hidden="true">→</span>
+                <div className="target-module"><span>NEXT MODULE</span><strong>{selectedModule?.name}</strong></div>
+              </div>
+              <p className="decision-reason">{continuity.reason}</p>
+              <div className="evidence-columns">
+                <div><span>ALREADY SHOWN</span><strong>{continuity.matched_prerequisites.length ? continuity.matched_prerequisites.map(label).join(", ") : "No required skills matched"}</strong></div>
+                <div><span>STILL TO DEVELOP</span><strong>{continuity.target_to_develop.length ? continuity.target_to_develop.map(label).join(", ") : "No new target skills identified"}</strong></div>
+              </div>
+            </div> : <div className="decision-prompt"><span>→</span><p>Run the comparison to see whether this project should continue, be partially reused, or start fresh.</p></div>}
+            <p className="method-note">This transparent heuristic is a prototype, not a trained or validated model. A lecturer makes the final decision.</p>
+          </section>
+        </div>
+      </section>
+
+      <section className="flow-section outlook-section" id="cohort-outlook">
+        <div className="section-heading">
+          <p className="step-label">02 <span>COHORT OUTLOOK</span></p>
+          <h2>Which skill may need attention?</h2>
+          <p>Estimate where current coverage could finish, then explore a clearly labelled intervention scenario.</p>
+        </div>
+
+        <div className="outlook-layout">
+          <section className="gap-panel" aria-label="Projected cohort competency gaps">
+            <div className="panel-heading"><div><span className="card-topline">PROJECTED GRADUATION GAPS</span><h3>Where students may need more practice</h3></div><span className="target-key"><i /> 70% target</span></div>
+            <div className="gap-list">
+              {positiveGaps.slice(0, 4).map((finding, index) => <article className="gap-row" key={finding.competency}>
+                <div className="gap-title"><span>{String(index + 1).padStart(2, "0")}</span><strong>{label(finding.competency)}</strong><b>{Math.round(finding.projected_gap * 100)} pt gap</b></div>
+                <CoverageBar current={finding.current_coverage} projected={finding.projected_graduation_coverage} target={finding.programme_target} />
+                <p><span><Percent value={finding.current_coverage} /> now</span><span><Percent value={finding.projected_graduation_coverage} /> projected</span><span>{finding.future_module_opportunities} future module {finding.future_module_opportunities === 1 ? "opportunity" : "opportunities"}</span></p>
+              </article>)}
+              {!positiveGaps.length && <p className="no-gaps">No projected gaps in the current illustrative scenario.</p>}
+            </div>
+            <p className="panel-footnote">Ranked by projected gap. Remaining-module gains and the 70% target are demonstration assumptions.</p>
+          </section>
+
+          <section className="scenario-panel" aria-label="Intervention scenario">
+            <p className="card-topline">EXPLORE A POSSIBLE NEXT STEP</p>
+            <h3>{selectedLinkedFocus ? `Build on the project with ${label(selectedLinkedFocus)}.` : "What if a future project reinforced a skill?"}</h3>
+            <p className="scenario-copy">{selectedLinkedFocus
+              ? "This skill is both a target for the selected module and a projected cohort gap. The overlap is a planning prompt, not a validated recommendation."
+              : linkedFocus
+                ? `The current project and module suggest ${label(linkedFocus)} as a possible focus. Select it to connect the two findings, or explore another cohort gap. These are planning prompts, not validated recommendations.`
+                : "Choose a cohort gap and model an assumed coverage gain. This scenario is not a measured outcome."}</p>
+            <label className="field-label" htmlFor="scenario-skill">SKILL TO REINFORCE</label>
+            <select id="scenario-skill" value={interventionSkill} onChange={e => { setInterventionSkill(e.target.value); setForecast(current => current ? { ...current, intervention: null } : current); }}>
+              {positiveGaps.map(f => <option value={f.competency} key={f.competency}>{label(f.competency)}</option>)}
+            </select>
+            <label className="field-label gain-label" htmlFor="scenario-gain">ASSUMED GAIN <strong>+{Math.round(gain * 100)} percentage points</strong></label>
+            <input id="scenario-gain" type="range" min="0" max="0.4" step="0.01" value={gain} onChange={e => { setGain(Number(e.target.value)); setForecast(current => current ? { ...current, intervention: null } : current); }} />
+            <button className="primary-button" disabled={busy || !interventionSkill} onClick={() => void runScenario()}>Compare the scenario<span aria-hidden="true">↗</span></button>
+            {activeIntervention && <div className="scenario-result" aria-live="polite">
+              <span>PROJECTED GAP · {label(activeIntervention.competency)}</span>
+              <div><strong><Percent value={activeIntervention.projected_gap} /></strong><i>without</i><b aria-hidden="true">→</b><strong><Percent value={activeIntervention.with_intervention_gap} /></strong><i>with assumed gain</i></div>
+              <p>Potential reduction: <strong>{Math.round(activeIntervention.potential_gap_reduction * 100)} points</strong>, under this assumption.</p>
+            </div>}
+            <p className="scenario-disclaimer">{demo.cohort.provenance === "SIMULATED" ? "No real cohort data has been supplied. Forecast values are simulated, assumption-based and not institutionally validated." : "Forecast values depend on unvalidated assumptions and are not institutionally validated."} Market data is not included.</p>
+          </section>
+        </div>
+      </section>
+
+      <details className="source-tools">
+        <summary>Review sources or change the demo inputs</summary>
+        <div className="source-tools-inner">
+          <p className="source-context">The five supplied briefs and the Degree-level OODJ example remain separate candidate sets until their programme relationship is verified.</p>
+
+          <section className="workspace-controls">
+            <div><span className="card-topline">CURRENT SCENARIO</span><h3>Switch to another confirmed data set</h3></div>
+            <label>PROGRAMME<select value={workspaceIds.programme_id} onChange={e => {
+              const programmeId = e.target.value;
+              const cohort = cohorts.find(c => c.programme_id === programmeId && c.provenance !== "EXTRACTED_CANDIDATE");
+              const project = projects.find(p => p.provenance !== "EXTRACTED_CANDIDATE"
+                && (!p.originating_module_id || modules.some(m => m.id === p.originating_module_id
+                  && m.programme_id === programmeId && m.provenance !== "EXTRACTED_CANDIDATE")));
+              setWorkspaceIds(w => ({ ...w, programme_id: programmeId, cohort_id: cohort?.id || "", project_id: project?.id || "" }));
+            }}>{programmes.filter(p => p.provenance !== "EXTRACTED_CANDIDATE").map(p => <option value={p.id} key={p.id}>{p.name}</option>)}</select></label>
+            <label>COHORT<select value={workspaceIds.cohort_id} onChange={e => setWorkspaceIds(w => ({ ...w, cohort_id: e.target.value }))}>{compatibleCohorts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
+            <label>PROJECT<select value={workspaceIds.project_id} onChange={e => setWorkspaceIds(w => ({ ...w, project_id: e.target.value }))}>{compatibleProjects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
+            <button className="secondary-button" disabled={busy || !workspaceIds.cohort_id || !workspaceIds.project_id} onClick={() => void loadWorkspace()}>Load scenario</button>
+          </section>
+
+          {candidateProgrammes.length > 0 && <section className="candidate-section">
+            <div><span className="card-topline">COURSEWORK CANDIDATES</span><h3>Review a curriculum source</h3></div>
+            <div className="candidate-buttons">{candidateProgrammes.map(p => <button className="secondary-button" key={p.id} onClick={() => void inspectCurriculum(p.id)}>{p.name}</button>)}</div>
+            {curriculumCandidate && <div className="candidate-review">
+              <div className="candidate-review-head"><h4>{curriculumCandidate.name}</h4><Provenance value={curriculumCandidate.provenance} /></div>
+              <p>{curriculumCandidate.source_label}</p>
+              <div className="candidate-module-list">{curriculumCandidate.modules.map(m => <article key={m.id}><span>SEMESTER {m.semester}</span><strong>{m.name}</strong><p>{m.assignment}</p></article>)}</div>
+              {curriculumCandidate.provenance === "EXTRACTED_CANDIDATE" && <button className="secondary-button" disabled={busy} onClick={() => void confirmCurriculum()}>Confirm reviewed curriculum</button>}
+            </div>}
+          </section>}
+
+          <section className="candidate-section">
+            <div><span className="card-topline">PROJECT EVIDENCE</span><h3>Inspect or add a repository</h3></div>
+            {candidateProjects.length > 0 && <div className="candidate-buttons">{candidateProjects.map(p => <button className="secondary-button" key={p.id} onClick={() => void inspectProject(p.id)}>Inspect {p.name}</button>)}</div>}
+            <div className="import-row">
+              <label className="repo-input">PUBLIC REPOSITORY URL<input type="url" placeholder="https://github.com/owner/repository" value={repoUrl} onChange={e => setRepoUrl(e.target.value)} /></label>
+              <button className="secondary-button" disabled={busy || !repoUrl} onClick={() => void importGithub()}>Analyze repository</button>
+              <label className="file-input">OR UPLOAD A ZIP<input type="file" accept=".zip,application/zip" disabled={busy} onChange={e => { const file = e.target.files?.[0]; if (file) void importZip(file); }} /></label>
+            </div>
+            {candidateProject && <div className="candidate-review">
+              <div className="candidate-review-head"><h4>{candidateProject.name}</h4><Provenance value={candidateProject.provenance} /></div>
+              <p>{candidateProject.source_label} · {candidateProject.files_scanned} source files scanned</p>
+              {candidateProject.provenance === "EXTRACTED_CANDIDATE" && <label className="origin-select">LINK TO COURSEWORK (IF VERIFIED)
+                <select value={candidateProject.originating_module_id || ""} onChange={e => { if (e.target.value) void setProjectOrigin(e.target.value); }}>
+                  <option value="">No coursework link selected</option>
+                  {modules.map(m => <option key={m.id} value={m.id}>{m.name} · {m.programme_name} · {m.provenance.replaceAll("_", " ")}</option>)}
+                </select>
+              </label>}
+              {candidateProject.evidence.length ? <ul className="candidate-evidence">{candidateProject.evidence.slice(0, 6).map((e, i) => <li key={`${e.source}-${i}`}><strong>{label(e.competency)}</strong><span>{e.detail}</span><code>{e.source}</code></li>)}</ul> : <p>No supported signals found. Review the repository manually before drawing a conclusion.</p>}
+              <p className="source-context">Static inspection does not run code or prove code quality, successful tests, or student proficiency.</p>
+              {candidateProject.provenance === "EXTRACTED_CANDIDATE" && <button className="secondary-button" disabled={busy} onClick={() => void confirmProject()}>Confirm reviewed project evidence</button>}
+            </div>}
+          </section>
+        </div>
+      </details>
+    </>}
+
+    <footer className="page-footer"><span>BUILDFORWARD</span><span>Predictions support educator decisions; they do not make them.</span></footer>
+  </main>;
 }
