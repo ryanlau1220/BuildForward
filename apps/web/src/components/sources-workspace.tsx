@@ -49,7 +49,7 @@ export function SourcesWorkspace({
         {curriculumCandidate && <div className="candidate-detail">
           <div className="candidate-detail-heading"><div><span className="eyebrow">SOURCE REVIEW</span><h4>{curriculumCandidate.name}</h4></div><Provenance value={curriculumCandidate.provenance} /></div>
           <p className="source-label">{curriculumCandidate.source_label}</p>
-          <div className="programme-warning"><strong>Programme alignment is unverified</strong><span>The supplied briefs may span different qualifications. Keep them separate until an educator verifies the sequence.</span></div>
+          <div className="programme-warning"><strong>User-provided semester order</strong><span>These briefs follow your Semester 1–5 labels. The Semester 1 brief identifies Diploma coursework, so this sequence remains a candidate rather than an officially verified programme specification. Degree-level OODJ material stays separate.</span></div>
           <div className="module-review-list">{curriculumCandidate.modules.map(item => <article key={item.id}>
             <div><span>SEMESTER {item.semester}</span><strong>{item.name}</strong></div><p>{item.assignment}</p>
             {item.outcomes.length > 0 && <ul>{item.outcomes.map(outcome => <li key={outcome}>{outcome}</li>)}</ul>}

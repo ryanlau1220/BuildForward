@@ -1,7 +1,7 @@
 {
   "id": "apu-coursework-sequence",
-  "name": "APU coursework materials (Semesters 1–5; programme alignment unverified)",
-  "source_label": "Extracted candidate from five user-provided module assignment materials in data/materials/. Filenames indicate semesters 1–5, but programme alignment is unverified; the Semester 1 visual programming brief identifies itself as Diploma coursework.",
+  "name": "APU coursework materials (user-labeled Semesters 1–5)",
+  "source_label": "Extracted candidate from five user-provided assignment materials in data/materials/, ordered as the user-labeled Semesters 1–5. The Semester 1 visual programming brief identifies itself as Diploma coursework; the sequence is user-provided and is not an officially verified programme specification.",
   "modules": [
     {
       "id": "apu-sem1-visual-interactive",

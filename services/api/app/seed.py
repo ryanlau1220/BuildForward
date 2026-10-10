@@ -32,7 +32,11 @@ def seed_source_candidates(session: Session) -> None:
     for filename in ("apu-curriculum-candidate.json", "oodj-coursework-candidate.json"):
         data = json.loads((IMPORTS_PATH / filename).read_text())
         programme_id = data["id"]
-        if session.get(Programme, programme_id):
+        existing = session.get(Programme, programme_id)
+        if existing:
+            if existing.provenance == "EXTRACTED_CANDIDATE":
+                existing.name = data["name"]
+                existing.source_label = data["source_label"]
             continue
         session.add(Programme(
             id=programme_id,

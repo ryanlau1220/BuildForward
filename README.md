@@ -4,7 +4,7 @@ BuildForward is a proof-of-concept curriculum decision-support app. It compares 
 
 ## Current data status
 
-The workbench opens with an **illustrative programme** and a **simulated cohort**. User-provided coursework is available in `data/materials/`; the five briefs are normalized as an unconfirmed candidate in `data/imports/apu-curriculum-candidate.json`. The Semester 1 brief identifies itself as Diploma coursework, while the separate OODJ brief is from a Degree Semester 1 folder. These candidate sets are kept separate until their programme relationship is verified. No real cohort or job-market data has been supplied, and forecast values are not validated institutional predictions.
+The workbench opens with an **illustrative programme** and a **simulated cohort**. User-provided coursework is available in `data/materials/`; the five briefs are normalized in their user-labeled Semester 1–5 order as an unconfirmed candidate in `data/imports/apu-curriculum-candidate.json`. The Semester 1 brief identifies itself as Diploma coursework, so this remains a user-provided sequence rather than an officially verified programme specification. The separate OODJ brief is from a Degree Semester 1 folder and stays separate. No real cohort or job-market data has been supplied, and forecast values are not validated institutional predictions.
 
 ## Run locally
 

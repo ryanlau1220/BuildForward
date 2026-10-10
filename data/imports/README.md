@@ -12,7 +12,7 @@ These JSON files normalize user-provided material for review. They are candidate
 - Semester 4: `Sem 4_Responsive Web Design and Development.pdf`
 - Semester 5: `Sem 5_Capstone Project.docx`
 
-The Semester 1 brief identifies itself as Diploma coursework. No complete programme specification or prerequisite sequence was supplied, so this five-file collection must not be treated as a verified single-programme curriculum. Prerequisites are intentionally left empty. Competency tags are provisional mappings for educator review, not verbatim module outcomes.
+The user confirms the Semester 1–5 labels are the intended order for this five-file sequence, and the prototype uses that order. The Semester 1 brief identifies itself as Diploma coursework, so the sequence remains a user-provided candidate rather than an officially verified programme specification. No prerequisite sequence was supplied; prerequisites are intentionally left empty. Competency tags are provisional mappings for educator review, not verbatim module outcomes.
 
 ## Separate OODJ example
 
