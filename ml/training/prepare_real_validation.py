@@ -22,11 +22,12 @@ FEATURES = (
 FIELDS = (
     "project_id", "anchor_project_id", "project_name", "project_source", "project_origin",
     "module_id", "module_name", "module_source", "module_pair_status", "pairing_rationale",
-    *FEATURES, "evidence_skills", "label", "label_source", "review_notes",
+    "prerequisite_mapping_status", *FEATURES, "evidence_skills", "label", "label_source",
+    "review_notes",
 )
 
 
-def read_manifest(path: Path) -> tuple[list[dict], list[dict]]:
+def read_manifest(path: Path) -> tuple[list[dict], list[dict], dict[tuple[str, str], dict], str]:
     manifest = json.loads(path.read_text())
     projects = manifest["projects"]
     modules = []
@@ -41,7 +42,15 @@ def read_manifest(path: Path) -> tuple[list[dict], list[dict]]:
         raise ValueError("Project IDs in the manifest must be unique")
     if len({module["id"] for module in modules}) != len(modules):
         raise ValueError("Module IDs in the manifest must be unique")
-    return projects, modules
+    reviews = manifest["reviews"]
+    review_keys = [(review["project_id"], review["module_id"]) for review in reviews]
+    expected_keys = {(project["id"], module["id"]) for project in projects for module in modules}
+    if len(review_keys) != len(set(review_keys)) or set(review_keys) != expected_keys:
+        raise ValueError("Manifest reviews must cover each project-module pair exactly once")
+    if any(review["label"] not in {"CONTINUE", "PARTIAL_REUSE", "RESET", None}
+           or not review["rationale"].strip() for review in reviews):
+        raise ValueError("Each review needs a valid label or null and a rationale")
+    return projects, modules, dict(zip(review_keys, reviews)), manifest["review_source"]
 
 
 def analyze_repository(root: Path) -> dict:
@@ -83,7 +92,7 @@ def feature_values(module: dict, analysis: dict) -> dict[str, str | int]:
 
 
 def prepare(manifest_path: Path, repositories_dir: Path, output: Path) -> list[dict]:
-    projects, modules = read_manifest(manifest_path)
+    projects, modules, reviews, review_source = read_manifest(manifest_path)
     analyses: dict[str, dict] = {}
     for project in projects:
         repository = repositories_dir / project["id"]
@@ -95,9 +104,10 @@ def prepare(manifest_path: Path, repositories_dir: Path, output: Path) -> list[d
     for project in projects:
         analysis = analyses[project["id"]]
         for module in modules:
+            review = reviews[(project["id"], module["id"])]
             review_note = (
-                "Human review required; assess module fit, intake context, and educational value; "
-                "document project ownership and reuse permission status separately."
+                "Hypothetical educational fit only; actual intake sequence, project ownership, "
+                "and assignment permission require separate confirmation."
             )
             if module["id"] == "apu-software-testing":
                 review_note += (
@@ -111,14 +121,9 @@ def prepare(manifest_path: Path, repositories_dir: Path, output: Path) -> list[d
                 )
             elif module["id"] == "apu-degree-sem2-data-structure":
                 review_note += " Confirm fit with the specified C++ patient-record assignment."
-            if (project["id"], module["id"]) in {
-                ("data-structure", "apu-degree-sem2-data-structure"),
-                ("nextgen-fitness-capstone", "apu-sem5-capstone"),
-            }:
-                review_note += (
-                    " This appears to be a submission for the same module; check for a genuinely "
-                    "earlier project version before treating it as future reuse."
-                )
+            review_note += f" Reviewed rationale: {review['rationale']}"
+            if module["required_competencies"] is None and review["label"]:
+                review_note += " Required-skill map unknown; exclude this label from model scoring."
             row = {
                 "project_id": project["id"],
                 "anchor_project_id": project["id"],
@@ -128,15 +133,21 @@ def prepare(manifest_path: Path, repositories_dir: Path, output: Path) -> list[d
                 "module_id": module["id"],
                 "module_name": module["name"],
                 "module_source": module["source_label"],
-                "module_pair_status": "HYPOTHETICAL_FIT_REVIEW_REQUIRED",
+                "module_pair_status": (
+                    "HYPOTHETICAL_FIT_REVIEWED" if review["label"]
+                    else "INELIGIBLE_SAME_MODULE_SUBMISSION"
+                ),
                 "pairing_rationale": (
                     "Hypothetical cross-intake fit check using a real repository and module brief; "
                     "this is not an observed student progression or proof of assignment permission."
                 ),
+                "prerequisite_mapping_status": (
+                    "UNKNOWN" if module["required_competencies"] is None else "DEFINED"
+                ),
                 **feature_values(module, analysis),
                 "evidence_skills": ";".join(analysis["competencies"]),
-                "label": "",
-                "label_source": "",
+                "label": review["label"] or "",
+                "label_source": review_source if review["label"] else "",
                 "review_notes": review_note,
             }
             rows.append(row)
@@ -157,4 +168,6 @@ if __name__ == "__main__":
                         default=ROOT / "ml/datasets/continuity_pairs.real.csv")
     args = parser.parse_args()
     rows = prepare(args.manifest, args.repositories, args.output)
-    print(f"Wrote {len(rows)} unlabeled candidate project-module pairs to {args.output}")
+    print(f"Wrote {len(rows)} project-module pairs with "
+          f"{sum(bool(row['label']) for row in rows)} approved hypothetical fit labels "
+          f"to {args.output}")

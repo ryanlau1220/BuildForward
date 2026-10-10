@@ -28,11 +28,13 @@ def test_external_validation_reports_pending_real_pairs_without_a_metric(tmp_pat
     path = tmp_path / "real.csv"
     with path.open("w", newline="") as destination:
         writer = csv.DictWriter(destination, fieldnames=[
-            "project_id", "prerequisite_coverage", "reuse_signal_count", "target_overlap",
+            "project_id", "module_pair_status", "prerequisite_mapping_status",
+            "prerequisite_coverage", "reuse_signal_count", "target_overlap",
             "evidence_count", "files_scanned", "label", "label_source",
         ])
         writer.writeheader()
-        writer.writerow({"project_id": "repo-a", "label": "", "label_source": ""})
+        writer.writerow({"project_id": "repo-a", "module_pair_status": "HYPOTHETICAL_FIT_REVIEW_REQUIRED",
+                         "prerequisite_mapping_status": "DEFINED", "label": "", "label_source": ""})
     summary = summarize_external_validation(None, path)
     assert summary["candidate_pairs"] == 1
     assert summary["reviewed_pairs"] == 0

@@ -77,25 +77,40 @@ def summarize_external_validation(model, path: Path | None) -> dict:
     if path is None:
         return {
             "dataset": None, "candidate_pairs": 0, "reviewed_pairs": 0,
+            "scored_pairs": 0, "unscored_reviewed_pairs": 0, "ineligible_pairs": 0,
             "pending_pairs": 0, "project_groups": 0, "metrics": None,
             "status": "No external project-module review dataset configured.",
         }
     with path.open(newline="") as source:
         reader = csv.DictReader(source)
-        if not reader.fieldnames or not set(FEATURES + ["project_id", "label", "label_source"]) <= set(reader.fieldnames):
-            raise ValueError("External validation CSV is missing project_id, model features, label, or label_source")
+        required_columns = set(FEATURES + [
+            "project_id", "module_pair_status", "prerequisite_mapping_status", "label", "label_source",
+        ])
+        if not reader.fieldnames or not required_columns <= set(reader.fieldnames):
+            raise ValueError(f"External validation CSV is missing columns: "
+                             f"{sorted(required_columns - set(reader.fieldnames or []))}")
         rows = list(reader)
     reviewed = [row for row in rows if row["label"].strip()]
+    ineligible = [row for row in rows if row["module_pair_status"] == "INELIGIBLE_SAME_MODULE_SUBMISSION"]
+    if any(row["label"].strip() for row in ineligible):
+        raise ValueError("Same-module submissions cannot have project-reuse labels")
     if any(row["label"] not in LABELS for row in reviewed):
         raise ValueError("External validation labels must be CONTINUE, PARTIAL_REUSE, or RESET")
     if any(not row["label_source"].strip() for row in reviewed):
         raise ValueError("Every reviewed external label must identify its human-review source")
+    if any(row["prerequisite_mapping_status"] not in {"UNKNOWN", "DEFINED"} for row in rows):
+        raise ValueError("Every external row needs a valid prerequisite mapping status")
     for index, row in enumerate(reviewed, start=2):
         for feature in FEATURES:
-            if not row[feature].strip():
+            raw = row[feature].strip()
+            if feature == "prerequisite_coverage" and row["prerequisite_mapping_status"] == "UNKNOWN":
+                if raw:
+                    raise ValueError(f"Reviewed external row {index} has coverage for an unknown map")
+                continue
+            if not raw:
                 raise ValueError(f"Reviewed external row {index} is missing {feature}")
             try:
-                value = float(row[feature])
+                value = float(raw)
             except ValueError as exc:
                 raise ValueError(f"Invalid {feature} in reviewed external row {index}") from exc
             if not np.isfinite(value):
@@ -104,26 +119,31 @@ def summarize_external_validation(model, path: Path | None) -> dict:
                 raise ValueError(f"{feature} must be between 0 and 1 in reviewed external row {index}")
             if feature in {"reuse_signal_count", "evidence_count", "files_scanned"} and value < 0:
                 raise ValueError(f"{feature} cannot be negative in reviewed external row {index}")
+    scored = [row for row in reviewed if row["prerequisite_mapping_status"] == "DEFINED"]
+    unscored = len(reviewed) - len(scored)
 
     result = {
         "dataset": path.name,
         "dataset_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
         "candidate_pairs": len(rows),
         "reviewed_pairs": len(reviewed),
-        "pending_pairs": len(rows) - len(reviewed),
+        "scored_pairs": len(scored),
+        "unscored_reviewed_pairs": unscored,
+        "ineligible_pairs": len(ineligible),
+        "pending_pairs": len(rows) - len(reviewed) - len(ineligible),
         "project_groups": len({row.get("anchor_project_id") or row["project_id"] for row in rows}),
         "label_sources": dict(Counter(row["label_source"] for row in reviewed)),
         "label_distribution": dict(Counter(row["label"] for row in reviewed)),
         "metrics": None,
         "status": "No human-reviewed labels yet; external review metric unavailable.",
     }
-    if reviewed:
-        x = np.array([[float(row[name]) for name in FEATURES] for row in reviewed], dtype=float)
-        y = np.array([row["label"] for row in reviewed])
+    if scored:
+        x = np.array([[float(row[name]) for name in FEATURES] for row in scored], dtype=float)
+        y = np.array([row["label"] for row in scored])
         predictions = model.predict(x)
-        baseline = [baseline_decision(row) for row in reviewed]
+        baseline = [baseline_decision(row) for row in scored]
         result["metrics"] = {
-            "reviewed_pairs": len(reviewed),
+            "scored_pairs": len(scored),
             "model_macro_f1": float(f1_score(y, predictions, labels=LABELS, average="macro", zero_division=0)),
             "baseline_macro_f1": float(f1_score(y, baseline, labels=LABELS, average="macro", zero_division=0)),
             "classification_report": classification_report(
@@ -132,8 +152,12 @@ def summarize_external_validation(model, path: Path | None) -> dict:
             "confusion_matrix": confusion_matrix(y, predictions, labels=LABELS).tolist(),
         }
         result["status"] = (
-            "Descriptive external evaluation on human-reviewed pairs; small samples do not establish generalisation."
+            "Descriptive agreement with project-owner-approved AI proposals on hypothetical pairs; "
+            "not observed reuse outcomes or independent educator validation. "
+            "Small samples do not establish generalisation."
         )
+    elif reviewed:
+        result["status"] = "Reviewed hypothetical labels have unknown required-skill maps; no external metric available."
     return result
 
 

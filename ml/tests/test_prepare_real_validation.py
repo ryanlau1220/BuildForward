@@ -72,8 +72,10 @@ def test_review_manifest_uses_five_user_selected_repositories(tmp_path):
     assert len(rows) == 15
     assert len({row["project_id"] for row in rows}) == 5
     assert len({row["module_id"] for row in rows}) == 3
-    assert all(row["label"] == "" for row in rows)
-    assert all(row["module_pair_status"] == "HYPOTHETICAL_FIT_REVIEW_REQUIRED" for row in rows)
+    assert sum(bool(row["label"]) for row in rows) == 13
+    assert sum(row["module_pair_status"] == "INELIGIBLE_SAME_MODULE_SUBMISSION" for row in rows) == 2
+    assert all(row["label_source"] == "project_owner_approved_ai_proposal_2026-10-10"
+               for row in rows if row["label"])
     testing = next(row for row in rows if row["module_id"] == "apu-software-testing")
     assert testing["prerequisite_coverage"] == 0
     assert "ShopEasy" in testing["review_notes"]
@@ -83,18 +85,21 @@ def test_review_manifest_uses_five_user_selected_repositories(tmp_path):
     assert dstr["pairing_rationale"]
     matching_dstr = next(row for row in rows if row["project_id"] == "data-structure"
                          and row["module_id"] == "apu-degree-sem2-data-structure")
-    assert "same module" in matching_dstr["review_notes"]
+    assert matching_dstr["label"] == ""
+    assert matching_dstr["module_pair_status"] == "INELIGIBLE_SAME_MODULE_SUBMISSION"
     capstone = next(row for row in rows if row["module_id"] == "apu-sem5-capstone")
     assert capstone["prerequisite_coverage"] == ""
+    assert capstone["prerequisite_mapping_status"] == "UNKNOWN"
     assert "business logic" in capstone["review_notes"]
 
 
 def test_external_validation_rejects_labels_without_computed_features(tmp_path):
     path = tmp_path / "real.csv"
     path.write_text(
-        "project_id,anchor_project_id,prerequisite_coverage,reuse_signal_count,target_overlap,"
+        "project_id,anchor_project_id,module_pair_status,prerequisite_mapping_status,"
+        "prerequisite_coverage,reuse_signal_count,target_overlap,"
         "evidence_count,files_scanned,label,label_source\n"
-        "repo-a,repo-a,,0,0,1,1,CONTINUE,educator_review\n"
+        "repo-a,repo-a,HYPOTHETICAL_FIT_REVIEWED,DEFINED,,0,0,1,1,CONTINUE,educator_review\n"
     )
     with pytest.raises(ValueError, match="missing prerequisite_coverage"):
         summarize_external_validation(None, path)
@@ -103,9 +108,10 @@ def test_external_validation_rejects_labels_without_computed_features(tmp_path):
 def test_external_validation_scores_reviewed_pairs_without_retraining(tmp_path):
     path = tmp_path / "reviewed.csv"
     path.write_text(
-        "project_id,anchor_project_id,prerequisite_coverage,reuse_signal_count,target_overlap,"
+        "project_id,anchor_project_id,module_pair_status,prerequisite_mapping_status,"
+        "prerequisite_coverage,reuse_signal_count,target_overlap,"
         "evidence_count,files_scanned,label,label_source\n"
-        "repo-a,repo-a,0.9,1,0.2,2,10,CONTINUE,educator_review\n"
+        "repo-a,repo-a,HYPOTHETICAL_FIT_REVIEWED,DEFINED,0.9,1,0.2,2,10,CONTINUE,educator_review\n"
     )
 
     class Model:
@@ -114,6 +120,31 @@ def test_external_validation_scores_reviewed_pairs_without_retraining(tmp_path):
 
     summary = summarize_external_validation(Model(), path)
     assert summary["reviewed_pairs"] == 1
+    assert summary["scored_pairs"] == 1
     assert summary["project_groups"] == 1
     assert summary["metrics"]["model_macro_f1"] == pytest.approx(1 / 3)
-    assert "small samples" in summary["status"]
+    assert "Small samples" in summary["status"]
+
+
+def test_unknown_capstone_map_keeps_reviewed_label_out_of_scoring(tmp_path):
+    path = tmp_path / "reviewed.csv"
+    path.write_text(
+        "project_id,module_pair_status,prerequisite_mapping_status,prerequisite_coverage,"
+        "reuse_signal_count,target_overlap,evidence_count,files_scanned,label,label_source\n"
+        "repo-a,HYPOTHETICAL_FIT_REVIEWED,DEFINED,1,1,0.2,2,10,CONTINUE,owner_review\n"
+        "repo-b,HYPOTHETICAL_FIT_REVIEWED,UNKNOWN,,0,0.1,2,10,PARTIAL_REUSE,owner_review\n"
+        "repo-c,INELIGIBLE_SAME_MODULE_SUBMISSION,DEFINED,1,0,0.5,2,10,,\n"
+    )
+
+    class Model:
+        def predict(self, features):
+            assert len(features) == 1
+            return np.array(["CONTINUE"])
+
+    summary = summarize_external_validation(Model(), path)
+    assert summary["candidate_pairs"] == 3
+    assert summary["reviewed_pairs"] == 2
+    assert summary["scored_pairs"] == 1
+    assert summary["unscored_reviewed_pairs"] == 1
+    assert summary["ineligible_pairs"] == 1
+    assert summary["pending_pairs"] == 0

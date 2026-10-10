@@ -1,5 +1,6 @@
 {
-  "description": "Five user-selected public repositories are evidence candidates for hypothetical future-module fit checks across intakes. Every repository is paired with the three available module briefs for review coverage, not because each pairing reflects an actual student pathway or a permitted assignment substitution. Pair labels remain blank until a human reviewer confirms fit and applies the rubric.",
+  "description": "Five user-selected public repositories are paired with three module briefs for hypothetical educational-fit review across intakes. The pairings are not observed student progressions or permitted assignment substitutions. Thirteen AI-proposed fit judgments were approved by the project owner in chat on 2026-10-10; two same-module submissions remain unlabelled. These are not independent educator labels or observed reuse outcomes.",
+  "review_source": "project_owner_approved_ai_proposal_2026-10-10",
   "projects": [
     {
       "id": "data-structure",
@@ -51,5 +52,22 @@
       "source_label": "User-provided 2602 assignment brief; degree and Semester 2 alignment are user-labeled candidates.",
       "definition_file": "data/candidates/degree-sem2-data-structure.json"
     }
+  ],
+  "reviews": [
+    {"project_id": "data-structure", "module_id": "apu-software-testing", "label": "PARTIAL_REUSE", "rationale": "C++ code and tests provide material for testing techniques, but the project does not match the ShopEasy domain."},
+    {"project_id": "data-structure", "module_id": "apu-sem5-capstone", "label": "PARTIAL_REUSE", "rationale": "The patient-analysis engine could be extended within a larger application; substantial system and design work remains."},
+    {"project_id": "data-structure", "module_id": "apu-degree-sem2-data-structure", "label": null, "rationale": "Appears to be a submission for this same assignment, not a prior project to carry forward."},
+    {"project_id": "oodj-apuasc", "module_id": "apu-software-testing", "label": "CONTINUE", "rationale": "The Java service and domain rules offer meaningful material for new testing work."},
+    {"project_id": "oodj-apuasc", "module_id": "apu-sem5-capstone", "label": "CONTINUE", "rationale": "The multi-role application has business logic and structure that could support substantial new features and design work."},
+    {"project_id": "oodj-apuasc", "module_id": "apu-degree-sem2-data-structure", "label": "RESET", "rationale": "The Java automotive system does not provide the required C++ patient-record and custom-container base."},
+    {"project_id": "nextgen-fitness-capstone", "module_id": "apu-software-testing", "label": "CONTINUE", "rationale": "The application and backend workflows offer meaningful functionality for testing work."},
+    {"project_id": "nextgen-fitness-capstone", "module_id": "apu-sem5-capstone", "label": null, "rationale": "Appears to be a submission for this same Capstone module, not an earlier project version."},
+    {"project_id": "nextgen-fitness-capstone", "module_id": "apu-degree-sem2-data-structure", "label": "RESET", "rationale": "The Python and Dart application does not supply a C++ patient-record and custom-container base."},
+    {"project_id": "flowquest-webdev", "module_id": "apu-software-testing", "label": "PARTIAL_REUSE", "rationale": "Web and game rules offer test cases, but parts of the logic would need separation for focused testing."},
+    {"project_id": "flowquest-webdev", "module_id": "apu-sem5-capstone", "label": "CONTINUE", "rationale": "The full-stack application could support substantial extension and required system-design work."},
+    {"project_id": "flowquest-webdev", "module_id": "apu-degree-sem2-data-structure", "label": "RESET", "rationale": "The TypeScript web application differs from the required C++ healthcare data-structure task."},
+    {"project_id": "java-sem5-hrms", "module_id": "apu-software-testing", "label": "PARTIAL_REUSE", "rationale": "Payroll and authentication rules offer testing cases, but business logic is closely coupled to the interface."},
+    {"project_id": "java-sem5-hrms", "module_id": "apu-sem5-capstone", "label": "PARTIAL_REUSE", "rationale": "HR workflows offer a base, while extensive implementation and design work would still be needed."},
+    {"project_id": "java-sem5-hrms", "module_id": "apu-degree-sem2-data-structure", "label": "RESET", "rationale": "The Java HR system does not provide the required C++ patient-record and custom-container base."}
   ]
 }

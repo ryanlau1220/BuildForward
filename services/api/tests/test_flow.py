@@ -55,8 +55,11 @@ def test_sample_predictions_are_explained_and_scenario_is_labelled():
         assert continuity["model"]["training_data_source"] == "synthetic_rubric_scenarios"
         assert continuity["model"]["training_rows"] == 72
         assert continuity["model"]["real_validation"]["candidate_pairs"] == 15
-        assert continuity["model"]["real_validation"]["reviewed_pairs"] == 0
-        assert continuity["model"]["real_validation"]["metrics"] is None
+        assert continuity["model"]["real_validation"]["reviewed_pairs"] == 13
+        assert continuity["model"]["real_validation"]["scored_pairs"] == 9
+        assert continuity["model"]["real_validation"]["unscored_reviewed_pairs"] == 4
+        assert continuity["model"]["real_validation"]["ineligible_pairs"] == 2
+        assert continuity["model"]["real_validation"]["metrics"]["model_macro_f1"] < 1
         assert continuity["heuristic_baseline_decision"] == "CONTINUE"
         assert continuity["model_features"] == {
             "prerequisite_coverage": 1.0,
