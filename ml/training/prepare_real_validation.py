@@ -96,8 +96,8 @@ def prepare(manifest_path: Path, repositories_dir: Path, output: Path) -> list[d
         analysis = analyses[project["id"]]
         for module in modules:
             review_note = (
-                "Human review required; confirm same or comparable module, intake context, "
-                "project ownership/reuse permission, and educational value before labeling."
+                "Human review required; assess module fit, intake context, and educational value; "
+                "document project ownership and reuse permission status separately."
             )
             if module["id"] == "apu-software-testing":
                 review_note += (

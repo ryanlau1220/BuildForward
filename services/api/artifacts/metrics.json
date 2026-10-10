@@ -147,7 +147,7 @@
   "claim_limit": "Synthetic rubric labels measure agreement with the scenario rubric, not institutional predictive validity.",
   "real_validation": {
     "dataset": "continuity_pairs.real.csv",
-    "dataset_sha256": "1208816a5da612cf1536cf00ab97007a8d07815b5912fe5be8c3291db7b3342a",
+    "dataset_sha256": "3ef81065dcc07741010f247cfd1fcbea83460180f38abdebd52e647af70dd572",
     "candidate_pairs": 15,
     "reviewed_pairs": 0,
     "pending_pairs": 15,
@@ -155,6 +155,6 @@
     "label_sources": {},
     "label_distribution": {},
     "metrics": null,
-    "status": "No human-reviewed labels yet; real-data metric unavailable."
+    "status": "No human-reviewed labels yet; external review metric unavailable."
   }
 }

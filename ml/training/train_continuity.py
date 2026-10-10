@@ -78,7 +78,7 @@ def summarize_external_validation(model, path: Path | None) -> dict:
         return {
             "dataset": None, "candidate_pairs": 0, "reviewed_pairs": 0,
             "pending_pairs": 0, "project_groups": 0, "metrics": None,
-            "status": "No real project-module validation dataset configured.",
+            "status": "No external project-module review dataset configured.",
         }
     with path.open(newline="") as source:
         reader = csv.DictReader(source)
@@ -115,7 +115,7 @@ def summarize_external_validation(model, path: Path | None) -> dict:
         "label_sources": dict(Counter(row["label_source"] for row in reviewed)),
         "label_distribution": dict(Counter(row["label"] for row in reviewed)),
         "metrics": None,
-        "status": "No human-reviewed labels yet; real-data metric unavailable.",
+        "status": "No human-reviewed labels yet; external review metric unavailable.",
     }
     if reviewed:
         x = np.array([[float(row[name]) for name in FEATURES] for row in reviewed], dtype=float)
