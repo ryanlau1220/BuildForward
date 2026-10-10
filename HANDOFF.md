@@ -2,13 +2,14 @@
 
 ## Current Status — 10 October 2026
 
-The concept, Track 1 positioning, data strategy, and application proof of concept are implemented. This workspace contains five supplied coursework briefs labeled Semesters 1–5 in `data/materials/`, a normalized material candidate in `data/imports/apu-curriculum-candidate.json`, and a separate OODJ assignment brief plus the user-provided public repository `jasonwong1025/oodj-apuasc`. Startup seeding registers the material collection, the one-module OODJ reference and its linked repository project as `EXTRACTED_CANDIDATE`; they are visible in Sources/Evidence and blocked from prediction until review. The five files are not verified as one programme sequence: the Semester 1 visual programming brief identifies Diploma coursework, while the OODJ brief is identified as Degree Semester 1 in its supplied path. No real cohort data or market evidence has been provided. The default dashboard remains an explicitly illustrative pathway with simulated cohort values.
+The concept, Track 1 positioning, data strategy, and application proof of concept are implemented. This workspace contains five supplied coursework briefs labeled Semesters 1–5 in `data/materials/`, a normalized material candidate in `data/imports/apu-curriculum-candidate.json`, and a separate OODJ assignment brief plus the user-provided public repository `jasonwong1025/oodj-apuasc`. Startup seeding registers these sources as `EXTRACTED_CANDIDATE`; they are reviewable but blocked from prediction until confirmed. The five files are not verified as one programme sequence: the Semester 1 visual programming brief identifies Diploma coursework, while the OODJ brief is identified as Degree Semester 1 in its supplied path. No real cohort data or market evidence has been provided. The decision walkthrough therefore uses an explicitly illustrative pathway and simulated cohort values by default.
 
 The event slides require a public GitHub repository, a deployed application, and a PDF presentation for submission. The local Phase 1 pitch is three minutes plus two minutes of questions. Keep the demo focused on one complete decision flow. Frontend package management uses pnpm 10.32.1.
 
 ### Implementation checkpoint
 
-- Next.js dashboard and FastAPI service are implemented locally, including review screens for seeded curriculum and repository candidates, human confirmation gates, a confirmed-module selector, and explicit continuity comparison.
+- A single-page Next.js decision walkthrough and FastAPI service are implemented locally. The core path compares project evidence with a future module, explains the continuity result, shows cohort gaps, and models an assumption-labelled scenario. Candidate review, import, and workspace switching remain available in a collapsed source panel with human confirmation gates.
+- The user clarified the hackathon scope: prioritize one pitch-ready, end-to-end decision walkthrough; do not build a full platform or standalone dashboard. The UI now presents project continuity and cohort outlook on one page, with source review and input switching tucked into an optional disclosure.
 - Scalar now serves the interactive API reference at `/docs`; `/openapi.json` remains available, and the default Swagger UI and ReDoc routes are disabled. Scalar telemetry and its optional agent are disabled.
 - Repository analysis is static and excludes data directories, database files, environment files, CSV/JSONL and arbitrary text. The supplied Java repository currently yields four candidate signals across 98 Java source files; tests and code were not executed.
 - `data/imports/` contains normalized candidates and source mapping notes. The local API seeds them on startup as `EXTRACTED_CANDIDATE` so a fresh database retains the review workflow.
@@ -1261,6 +1262,8 @@ Do not implement:
 
 ## 30. Suggested Implementation Order
 
+This order describes the fuller product direction, not a requirement to build a complete platform for the hackathon. The current pitch scope is the single decision flow defined in Section 31; keep later phases deferred unless they are necessary to make that flow work end to end.
+
 ### Phase 1 — Canonical Domain Model
 1. Define PostgreSQL schema.
 2. Seed programme.
@@ -1300,17 +1303,15 @@ Do not implement:
 7. Compare projected coverage with and without a proposed intervention.
 8. Surface uncertainty and scenario assumptions clearly.
 
-### Phase 6 — UI
-Required views:
-- programme overview;
-- curriculum path;
-- project analysis;
-- continuity decision;
-- cohort competency coverage;
-- graduation-gap forecast;
-- prioritized gaps;
-- projected intervention scenario;
-- recommended intervention.
+### Phase 6 — Pitch UI
+Use one concise guided page for the three-minute pitch. It should show:
+1. Existing project evidence and its provenance.
+2. A selected later module, a `CONTINUE / PARTIAL_REUSE / RESET` result, and the matching or missing evidence.
+3. Ranked cohort competency gaps, followed by a transparent with/without scenario.
+4. A possible assignment focus only when project targets overlap with a projected cohort gap; label the overlap as a planning prompt, not a validated recommendation.
+5. A clear statement that the forecast uses simulated or unvalidated data and that educators make the decision.
+
+Keep curriculum and repository review, imports, and workspace switching in an optional collapsed source panel. Do not add a separate dashboard, standalone analytics pages, or navigation that is not needed for the end-to-end decision flow.
 
 ### Phase 7 — Optional LLM Extraction
 Only add if needed:
@@ -1321,33 +1322,27 @@ Only add if needed:
 Require schema validation and human confirmation.
 
 ### Phase 8 — Demo Preparation
-Use pre-normalised real data for the main demo.
+Use preloaded data for the main demo and label the illustrative pathway and simulated cohort clearly. Keep the Diploma-labelled five-brief candidate separate from the Degree-level OODJ example until their programme relationship is verified.
 
 Do not make the pitch depend on live document extraction.
 
-Demonstrate one unfamiliar or messy input, but support any robustness or false-alarm claim with the separate evaluation set. Fit the main decision flow into the three-minute local presentation.
+Fit one complete decision flow into the three-minute local presentation. Do not claim general robustness unless a separate evaluation set supports it.
 
 ---
 
-## 31. MVP Acceptance Criteria
+## 31. Hackathon Pitch Acceptance Criteria
 
-BuildForward is hackathon-ready when it can:
+For the time-limited pitch, prioritize this end-to-end slice:
 
-1. import a real or curated programme structure;
-2. ingest at least one real assignment brief;
-3. analyse at least one real student project repository;
-4. extract and store competency evidence;
-5. compare the project with an upcoming module;
-6. predict `CONTINUE / PARTIAL_REUSE / RESET`;
-7. explain why;
-8. suggest a realistic evolution path;
-9. show cohort-level competency coverage;
-10. forecast at least one graduation competency gap;
-11. rank forecast gaps and explain the top priority;
-12. recommend a feasible intervention linked to a project continuity decision;
-13. compare projected outcomes with and without that intervention under stated assumptions;
-14. show how uncertain or unfamiliar evidence is handled, with a small documented evaluation;
-15. stop before execution and leave the final decision to the human user.
+1. Show existing project evidence and its source status.
+2. Compare that project with a later module in the same selected programme.
+3. Return `CONTINUE / PARTIAL_REUSE / RESET` with matching and missing evidence.
+4. Show ranked cohort gaps with explicit assumptions and simulated-data labels.
+5. Connect an overlapping project target and cohort gap to a clearly labelled planning scenario.
+6. Compare the scenario with and without an assumed gain.
+7. Keep candidate sources behind review and confirmation; leave decisions to the educator.
+
+Do not expand the hackathon build into the full research/product roadmap below. Empirical evaluation, trained models, real cohort data, market signals, LMS integrations, and production readiness remain future work unless explicitly prioritized later.
 
 ---
 

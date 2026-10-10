@@ -4,7 +4,7 @@ BuildForward is a proof-of-concept curriculum decision-support app. It compares 
 
 ## Current data status
 
-The default dashboard is still an **illustrative sample** with a **simulated cohort**. Real source materials are now present in `data/materials/`: assignment briefs labeled Semesters 1–5, plus an OODJ assignment brief and its public GitHub repository were provided separately. A normalized five-module material candidate is at `data/imports/apu-curriculum-candidate.json`; its provenance remains unconfirmed. The Semester 1 brief identifies itself as Diploma coursework, while the separate OODJ brief is identified as Degree Semester 1 in its supplied path. The five files are not yet verified as one programme sequence, and the OODJ project is kept separate. No real cohort or job-market data has been supplied. Forecasts are not validated institutional predictions.
+The single-page decision walkthrough opens with an **illustrative programme** and a **simulated cohort**. User-provided coursework is available in `data/materials/`; the five briefs are normalized as an unconfirmed candidate in `data/imports/apu-curriculum-candidate.json`. The Semester 1 brief identifies itself as Diploma coursework, while the separate OODJ brief is from a Degree Semester 1 folder. These candidate sets are kept separate until their programme relationship is verified. No real cohort or job-market data has been supplied, and forecast values are not validated institutional predictions.
 
 ## Run locally
 
@@ -51,9 +51,9 @@ The sample scenario assumes a 70% programme coverage target and a 22-point gain 
 ## Importing real material
 
 1. The five supplied materials are normalized in `data/imports/apu-curriculum-candidate.json` and seeded locally as extracted candidates, along with the separate OODJ module and repository candidates. Fresh databases receive the same review-only records automatically.
-2. Open **Sources & import**, inspect the candidate module outcomes and assignment summaries, and compare them with files in `data/materials/`. Confirm only after educator review. The API equivalent is `POST /api/v1/programmes/{id}/confirm`.
-3. Upload a real completed project ZIP, or enter its public GitHub URL in the Sources view. Review the extracted evidence and confirm it.
-4. If actual cohort coverage is available, import it through `POST /api/v1/cohorts/import`, review, and confirm. Otherwise, label any scenario as simulated.
+2. Expand **Review sources or change the demo inputs** below the walkthrough. Inspect the candidate module outcomes and assignment summaries against files in `data/materials/`. Confirm only after educator review. The API equivalent is `POST /api/v1/programmes/{id}/confirm`.
+3. In the same source panel, inspect the supplied OODJ repository evidence or analyze a public GitHub repository / ZIP. Review extracted evidence and confirm it only after human review.
+4. If actual cohort coverage is available, import it through `POST /api/v1/cohorts/import`, review, and confirm. Otherwise, keep the cohort labelled as simulated.
 
 Imported candidates are blocked from prediction until confirmed. The materials do not specify prerequisites, so none are inferred. The OODJ assignment and public repo are a separate coursework example; their relationship to the five-module sequence needs educator confirmation. Static repository inspection never runs uploaded code and skips data folders, database files, CSV/JSONL, environment files, and arbitrary text files.
 
