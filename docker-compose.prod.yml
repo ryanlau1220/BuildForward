@@ -1,0 +1,85 @@
+# Production stack for a single VPS fronted by Nginx Proxy Manager (NPM).
+#
+#   docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+#
+# NPM (running separately) terminates TLS and reverse-proxies to the ports
+# published below. Ports are bound to 127.0.0.1 so they are NOT reachable
+# directly from the public internet -- only NPM (on the same host) proxies them.
+#
+# Point NPM at these upstreams (host = the VPS, or host.docker.internal if NPM
+# is itself a container with host-gateway access):
+#
+#   Option A (single hostname, same-origin -- recommended):
+#     Proxy host  <DOMAIN>  ->  127.0.0.1:3000   (the web app)
+#     Add a Custom Location in NPM:
+#       location  /api        ->  127.0.0.1:8000
+#       location  /docs       ->  127.0.0.1:8000
+#       location  /openapi.json -> 127.0.0.1:8000
+#     Set NEXT_PUBLIC_API_URL=https://<DOMAIN>  (same origin, no CORS).
+#
+#   Option B (two hostnames):
+#     Proxy host  <DOMAIN>       ->  127.0.0.1:3000
+#     Proxy host  api.<DOMAIN>   ->  127.0.0.1:8000
+#     Set NEXT_PUBLIC_API_URL=https://api.<DOMAIN>  and make sure
+#     CORS_ORIGINS allows https://<DOMAIN>.
+#
+# WEB_BIND / API_BIND default to 127.0.0.1 but can be overridden (e.g. to a
+# private Docker-network IP) in .env.production.
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-buildforward}
+      POSTGRES_USER: ${POSTGRES_USER:-buildforward}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.production}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-buildforward} -d ${POSTGRES_DB:-buildforward}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - internal
+
+  api:
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-buildforward}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-buildforward}
+      # Public origin(s) allowed to call the API from a browser. For the
+      # single-hostname setup this is just your domain. Comma-separate extras.
+      CORS_ORIGINS: ${CORS_ORIGINS:?set CORS_ORIGINS in .env.production}
+    ports:
+      - "${API_BIND:-127.0.0.1}:8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        # Baked in at build time (NEXT_PUBLIC_* is inlined into the bundle).
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:?set NEXT_PUBLIC_API_URL in .env.production}
+    restart: unless-stopped
+    ports:
+      - "${WEB_BIND:-127.0.0.1}:3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - internal
+
+volumes:
+  postgres_data:
+
+networks:
+  internal:

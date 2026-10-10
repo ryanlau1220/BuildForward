@@ -7,3 +7,10 @@
 *.db
 *.tsbuildinfo
 AI SLIDES .pdf
+
+# Large source coursework/submission assets are not read at runtime.
+# The API only loads data/sample_demo.json and data/imports/*.json.
+data/materials
+data/submissions
+PITCH_DECK.html
+PITCH_DECK*.html
