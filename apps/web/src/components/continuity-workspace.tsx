@@ -5,6 +5,7 @@ type ModuleOption = {
   name: string;
   semester: number;
   outcomes: string[];
+  assignment: string;
   target_competencies?: string[];
 };
 
@@ -26,7 +27,7 @@ export function ContinuityWorkspace({
 }) {
   return <section className="view-panel" aria-labelledby="reuse-title">
     <div className="view-intro"><div><p className="eyebrow">EXISTING PROJECT × FUTURE MODULE</p><h2 id="reuse-title">Can this project be meaningfully reused and extended?</h2></div>
-      <p>Compare evidence from an existing student project with a future module’s expectations. The result helps an educator review whether that project can carry forward.</p></div>
+      <p>Compare an existing project with a future module’s learning goals. The result shows reuse potential for educator review.</p></div>
 
     <div className="continuity-grid">
       <section className="surface project-summary" aria-labelledby="project-title">
@@ -52,6 +53,7 @@ export function ContinuityWorkspace({
           <h4>Learning outcomes</h4>
           {selectedModule.outcomes.length ? <ul>{selectedModule.outcomes.map(outcome => <li key={outcome}>{outcome}</li>)}</ul> : <p>No outcomes have been recorded for this module.</p>}
           {selectedModule.target_competencies?.length ? <p className="competency-tags">{selectedModule.target_competencies.map(item => <span key={item}>{label(item)}</span>)}</p> : null}
+          <p><strong>Current assignment:</strong> {selectedModule.assignment}</p>
         </div>}
         {project.provenance === "EXTRACTED_CANDIDATE" && <p className="inline-hint">Review and confirm this project in Data Sources before checking reuse.</p>}
         {!modules.length && <p className="inline-hint">Review and confirm the course details in Data Sources before running this check.</p>}
@@ -60,6 +62,7 @@ export function ContinuityWorkspace({
         {continuity ? <div className="result-block" aria-live="polite">
           <div className="result-topline"><div><span className="eyebrow">PROJECT REUSE DECISION</span><p className="model-name">{continuity.model.name.replaceAll("_", " ")} · {continuity.model.training_rows} synthetic rubric scenarios</p></div><span className={`decision-badge ${continuity.decision.toLowerCase()}`}>{projectReuseDecisionLabel(continuity.decision)}</span></div>
           <p className="result-reason">{continuity.reason}</p>
+          <p className="small-note">This result estimates project fit with the module’s learning goals. It does not assess assignment rules or judge the brief. An educator decides whether to reuse the project, adapt an activity, or keep the current assignment.</p>
           <dl className="result-details">
           <div><dt>Required skills covered</dt><dd>{Math.round(continuity.prerequisite_coverage * 100)}%</dd></div>
           <div><dt>Skills already shown</dt><dd>{continuity.matched_prerequisites.length ? continuity.matched_prerequisites.map(label).join(", ") : "No required skills matched"}</dd></div>

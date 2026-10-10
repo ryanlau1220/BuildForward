@@ -23,6 +23,7 @@ type ModuleChoice = {
   programme_id: string;
   programme_name: string;
   outcomes: string[];
+  assignment: string;
   target_competencies?: string[];
 };
 type CurriculumCandidate = {
