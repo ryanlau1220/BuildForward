@@ -1,7 +1,7 @@
 {
   "id": "apu-oodj-coursework-reference",
-  "name": "APU OODJ coursework reference",
-  "source_label": "Extracted candidate from user-provided 2602-OODJ assignment brief and public repository https://github.com/jasonwong1025/oodj-apuasc; kept separate from the supplied Semesters 1–5 sequence",
+  "name": "APU degree coursework reference (user-ordered)",
+  "source_label": "User-provided degree material order: OODJ followed by Software Testing. Semester order and programme alignment are not independently verified.",
   "modules": [
     {
       "id": "apu-oodj-assignment",
@@ -13,6 +13,17 @@
       "reuse_signals": [],
       "outcomes": ["Design and implement a Java application using object-oriented programming concepts", "Build a graphical interface and persist application data using text files", "Validate user input and document the design"],
       "assignment": "Group assignment brief for an automotive service centre system; the supplied brief requires a Java GUI and text-file storage. This summary omits detailed assessment instructions."
+    },
+    {
+      "id": "apu-software-testing",
+      "name": "Software Testing",
+      "semester": 2,
+      "prerequisites": ["apu-oodj-assignment"],
+      "required_competencies": [],
+      "target_competencies": ["software-testing", "test-planning", "functional-testing", "nonfunctional-testing", "equivalence-partitioning", "boundary-value-analysis", "test-case-design", "regression-testing", "test-automation"],
+      "reuse_signals": ["testable-code", "automated-tests", "unit-testing"],
+      "outcomes": ["Determine the aims, objectives, deliverables and scope of a software testing approach", "Analyze testing techniques for a project", "Select appropriate software testing tools"],
+      "assignment": "Latest supplied degree brief uses a ShopEasy e-commerce case study and asks for test planning, requirements, equivalence partitioning, boundary value analysis and test cases. No submission has been supplied."
     }
   ]
 }

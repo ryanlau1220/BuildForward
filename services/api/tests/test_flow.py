@@ -111,8 +111,24 @@ def test_supplied_material_candidates_are_seeded_but_not_confirmed():
         assert len(curriculum["source_label"]) <= 200
         assert len(curriculum["modules"]) == 5
         assert oodj["provenance"] == "EXTRACTED_CANDIDATE"
+        assert [module["semester"] for module in oodj["modules"]] == [1, 2]
+        assert oodj["modules"][1]["id"] == "apu-software-testing"
+        assert "No submission has been supplied" in oodj["modules"][1]["assignment"]
         assert project["provenance"] == "EXTRACTED_CANDIDATE"
         assert project["originating_module_id"] == "apu-oodj-assignment"
+
+        projects = client.get("/api/v1/projects").json()
+        submitted = [p for p in projects if p["id"].startswith("submission-")]
+        assert len(submitted) == 5
+        assert all(p["provenance"] == "EXTRACTED_CANDIDATE" for p in submitted)
+        for candidate in submitted:
+            detail = client.get(f"/api/v1/projects/{candidate['id']}").json()
+            assert detail["files_scanned"] == 0
+            assert "report summary only" in detail["source_label"]
+            assert "TP0" not in detail["source_label"]
+
+        oodj_detail = client.get("/api/v1/projects/project-oodj-apuasc").json()
+        assert "OODJ_Assignment.docx" in oodj_detail["source_label"]
 
 
 def test_project_evidence_requires_human_confirmation():

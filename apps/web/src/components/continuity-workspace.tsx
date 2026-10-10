@@ -39,7 +39,7 @@ export function ContinuityWorkspace({
             <div><strong>{label(item.competency)}</strong><p>{item.detail}</p></div><code>{item.source}</code>
           </article>)}
         </div> : <p className="empty-note">No static evidence was detected. Review the repository manually before relying on a comparison.</p>}
-        <p className="small-note">Detected files and dependencies indicate possible use; they do not prove code quality, test success or student proficiency.</p>
+        <p className="small-note">Report summaries and detected files or dependencies indicate possible use; they do not prove code quality, test success or student proficiency.</p>
       </section>
 
       <section className="surface comparison-panel" aria-labelledby="comparison-title">

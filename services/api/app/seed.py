@@ -34,22 +34,36 @@ def seed_source_candidates(session: Session) -> None:
         programme_id = data["id"]
         existing = session.get(Programme, programme_id)
         if existing:
-            if existing.provenance == "EXTRACTED_CANDIDATE":
-                existing.name = data["name"]
-                existing.source_label = data["source_label"]
-            continue
-        session.add(Programme(
-            id=programme_id,
-            name=data["name"],
-            source_label=data["source_label"],
-            provenance="EXTRACTED_CANDIDATE",
-        ))
+            if existing.provenance != "EXTRACTED_CANDIDATE":
+                continue
+            existing.name = data["name"]
+            existing.source_label = data["source_label"]
+        else:
+            session.add(Programme(
+                id=programme_id,
+                name=data["name"],
+                source_label=data["source_label"],
+                provenance="EXTRACTED_CANDIDATE",
+            ))
         for item in data["modules"]:
-            session.add(Module(**item, programme_id=programme_id,
-                               provenance="EXTRACTED_CANDIDATE"))
+            module = session.get(Module, item["id"])
+            if module and module.provenance != "EXTRACTED_CANDIDATE":
+                continue
+            session.merge(Module(**item, programme_id=programme_id,
+                                 provenance="EXTRACTED_CANDIDATE"))
     session.flush()
 
-    project_data = json.loads((IMPORTS_PATH / "oodj-project-candidate.json").read_text())
-    if not session.get(Project, project_data["id"]):
-        session.add(Project(**project_data, provenance="EXTRACTED_CANDIDATE"))
+    project_files = ["oodj-project-candidate.json", "submission-projects-candidate.json"]
+    for filename in project_files:
+        candidate_data = json.loads((IMPORTS_PATH / filename).read_text())
+        candidates = candidate_data if isinstance(candidate_data, list) else [candidate_data]
+        for data in candidates:
+            existing = session.get(Project, data["id"])
+            if existing:
+                if existing.provenance != "EXTRACTED_CANDIDATE":
+                    continue
+                for key, value in data.items():
+                    setattr(existing, key, value)
+            else:
+                session.add(Project(**data, provenance="EXTRACTED_CANDIDATE"))
     session.commit()

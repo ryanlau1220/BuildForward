@@ -59,7 +59,7 @@ export function SourcesWorkspace({
       </section>
 
       <section className="surface source-panel" aria-labelledby="project-sources-title">
-        <div className="surface-heading"><div><p className="eyebrow">PROJECT INPUTS</p><h3 id="project-sources-title">Repository evidence</h3></div><span className="count-pill">{candidateProjects.length} to review</span></div>
+        <div className="surface-heading"><div><p className="eyebrow">PROJECT INPUTS</p><h3 id="project-sources-title">Submissions and repositories</h3></div><span className="count-pill">{candidateProjects.length} to review</span></div>
         {candidateProjects.length > 0 && <div className="candidate-list">{candidateProjects.map(item => <article className="candidate-row" key={item.id}>
           <div className="candidate-row-main"><strong>{item.name}</strong><Provenance value={item.provenance} /></div>
           <button type="button" className="secondary-button" onClick={() => onInspectProject(item.id)}>Review evidence</button>
@@ -71,14 +71,14 @@ export function SourcesWorkspace({
         <label className="field upload-field"><span>Or upload a source ZIP</span><input type="file" accept=".zip,application/zip" disabled={busy} onChange={e => { const file = e.target.files?.[0]; if (file) onImportZip(file); }} /></label>
         {candidateProject && <div className="candidate-detail">
           <div className="candidate-detail-heading"><div><span className="eyebrow">SOURCE REVIEW</span><h4>{candidateProject.name}</h4></div><Provenance value={candidateProject.provenance} /></div>
-          <p className="source-label">{candidateProject.source_label} · {candidateProject.files_scanned} source files scanned</p>
+          <p className="source-label">{candidateProject.source_label} · {candidateProject.files_scanned ? `${candidateProject.files_scanned} source files scanned` : "No repository files scanned"}</p>
           {candidateProject.provenance === "EXTRACTED_CANDIDATE" && <label className="field origin-field"><span>Link to coursework only if verified</span><select value={candidateProject.originating_module_id || ""} onChange={e => { if (e.target.value) onProjectOrigin(e.target.value); }}>
             <option value="">No coursework link selected</option>
             {modules.map(module => <option key={module.id} value={module.id}>{module.name} · {module.programme_name} · {module.provenance.replaceAll("_", " ").toLowerCase()}</option>)}
           </select></label>}
           {candidateProject.evidence.length ? <div className="candidate-evidence-list">{candidateProject.evidence.map((item, index) => <article key={`${item.source}-${index}`}><strong>{label(item.competency)}</strong><span>{item.detail}</span><code>{item.source}</code></article>)}</div>
             : <p className="empty-note">No supported signals were found. Review the repository manually before drawing a conclusion.</p>}
-          <p className="small-note">Static scanning does not run code or prove code quality, successful tests or proficiency.</p>
+          <p className="small-note">Evidence is from the labeled report summary or static repository scan. Code was not run; evidence does not prove quality, successful tests or individual proficiency.</p>
           {candidateProject.provenance === "EXTRACTED_CANDIDATE" && <button type="button" className="secondary-button" disabled={busy} onClick={onConfirmProject}>Confirm reviewed evidence</button>}
         </div>}
       </section>

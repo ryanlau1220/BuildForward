@@ -1,14 +1,19 @@
 {
   "id": "project-oodj-apuasc",
   "name": "oodj-apuasc",
-  "source_label": "https://github.com/jasonwong1025/oodj-apuasc (public source; scanned archive contents only)",
+  "source_label": "User-supplied OODJ_Assignment.docx report plus https://github.com/jasonwong1025/oodj-apuasc; report and repository evidence are candidates for review.",
   "originating_module_id": "apu-oodj-assignment",
-  "competencies": ["domain-model", "modularity", "object-oriented-design", "testable-code"],
+  "competencies": ["domain-model", "modularity", "object-oriented-design", "testable-code", "java-programming", "swing-ui", "text-file-persistence", "input-validation", "documentation"],
   "evidence": [
     {"competency": "modularity", "source": "repository structure", "detail": "98 Java source files found"},
     {"competency": "testable-code", "source": "repository structure", "detail": "Service or domain code is separated into files"},
     {"competency": "domain-model", "source": "repository structure", "detail": "Domain or service files found"},
-    {"competency": "object-oriented-design", "source": "Java source", "detail": "Class or interface declaration found"}
+    {"competency": "object-oriented-design", "source": "Java source", "detail": "Class or interface declaration found"},
+    {"competency": "java-programming", "source": "OODJ_Assignment.docx · project overview", "detail": "The report describes a Java SE application."},
+    {"competency": "swing-ui", "source": "OODJ_Assignment.docx · project scope", "detail": "The report describes a desktop interface using java.awt and javax.swing."},
+    {"competency": "text-file-persistence", "source": "OODJ_Assignment.docx · project scope", "detail": "The report describes text-file storage; no relational database is used."},
+    {"competency": "input-validation", "source": "OODJ_Assignment.docx · objectives", "detail": "The report describes validation for user input."},
+    {"competency": "documentation", "source": "OODJ_Assignment.docx", "detail": "A project design and implementation report was supplied."}
   ],
   "languages": ["Java"],
   "files_scanned": 98
