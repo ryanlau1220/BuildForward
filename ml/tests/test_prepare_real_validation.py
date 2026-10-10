@@ -1,0 +1,62 @@
+import numpy as np
+import pytest
+
+from training.prepare_real_validation import analyze_repository, feature_values
+from training.train_continuity import summarize_external_validation
+
+
+def test_candidate_features_keep_unmapped_prerequisites_blank():
+    module = {
+        "required_competencies": [],
+        "target_competencies": ["unit-testing"],
+        "reuse_signals": ["unit-testing"],
+    }
+    analysis = {"competencies": ["unit-testing"], "evidence": [{}, {}], "files_scanned": 3}
+    values = feature_values(module, analysis)
+    assert values["prerequisite_coverage"] == ""
+    assert values["reuse_signal_count"] == 1
+    assert values["target_overlap"] == 1
+    assert values["evidence_count"] == 2
+
+
+def test_repository_scan_uses_shared_safe_file_rules(tmp_path):
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "app/api/test-update").mkdir(parents=True)
+    (tmp_path / "tests/smoke.cpp").write_text("int smoke() { return 1; }")
+    (tmp_path / "include.hpp").write_text("class Header {};")
+    (tmp_path / "app/api/test-update/route.ts").write_text("export function POST() {}")
+    (tmp_path / "users.csv").write_text("name,grade\nprivate,record")
+    analysis = analyze_repository(tmp_path)
+    assert analysis["files_scanned"] == 3
+    assert "C++" in analysis["languages"]
+    assert "unit-testing" in analysis["competencies"]
+
+
+def test_external_validation_rejects_labels_without_computed_features(tmp_path):
+    path = tmp_path / "real.csv"
+    path.write_text(
+        "project_id,anchor_project_id,prerequisite_coverage,reuse_signal_count,target_overlap,"
+        "evidence_count,files_scanned,label,label_source\n"
+        "repo-a,repo-a,,0,0,1,1,CONTINUE,educator_review\n"
+    )
+    with pytest.raises(ValueError, match="missing prerequisite_coverage"):
+        summarize_external_validation(None, path)
+
+
+def test_external_validation_scores_reviewed_pairs_without_retraining(tmp_path):
+    path = tmp_path / "reviewed.csv"
+    path.write_text(
+        "project_id,anchor_project_id,prerequisite_coverage,reuse_signal_count,target_overlap,"
+        "evidence_count,files_scanned,label,label_source\n"
+        "repo-a,repo-a,0.9,1,0.2,2,10,CONTINUE,educator_review\n"
+    )
+
+    class Model:
+        def predict(self, _features):
+            return np.array(["CONTINUE"])
+
+    summary = summarize_external_validation(Model(), path)
+    assert summary["reviewed_pairs"] == 1
+    assert summary["project_groups"] == 1
+    assert summary["metrics"]["model_macro_f1"] == pytest.approx(1 / 3)
+    assert "small samples" in summary["status"]

@@ -41,6 +41,7 @@
 # User uploads and generated model artifacts
 /data/submissions/*
 !data/submissions/.gitkeep
+/data/validation/repositories/
 ml/models/
 ml/artifacts/
 

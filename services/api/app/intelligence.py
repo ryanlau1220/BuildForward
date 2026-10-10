@@ -73,6 +73,7 @@ def continuity(project: Project, module: Module) -> dict:
         "held_out_macro_f1": metadata["evaluation"]["holdout_macro_f1"],
         "baseline_macro_f1": metadata["evaluation"]["baseline_macro_f1"],
         "claim_limit": metadata["claim_limit"],
+        "real_validation": metadata["real_validation"],
     }
     reason = (
         f"The trained classifier assigns {decision.replace('_', ' ')} from five project-module "

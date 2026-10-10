@@ -1,8 +1,10 @@
+import csv
 import json
 
 import joblib
+
 from training.generate_synthetic_scenarios import write_dataset
-from training.train_continuity import train
+from training.train_continuity import summarize_external_validation, train
 
 
 def test_training_keeps_anchors_grouped_and_records_synthetic_limits(tmp_path):
@@ -20,3 +22,19 @@ def test_training_keeps_anchors_grouped_and_records_synthetic_limits(tmp_path):
     assert artifact["metadata"]["training_data_source"] == "synthetic_rubric_scenarios"
     assert artifact["metadata"]["claim_limit"] == metrics["claim_limit"]
     assert json.loads((artifact_dir / "metrics.json").read_text())["dataset_sha256"] == metrics["dataset_sha256"]
+
+
+def test_external_validation_reports_pending_real_pairs_without_a_metric(tmp_path):
+    path = tmp_path / "real.csv"
+    with path.open("w", newline="") as destination:
+        writer = csv.DictWriter(destination, fieldnames=[
+            "project_id", "prerequisite_coverage", "reuse_signal_count", "target_overlap",
+            "evidence_count", "files_scanned", "label", "label_source",
+        ])
+        writer.writeheader()
+        writer.writerow({"project_id": "repo-a", "label": "", "label_source": ""})
+    summary = summarize_external_validation(None, path)
+    assert summary["candidate_pairs"] == 1
+    assert summary["reviewed_pairs"] == 0
+    assert summary["pending_pairs"] == 1
+    assert summary["metrics"] is None

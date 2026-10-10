@@ -1,0 +1,55 @@
+{
+  "description": "Curated source-code candidates from user-provided public repositories. Pair labels are intentionally blank until a reviewer confirms the project-module fit and applies the rubric.",
+  "projects": [
+    {
+      "id": "data-structure",
+      "name": "Data Structure",
+      "source_url": "https://github.com/jasonwong1025/Data-Structure",
+      "origin": "Coursework candidate; programme and module alignment not independently verified"
+    },
+    {
+      "id": "oodj-apuasc",
+      "name": "APUASC - OODJ",
+      "source_url": "https://github.com/jasonwong1025/oodj-apuasc",
+      "origin": "Coursework; repository is the user-provided OODJ assignment project"
+    },
+    {
+      "id": "nextgen-fitness-capstone",
+      "name": "NextGen Fitness - Capstone Project submission",
+      "source_url": "https://github.com/TngEr0425/capstone",
+      "origin": "University capstone project; README identifies APU capstone context"
+    },
+    {
+      "id": "flowquest-webdev",
+      "name": "FlowQuest - Web Development assignment",
+      "source_url": "https://github.com/JV-GG/WebDevassignment-mt",
+      "origin": "University coursework; repository README identifies a web development assignment"
+    },
+    {
+      "id": "sdp-diploma",
+      "name": "Counting Strike - SDP Diploma",
+      "source_url": "https://github.com/JV-GG/SDP-DIPLOMA",
+      "origin": "Diploma coursework candidate; repository README identifies SDP Diploma"
+    },
+    {
+      "id": "java-sem5-hrms",
+      "name": "Human Resource Management System - Java Sem 5",
+      "source_url": "https://github.com/JV-GG/Java_sem5",
+      "origin": "Unknown; repository name includes Sem 5, README does not establish course or hackathon context"
+    }
+  ],
+  "modules": [
+    {
+      "id": "apu-software-testing",
+      "name": "Software Testing",
+      "source_label": "User-provided Software Testing assignment brief; module order is a candidate, not independently verified",
+      "definition_file": "data/imports/oodj-coursework-candidate.json"
+    },
+    {
+      "id": "apu-sem5-capstone",
+      "name": "Capstone Project",
+      "source_label": "User-provided Capstone Project brief; reuse policy and programme alignment require educator confirmation",
+      "definition_file": "data/imports/apu-curriculum-candidate.json"
+    }
+  ]
+}

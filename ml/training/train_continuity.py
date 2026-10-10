@@ -73,7 +73,71 @@ def baseline_decision(row: dict[str, str]) -> str:
     return "PARTIAL_REUSE"
 
 
-def train(input_path: Path, output_dir: Path) -> dict:
+def summarize_external_validation(model, path: Path | None) -> dict:
+    if path is None:
+        return {
+            "dataset": None, "candidate_pairs": 0, "reviewed_pairs": 0,
+            "pending_pairs": 0, "project_groups": 0, "metrics": None,
+            "status": "No real project-module validation dataset configured.",
+        }
+    with path.open(newline="") as source:
+        reader = csv.DictReader(source)
+        if not reader.fieldnames or not set(FEATURES + ["project_id", "label", "label_source"]) <= set(reader.fieldnames):
+            raise ValueError("External validation CSV is missing project_id, model features, label, or label_source")
+        rows = list(reader)
+    reviewed = [row for row in rows if row["label"].strip()]
+    if any(row["label"] not in LABELS for row in reviewed):
+        raise ValueError("External validation labels must be CONTINUE, PARTIAL_REUSE, or RESET")
+    if any(not row["label_source"].strip() for row in reviewed):
+        raise ValueError("Every reviewed external label must identify its human-review source")
+    for index, row in enumerate(reviewed, start=2):
+        for feature in FEATURES:
+            if not row[feature].strip():
+                raise ValueError(f"Reviewed external row {index} is missing {feature}")
+            try:
+                value = float(row[feature])
+            except ValueError as exc:
+                raise ValueError(f"Invalid {feature} in reviewed external row {index}") from exc
+            if not np.isfinite(value):
+                raise ValueError(f"Non-finite {feature} in reviewed external row {index}")
+            if feature in {"prerequisite_coverage", "target_overlap"} and not 0 <= value <= 1:
+                raise ValueError(f"{feature} must be between 0 and 1 in reviewed external row {index}")
+            if feature in {"reuse_signal_count", "evidence_count", "files_scanned"} and value < 0:
+                raise ValueError(f"{feature} cannot be negative in reviewed external row {index}")
+
+    result = {
+        "dataset": path.name,
+        "dataset_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        "candidate_pairs": len(rows),
+        "reviewed_pairs": len(reviewed),
+        "pending_pairs": len(rows) - len(reviewed),
+        "project_groups": len({row.get("anchor_project_id") or row["project_id"] for row in rows}),
+        "label_sources": dict(Counter(row["label_source"] for row in reviewed)),
+        "label_distribution": dict(Counter(row["label"] for row in reviewed)),
+        "metrics": None,
+        "status": "No human-reviewed labels yet; real-data metric unavailable.",
+    }
+    if reviewed:
+        x = np.array([[float(row[name]) for name in FEATURES] for row in reviewed], dtype=float)
+        y = np.array([row["label"] for row in reviewed])
+        predictions = model.predict(x)
+        baseline = [baseline_decision(row) for row in reviewed]
+        result["metrics"] = {
+            "reviewed_pairs": len(reviewed),
+            "model_macro_f1": float(f1_score(y, predictions, labels=LABELS, average="macro", zero_division=0)),
+            "baseline_macro_f1": float(f1_score(y, baseline, labels=LABELS, average="macro", zero_division=0)),
+            "classification_report": classification_report(
+                y, predictions, labels=LABELS, output_dict=True, zero_division=0
+            ),
+            "confusion_matrix": confusion_matrix(y, predictions, labels=LABELS).tolist(),
+        }
+        result["status"] = (
+            "Descriptive external evaluation on human-reviewed pairs; small samples do not establish generalisation."
+        )
+    return result
+
+
+def train(input_path: Path, output_dir: Path, external_validation_path: Path | None = None) -> dict:
     rows = load_rows(input_path)
     x = np.array([[float(row[name]) for name in FEATURES] for row in rows], dtype=float)
     y = np.array([row["label"] for row in rows])
@@ -123,6 +187,7 @@ def train(input_path: Path, output_dir: Path) -> dict:
     # holdout is reserved for final reporting and never decides the winner.
     winner = max(results, key=lambda name: results[name]["group_cv_macro_f1"])
     selected_model = candidates[winner].fit(x, y)
+    external_validation = summarize_external_validation(selected_model, external_validation_path)
     output_dir.mkdir(parents=True, exist_ok=True)
     label_sources = dict(Counter(row["label_source"] for row in rows))
     all_labels_synthetic_or_rubric = all(
@@ -157,6 +222,7 @@ def train(input_path: Path, output_dir: Path) -> dict:
             )),
         },
         "claim_limit": claim_limit,
+        "real_validation": external_validation,
     }
     artifact = {
         "model": selected_model,
@@ -177,6 +243,7 @@ def train(input_path: Path, output_dir: Path) -> dict:
         "baseline_macro_f1": metadata["evaluation"]["baseline_macro_f1"],
         "results": results,
         "claim_limit": claim_limit,
+        "real_validation": external_validation,
     }
     (output_dir / "metrics.json").write_text(json.dumps(metrics, indent=2))
     return metrics
@@ -186,5 +253,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("dataset", type=Path)
     parser.add_argument("output_dir", type=Path)
+    parser.add_argument("--external-validation", type=Path)
     args = parser.parse_args()
-    print(json.dumps(train(args.dataset, args.output_dir), indent=2))
+    print(json.dumps(train(args.dataset, args.output_dir, args.external_validation), indent=2))

@@ -144,5 +144,17 @@
       ]
     }
   },
-  "claim_limit": "Synthetic rubric labels measure agreement with the scenario rubric, not institutional predictive validity."
+  "claim_limit": "Synthetic rubric labels measure agreement with the scenario rubric, not institutional predictive validity.",
+  "real_validation": {
+    "dataset": "continuity_pairs.real.csv",
+    "dataset_sha256": "10d0b2931f3313904bfd4419fd50330fdf050d0c371ec2cf974c09d0719026e7",
+    "candidate_pairs": 12,
+    "reviewed_pairs": 0,
+    "pending_pairs": 12,
+    "project_groups": 6,
+    "label_sources": {},
+    "label_distribution": {},
+    "metrics": null,
+    "status": "No human-reviewed labels yet; real-data metric unavailable."
+  }
 }

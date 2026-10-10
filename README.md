@@ -46,7 +46,7 @@ The demo data is seeded on first startup. Deleting the local `services/api/build
 - Predicted skill gaps at graduation and a with/without recommended-action scenario using a gain assumption set by the educator.
 - Source provenance and uncertainty labels throughout the interface.
 
-The project-reuse model is a proof of concept trained on synthetic rubric scenarios, not historical student data. The interface reports that source and its grouped holdout macro-F1; this measures agreement with the scenario rubric rather than institutional predictive validity. See [ml/README.md](ml/README.md) for the dataset method and reproducible training commands.
+The project-reuse model is a proof of concept trained on synthetic rubric scenarios, not historical student data. The interface reports that source and its grouped holdout macro-F1; this measures agreement with the scenario rubric rather than institutional predictive validity. A separate real-project review set contains 12 unlabeled candidate pairs from six user-provided repositories and two supplied module briefs. These pairs are not training data, and no real-data validation metric is available until an educator confirms each pairing, maps missing prerequisites, and supplies labels. See [ml/README.md](ml/README.md) for the dataset method and reproducible commands.
 
 The Graduation Skills Forecast ranks skills with mapped ILMIA role-profile evidence by expected graduation gap, selected-profile coverage, and future learning opportunities. Skills without mapped evidence are marked unavailable and ordered by expected gap alone. These role-profile shares are not percentages of all job ads; see [docs/market-data.md](docs/market-data.md).
 

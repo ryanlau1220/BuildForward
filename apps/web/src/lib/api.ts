@@ -18,6 +18,11 @@ export type Continuity = {
     name: string; training_data_source: string; training_dataset: string;
     training_rows: number; anchor_groups: number; dataset_sha256: string;
     held_out_macro_f1: number; baseline_macro_f1: number; claim_limit: string;
+    real_validation: {
+      dataset: string | null; candidate_pairs: number; reviewed_pairs: number;
+      pending_pairs: number; project_groups: number; status: string;
+      metrics: { reviewed_pairs: number; model_macro_f1: number; baseline_macro_f1: number } | null;
+    };
   };
   heuristic_baseline_decision: string;
   model_features: {
