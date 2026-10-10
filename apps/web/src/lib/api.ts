@@ -20,6 +20,10 @@ export type Continuity = {
     held_out_macro_f1: number; baseline_macro_f1: number; claim_limit: string;
   };
   heuristic_baseline_decision: string;
+  model_features: {
+    prerequisite_coverage: number; reuse_signal_count: number; target_overlap: number;
+    evidence_count: number; files_scanned: number;
+  };
   prerequisite_coverage: number; matched_prerequisites: string[];
   missing_prerequisites: string[]; reuse_signals: string[];
   target_already_met: string[]; target_to_develop: string[];

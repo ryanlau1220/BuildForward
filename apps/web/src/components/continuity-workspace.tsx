@@ -66,6 +66,16 @@ export function ContinuityWorkspace({
             <div><dt>Still to develop</dt><dd>{continuity.target_to_develop.length ? continuity.target_to_develop.map(label).join(", ") : "No additional targets identified"}</dd></div>
             <div><dt>Missing prerequisites</dt><dd>{continuity.missing_prerequisites.length ? continuity.missing_prerequisites.map(label).join(", ") : "None listed"}</dd></div>
           </dl>
+          <div className="model-inputs">
+            <strong>Classifier inputs</strong><span>Values supplied to the proof-of-concept model</span>
+            <dl>
+              <div><dt>Prerequisite coverage</dt><dd>{Math.round(continuity.model_features.prerequisite_coverage * 100)}%</dd></div>
+              <div><dt>Reuse signals</dt><dd>{continuity.model_features.reuse_signal_count}</dd></div>
+              <div><dt>Target overlap</dt><dd>{Math.round(continuity.model_features.target_overlap * 100)}%</dd></div>
+              <div><dt>Evidence items</dt><dd>{continuity.model_features.evidence_count}</dd></div>
+              <div><dt>File-count input</dt><dd>{continuity.model_features.files_scanned}</dd></div>
+            </dl>
+          </div>
           <p className="model-baseline">Heuristic baseline: <strong>{continuity.heuristic_baseline_decision.replaceAll("_", " ")}</strong> · grouped holdout macro-F1: {continuity.model.held_out_macro_f1.toFixed(2)} (baseline {continuity.model.baseline_macro_f1.toFixed(2)}).</p>
           <p className="small-note">{continuity.model.claim_limit} An educator makes the final decision.</p>
         </div> : <div className="result-placeholder"><strong>Comparison result will appear here</strong><span>Run the comparison to review the signal and supporting evidence.</span></div>}

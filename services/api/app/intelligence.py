@@ -87,6 +87,13 @@ def continuity(project: Project, module: Module) -> dict:
         "method": f"{metadata['model_name']} trained classifier",
         "model": model_summary,
         "heuristic_baseline_decision": baseline,
+        "model_features": {
+            "prerequisite_coverage": round(prerequisite_coverage, 2),
+            "reuse_signal_count": len(reuse),
+            "target_overlap": round(target_overlap, 2),
+            "evidence_count": len(project.evidence),
+            "files_scanned": project.files_scanned or 0,
+        },
         "prerequisite_coverage": round(prerequisite_coverage, 2),
         "matched_prerequisites": matched,
         "missing_prerequisites": missing,

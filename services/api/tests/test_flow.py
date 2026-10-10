@@ -54,6 +54,13 @@ def test_sample_predictions_are_explained_and_scenario_is_labelled():
         assert continuity["model"]["training_data_source"] == "synthetic_rubric_scenarios"
         assert continuity["model"]["training_rows"] == 72
         assert continuity["heuristic_baseline_decision"] == "CONTINUE"
+        assert continuity["model_features"] == {
+            "prerequisite_coverage": 1.0,
+            "reuse_signal_count": 1,
+            "target_overlap": 0.0,
+            "evidence_count": 3,
+            "files_scanned": 0,
+        }
         assert len(continuity["model"]["dataset_sha256"]) == 64
         assert continuity["matched_prerequisites"] == ["modularity", "object-oriented-design"]
         assert continuity["human_decision_required"] is True
