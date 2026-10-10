@@ -80,6 +80,7 @@ def test_supplied_material_candidates_are_seeded_but_not_confirmed():
         project = client.get("/api/v1/projects/project-oodj-apuasc").json()
         assert curriculum["provenance"] == "EXTRACTED_CANDIDATE"
         assert curriculum["name"] == "APU coursework materials (user-labeled Semesters 1–5)"
+        assert len(curriculum["source_label"]) <= 200
         assert len(curriculum["modules"]) == 5
         assert oodj["provenance"] == "EXTRACTED_CANDIDATE"
         assert project["provenance"] == "EXTRACTED_CANDIDATE"
