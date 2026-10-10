@@ -15,7 +15,6 @@ import joblib
 import numpy as np
 from sklearn.base import clone
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, confusion_matrix, f1_score
 from sklearn.model_selection import GroupKFold, GroupShuffleSplit
@@ -86,11 +85,10 @@ def train(input_path: Path, output_dir: Path) -> dict:
 
     candidates = {
         "logistic_regression": make_pipeline(
-            SimpleImputer(strategy="median"), StandardScaler(),
+            StandardScaler(),
             LogisticRegression(max_iter=1000, class_weight="balanced", random_state=42),
         ),
         "random_forest": make_pipeline(
-            SimpleImputer(strategy="median"),
             RandomForestClassifier(n_estimators=100, max_depth=5, class_weight="balanced",
                                    random_state=42),
         ),
