@@ -1,7 +1,7 @@
 import { label, type Project } from "@/lib/api";
 
 type Choice = { id: string; name: string; provenance: string };
-type ModuleChoice = { id: string; name: string; semester: number; programme_id: string; programme_name: string; provenance: string };
+type ModuleChoice = { id: string; name: string; programme_name: string; provenance: string };
 type CurriculumCandidate = {
   id: string;
   name: string;

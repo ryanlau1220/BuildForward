@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { label, studentIntakeLabel, type Demo, type Finding, type Forecast } from "@/lib/api";
+import { label, studentIntakeLabel, type Demo, type Finding } from "@/lib/api";
 
 function CoverageBar({ current, projected, target }: { current: number; projected: number; target: number }) {
   return <div className="coverage-track" role="img" aria-label={`Current skill coverage ${Math.round(current * 100)} percent, expected skill coverage at graduation ${Math.round(projected * 100)} percent, illustrative target ${Math.round(target * 100)} percent`}>
@@ -12,11 +12,10 @@ function CoverageBar({ current, projected, target }: { current: number; projecte
 function Percent({ value }: { value: number }) { return <>{Math.round(value * 100)}%</>; }
 
 export function CohortOutlook({
-  demo, forecast, positiveGaps, interventionSkill, gain, busy, linkedFocus, activeIntervention,
+  demo, positiveGaps, interventionSkill, gain, busy, linkedFocus, activeIntervention,
   onSkillChange, onGainChange, onCompare,
 }: {
   demo: Demo;
-  forecast: Forecast;
   positiveGaps: Finding[];
   interventionSkill: string;
   gain: number;

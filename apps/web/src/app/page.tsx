@@ -49,7 +49,6 @@ const viewLabels: Record<View, string> = {
 export default function Home() {
   const [view, setView] = useState<View>("cohort");
   const [demo, setDemo] = useState<Demo | null>(null);
-  const [project, setProject] = useState<Project | null>(null);
   const [continuity, setContinuity] = useState<Continuity | null>(null);
   const [forecast, setForecast] = useState<Forecast | null>(null);
   const [moduleId, setModuleId] = useState("");
@@ -72,6 +71,7 @@ export default function Home() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
+  const project = demo?.project;
   const programmeModules = useMemo(() => {
     if (!demo) return [];
     return modules
@@ -91,7 +91,6 @@ export default function Home() {
 
   function applyWorkspace(data: Demo) {
     setDemo(data);
-    setProject(data.project);
     setContinuity(data.continuity);
     setForecast(data.forecast);
     setModuleId(data.continuity?.module_id || "");
@@ -342,7 +341,6 @@ export default function Home() {
           />}
           {view === "cohort" && <CohortOutlook
             demo={demo}
-            forecast={forecast}
             positiveGaps={positiveGaps}
             interventionSkill={interventionSkill}
             gain={gain}
