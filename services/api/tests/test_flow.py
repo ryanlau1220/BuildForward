@@ -53,7 +53,7 @@ def test_sample_predictions_are_explained_and_scenario_is_labelled():
         assert continuity["model"]["name"] == "random_forest"
         assert continuity["model"]["training_data_source"] == "synthetic_rubric_scenarios"
         assert continuity["model"]["training_rows"] == 72
-        assert continuity["model"]["real_validation"]["candidate_pairs"] == 12
+        assert continuity["model"]["real_validation"]["candidate_pairs"] == 15
         assert continuity["model"]["real_validation"]["reviewed_pairs"] == 0
         assert continuity["model"]["real_validation"]["metrics"] is None
         assert continuity["heuristic_baseline_decision"] == "CONTINUE"
@@ -108,12 +108,20 @@ def test_supplied_material_candidates_are_seeded_but_not_confirmed():
     with TestClient(app) as client:
         curriculum = client.get("/api/v1/programmes/apu-coursework-sequence").json()
         oodj = client.get("/api/v1/programmes/apu-oodj-coursework-reference").json()
+        dstr = client.get("/api/v1/programmes/apu-degree-sem2-dstr-candidate").json()
         project = client.get("/api/v1/projects/project-oodj-apuasc").json()
         assert curriculum["provenance"] == "EXTRACTED_CANDIDATE"
         assert curriculum["name"] == "APU coursework materials (user-labeled Semesters 1–5)"
         assert len(curriculum["source_label"]) <= 200
         assert len(curriculum["modules"]) == 5
         assert oodj["provenance"] == "EXTRACTED_CANDIDATE"
+        assert dstr["provenance"] == "EXTRACTED_CANDIDATE"
+        dstr_module = next(m for m in dstr["modules"]
+                           if m["id"] == "apu-degree-sem2-data-structure")
+        assert dstr_module["semester"] == 2
+        assert dstr_module["required_competencies"] == []
+        assert "custom-array" in dstr_module["target_competencies"]
+        assert "singly-linked-list" in dstr_module["target_competencies"]
         assert [module["semester"] for module in oodj["modules"]] == [1, 2]
         assert oodj["modules"][1]["id"] == "apu-software-testing"
         assert "No submission has been supplied" in oodj["modules"][1]["assignment"]

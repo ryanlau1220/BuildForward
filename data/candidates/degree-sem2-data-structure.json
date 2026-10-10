@@ -1,0 +1,34 @@
+{
+  "id": "apu-degree-sem2-dstr-candidate",
+  "name": "Degree coursework candidate (user-labeled Semester 2)",
+  "source_label": "User-provided 2602 CT077-3-2-DSTR assignment; degree and semester alignment are user-supplied, not independently verified.",
+  "modules": [
+    {
+      "id": "apu-degree-sem2-data-structure",
+      "name": "Data Structure (CT077-3-2-DSTR)",
+      "semester": 2,
+      "prerequisites": [],
+      "required_competencies": [],
+      "target_competencies": [
+        "cpp-programming",
+        "custom-array",
+        "singly-linked-list",
+        "sorting-algorithms",
+        "searching-algorithms",
+        "patient-record-analysis",
+        "cost-calculation",
+        "performance-measurement",
+        "algorithm-comparison",
+        "console-reporting"
+      ],
+      "reuse_signals": [],
+      "outcomes": [
+        "Implement the supplied patient datasets using a custom array and a singly linked list.",
+        "Sort and search patient records, then summarize care and cost information in console output.",
+        "Measure execution time and operation or memory counts when comparing data structures and algorithms.",
+        "Use patterns in the supplied data to support practical recommendations."
+      ],
+      "assignment": "Candidate summary of the user-provided 2602 CT077-3-2-DSTR assignment brief. It describes two console implementations, record operations, summary analysis, and measurements; the brief does not establish prerequisite modules."
+    }
+  ]
+}

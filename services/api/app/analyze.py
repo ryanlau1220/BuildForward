@@ -103,6 +103,35 @@ def analyze_files(files: dict[str, bytes]) -> dict:
     if any(token in joined for token in ("fastapi", "express", "spring-boot", "springframework.web")):
         add("web-api", "dependency or source text", "Web framework reference found")
 
+    # Assignment-specific evidence is based on named types and operations, not
+    # on repository descriptions or presumed student proficiency.
+    cpp_paths = [p for p in source_paths if PurePosixPath(p).suffix in {".cpp", ".hpp", ".h"}]
+    if cpp_paths:
+        add("cpp-programming", cpp_paths[0], "C++ source or header files found")
+    if re.search(r"\bclass\s+arraylist\b", joined):
+        add("custom-array", "C++ source text", "ArrayList type declaration found")
+    if (re.search(r"\bclass\s+linkedlist\b", joined)
+            and re.search(r"\bnode\s*\*\s*next\b", joined)):
+        add("singly-linked-list", "C++ source text", "LinkedList node with a next pointer found")
+    if re.search(r"\b(selectionsort|mergesort)\s*\(", joined):
+        add("sorting-algorithms", "source text", "Sorting operation declarations or calls found")
+    if re.search(r"\b(sortedsearch|linearsearch|binarysearch)\s*\(", joined):
+        add("searching-algorithms", "source text", "Search operation declarations or calls found")
+    if re.search(r"\b(struct|class)\s+patient\b", joined) and re.search(
+        r"\b(agegroupof|caretypeof|agegroup|caretype)\b", joined
+    ):
+        add("patient-record-analysis", "source text", "Patient record and grouping fields found")
+    if re.search(r"\b(totalcost|basecostperhour)\b", joined):
+        add("cost-calculation", "source text", "Cost fields or calculation references found")
+    if re.search(r"\b(steady_clock|nanoseconds|comparisons)\b", joined):
+        add("performance-measurement", "source text", "Timing or operation-count references found")
+    if re.search(r"\b(selectionsort|mergesort)\s*\(", joined) and re.search(
+        r"\b(arraylist|linkedlist)\b", joined
+    ):
+        add("algorithm-comparison", "source text", "Multiple sort algorithms and container types referenced")
+    if re.search(r"#include\s*<iostream>", joined) and re.search(r"\b(cout|print)\b", joined):
+        add("console-reporting", "source text", "Console output operations found")
+
     return {
         "competencies": sorted({e["competency"] for e in evidence}),
         "evidence": evidence,

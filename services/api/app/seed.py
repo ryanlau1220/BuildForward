@@ -7,6 +7,7 @@ from .models import Cohort, Module, Programme, Project
 
 SEED_PATH = Path(__file__).resolve().parents[3] / "data" / "sample_demo.json"
 IMPORTS_PATH = Path(__file__).resolve().parents[3] / "data" / "imports"
+CANDIDATES_PATH = Path(__file__).resolve().parents[3] / "data" / "candidates"
 
 
 def seed_sample(session: Session) -> None:
@@ -52,6 +53,23 @@ def seed_source_candidates(session: Session) -> None:
             module = session.get(Module, item["id"])
             if module and module.provenance != "EXTRACTED_CANDIDATE":
                 continue
+            session.merge(Module(**item, programme_id=programme_id,
+                                 provenance="EXTRACTED_CANDIDATE"))
+    # This source candidate is tracked separately because the assignment PDF is
+    # intentionally excluded from Git. Keep its extraction explicitly reviewable.
+    data = json.loads((CANDIDATES_PATH / "degree-sem2-data-structure.json").read_text())
+    programme_id = data["id"]
+    existing = session.get(Programme, programme_id)
+    if not existing:
+        session.add(Programme(id=programme_id, name=data["name"],
+                              source_label=data["source_label"],
+                              provenance="EXTRACTED_CANDIDATE"))
+    elif existing.provenance == "EXTRACTED_CANDIDATE":
+        existing.name = data["name"]
+        existing.source_label = data["source_label"]
+    for item in data["modules"]:
+        module = session.get(Module, item["id"])
+        if not module or module.provenance == "EXTRACTED_CANDIDATE":
             session.merge(Module(**item, programme_id=programme_id,
                                  provenance="EXTRACTED_CANDIDATE"))
     session.flush()

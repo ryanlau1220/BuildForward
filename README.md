@@ -59,7 +59,7 @@ The sample scenario assumes a 70% skill-coverage target and a 22-point gain for 
 
 ## Importing real material
 
-1. The five supplied materials are normalized in `data/imports/apu-curriculum-candidate.json` and seeded locally as extracted candidates, along with the separate OODJ module and repository candidates. Fresh databases receive the same review-only records automatically.
+1. The five semester-labeled materials are normalized in `data/imports/apu-curriculum-candidate.json`; the OODJ example and the newly supplied CT077-3-2-DSTR brief are separate extracted candidates. The Data Structure record carries provisional skill tags mapped from the assignment tasks, while prerequisites stay unmapped. Fresh databases receive these review-only records automatically.
 2. Open **Data Sources**. Inspect the candidate module outcomes and assignment summaries against files in `data/materials/`. Confirm only after educator review. The API equivalent is `POST /api/v1/programmes/{id}/confirm`.
 3. In Data Sources, inspect the supplied OODJ repository evidence or analyze a public GitHub repository / ZIP. Review extracted evidence and confirm it only after human review.
 4. If actual student-intake skill coverage is available, import it through the existing `POST /api/v1/cohorts/import` endpoint, review, and confirm. Otherwise, keep the student intake labelled as simulated.
