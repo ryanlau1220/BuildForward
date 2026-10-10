@@ -48,6 +48,11 @@ const viewLabels: Record<View, string> = {
   cohort: "Graduation Skills Forecast",
   sources: "Data Sources",
 };
+const mobileViewLabels: Record<View, string> = {
+  continuity: "Project Reuse",
+  cohort: "Skills Forecast",
+  sources: "Data Sources",
+};
 
 export default function Home() {
   const [view, setView] = useState<View>("cohort");
@@ -301,15 +306,15 @@ export default function Home() {
       <a className="brand" href="/" aria-label="BuildForward workspace"><Image className="brand-logo" src="/brand/logo.png" alt="BuildForward" width={1606} height={709} priority /></a>
       <div className="sidebar-label">WORKSPACE</div>
       <nav className="primary-nav" aria-label="Workspace views">
-        {(Object.keys(viewLabels) as View[]).map((item, index) => <button
+        {(Object.keys(viewLabels) as View[]).map(item => <button
           className={`nav-item ${view === item ? "active" : ""}`}
           type="button"
+          aria-label={viewLabels[item]}
           aria-current={view === item ? "page" : undefined}
           key={item}
           onClick={() => { setView(item); setError(""); setMessage(""); }}
-        ><span className="nav-index">0{index + 1}</span><span>{viewLabels[item]}</span></button>)}
+        ><span className="nav-label-full">{viewLabels[item]}</span><span className="nav-label-mobile" aria-hidden="true">{mobileViewLabels[item]}</span></button>)}
       </nav>
-      <div className="sidebar-bottom"><span className="status-dot" />{provenanceStatus}</div>
     </aside>
 
     <main className="main-area">
@@ -333,7 +338,7 @@ export default function Home() {
         {error && <div className="notice notice-error" role="alert"><span>{error}</span><button type="button" onClick={() => setError("")} aria-label="Dismiss error">×</button></div>}
         {message && <div className="notice notice-success" role="status"><span>{message}</span><button type="button" onClick={() => setMessage("")} aria-label="Dismiss message">×</button></div>}
         {!demo || !forecast || !project ? <section className="empty-workspace"><h2>Decision inputs are unavailable</h2><p>Check that the API is running, then reload this workspace.</p></section> : <>
-          <div className="data-status"><span className="status-dot" /><span>{provenanceStatus}</span><span className="status-divider" />{demo.programme.name} <span>·</span> {studentIntakeLabel(demo.cohort.name)}</div>
+          <div className="data-status"><span className="status-dot" /><span>{provenanceStatus}</span></div>
           {view === "continuity" && <ContinuityWorkspace
             project={project}
             modules={programmeModules}

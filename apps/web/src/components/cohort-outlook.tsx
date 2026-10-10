@@ -59,13 +59,10 @@ export function CohortOutlook({
       : null;
   return <section className="view-panel" aria-labelledby="forecast-title">
     <div className="view-intro"><div><p className="eyebrow">STUDENT INTAKE SKILL FORECAST</p><h2 id="forecast-title">Predicted Skill Gaps at Graduation</h2></div>
-      <p>See expected skill coverage at graduation, which future modules can build each skill, and how a possible action changes the scenario.</p></div>
-
-    <div className="forecast-meta"><div><span>STUDENT INTAKE</span><strong>{studentIntakeLabel(demo.cohort.name)}</strong></div><div><span>FORECAST HORIZON</span><strong>Graduation</strong></div><div><span>FORECAST BASIS</span><strong>Assumption-based; not validated on past intakes</strong></div></div>
-    <p className="small-note">A student intake is a group of students progressing through this programme together. It is not a semester.</p>
+      <p>Illustrative estimate for {studentIntakeLabel(demo.cohort.name)}; not validated on past intakes.</p></div>
     <div className="outlook-grid">
       <section className="surface gap-panel" aria-labelledby="gaps-title">
-        <div className="surface-heading"><div><p className="eyebrow">SKILLS TO REVIEW</p><h3 id="gaps-title">Predicted Skill Gaps at Graduation</h3></div><span className="target-legend"><i />{positiveGaps[0] ? `${Math.round(positiveGaps[0].programme_target * 100)}% illustrative target` : "Illustrative target"}</span></div>
+        <div className="surface-heading"><div><p className="eyebrow">FORECAST</p><h3 id="gaps-title">Skills to review</h3></div><span className="target-legend"><i />{positiveGaps[0] ? `${Math.round(positiveGaps[0].programme_target * 100)}% illustrative target` : "Illustrative target"}</span></div>
         {positiveGaps.length ? <div className="gap-list">
           {positiveGaps.map((finding, index) => <article className="gap-row" key={finding.competency}>
             <div className="gap-heading"><span className="rank-number">{String(index + 1).padStart(2, "0")}</span><button className="skill-select-link" type="button" onClick={() => chooseScenarioSkill(finding.competency, onSkillChange)} aria-label={`Use ${label(finding.competency)} in the recommended action scenario`}>{label(finding.competency)}</button><span className={`priority ${finding.priority_score !== null ? "market" : "gap-only"}`} title="Planning score, not a probability">{finding.priority_score !== null ? `Score ${finding.priority_score.toFixed(4)}` : "Gap only"}</span></div>
@@ -74,14 +71,15 @@ export function CohortOutlook({
             {finding.market_evidence ? <p className="market-signal">
               <strong>{finding.market_evidence.occupation.online_offerings.toLocaleString()}</strong> DOSM online job offerings for <a href={finding.market_evidence.occupation.source} target="_blank" rel="noreferrer">{finding.market_evidence.occupation.name}</a> in Q2 2026
               <span>{((finding.market_relevance ?? 0) * 100).toFixed(1)}% of {finding.market_evidence.occupation.total_online_offerings.toLocaleString()} online offerings were for this occupation, not this skill.</span>
-              <span>BuildForward mapping ({finding.market_evidence.mapping_type}): {finding.market_evidence.mapping_note}</span>
             </p> : <p className="market-signal unavailable">No mapped market signal for this skill</p>}
+            <details className="gap-detail"><summary>Why this rank</summary>
+            {finding.market_evidence && <p className="priority-reason">BuildForward mapping ({finding.market_evidence.mapping_type}): {finding.market_evidence.mapping_note}</p>}
             <p className="priority-reason">{finding.priority_reason
               .replaceAll("projected gap", "expected skill gap at graduation")
               .replaceAll("curriculum-runway factor", "future learning opportunities factor")
               .replaceAll("remaining module opportunities", "future learning opportunities")
               .replaceAll("remaining module opportunity", "future learning opportunity")
-              .replaceAll("competency", "skill")}</p>
+              .replaceAll("competency", "skill")}</p></details>
           </article>)}
         </div> : <div className="empty-state"><h4>No predicted skill gaps in this scenario</h4><p>No skills are below the illustrative graduation target.</p></div>}
         <div className="assumption-note"><strong>How to read this</strong><p>Skills with a BuildForward occupation mapping are ordered using the expected skill gap, DOSM occupation share, and future learning opportunities. Other skills are ordered by expected gap alone. DOSM reports online job offerings by occupation, not how many employers request each skill. See <a href="https://www.dosm.gov.my/portal-main/release-content/big-data-analytics-job-market-insights-q22026" target="_blank" rel="noreferrer">DOSM Job Market Insights, Q2 2026</a>. The graduation target and coverage gains are illustrative assumptions.</p></div>

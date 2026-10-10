@@ -26,8 +26,7 @@ export function ContinuityWorkspace({
   onCompare: () => void;
 }) {
   return <section className="view-panel" aria-labelledby="reuse-title">
-    <div className="view-intro"><div><p className="eyebrow">EXISTING PROJECT × FUTURE MODULE</p><h2 id="reuse-title">Can this project be meaningfully reused and extended?</h2></div>
-      <p>Compare an existing project with a future module’s learning goals. The result shows reuse potential for educator review.</p></div>
+    <div className="view-intro"><div><p className="eyebrow">EXISTING PROJECT × FUTURE MODULE</p><h2 id="reuse-title">Can this project be meaningfully reused and extended?</h2></div></div>
 
     <div className="continuity-grid">
       <section className="surface project-summary" aria-labelledby="project-title">
@@ -60,15 +59,17 @@ export function ContinuityWorkspace({
         <button className="primary-button" type="button" disabled={busy || !selectedModule || project.provenance === "EXTRACTED_CANDIDATE"} onClick={onCompare} aria-busy={busy}>{busy ? "Checking project reuse…" : "Run project reuse check"}</button>
 
         {continuity ? <div className="result-block" aria-live="polite">
-          <div className="result-topline"><div><span className="eyebrow">PROJECT REUSE DECISION</span><p className="model-name">{continuity.model.name.replaceAll("_", " ")} · {continuity.model.training_rows} synthetic rubric scenarios</p></div><span className={`decision-badge ${continuity.decision.toLowerCase()}`}>{projectReuseDecisionLabel(continuity.decision)}</span></div>
+          <div className="result-topline"><span className="eyebrow">PROJECT REUSE DECISION</span><span className={`decision-badge ${continuity.decision.toLowerCase()}`}>{projectReuseDecisionLabel(continuity.decision)}</span></div>
           <p className="result-reason">{continuity.reason}</p>
-          <p className="small-note">This result estimates project fit with the module’s learning goals. It does not assess assignment rules or judge the brief. An educator decides whether to reuse the project, adapt an activity, or keep the current assignment.</p>
+          <p className="small-note">Proof-of-concept model trained on synthetic scenarios. It estimates learning-goal fit; review assignment rules and decide.</p>
           <dl className="result-details">
           <div><dt>Required skills covered</dt><dd>{Math.round(continuity.prerequisite_coverage * 100)}%</dd></div>
           <div><dt>Skills already shown</dt><dd>{continuity.matched_prerequisites.length ? continuity.matched_prerequisites.map(label).join(", ") : "No required skills matched"}</dd></div>
           <div><dt>Skills to build in this module</dt><dd>{continuity.target_to_develop.length ? continuity.target_to_develop.map(label).join(", ") : "No additional targets identified"}</dd></div>
           <div><dt>Required skills not shown in project</dt><dd>{continuity.missing_prerequisites.length ? continuity.missing_prerequisites.map(label).join(", ") : "None listed"}</dd></div>
           </dl>
+          <details className="method-details"><summary>Model evidence and limitations</summary>
+          <p className="model-name">{continuity.model.name.replaceAll("_", " ")} · {continuity.model.training_rows} synthetic rubric scenarios</p>
           <div className="model-inputs">
             <strong>Classifier inputs</strong><span>Values supplied to the proof-of-concept model</span>
             <dl>
@@ -83,7 +84,8 @@ export function ContinuityWorkspace({
           <p className="model-baseline">Hypothetical fit checks using real repositories: <strong>{continuity.model.real_validation.candidate_pairs} pairs across {continuity.model.real_validation.project_groups} projects · {continuity.model.real_validation.reviewed_pairs} approved labels · {continuity.model.real_validation.scored_pairs} scored · {continuity.model.real_validation.unscored_reviewed_pairs} awaiting a required-skill map · {continuity.model.real_validation.ineligible_pairs} same-module pairs excluded</strong>.</p>
           {continuity.model.real_validation.metrics && <p className="model-baseline">Agreement on {continuity.model.real_validation.metrics.scored_pairs} hypothetical pairs: model macro-F1 <strong>{continuity.model.real_validation.metrics.model_macro_f1.toFixed(2)}</strong> (simple baseline {continuity.model.real_validation.metrics.baseline_macro_f1.toFixed(2)}).</p>}
           <p className="small-note">{continuity.model.real_validation.status}</p>
-          <p className="small-note">{continuity.model.claim_limit} An educator makes the final decision.</p>
+          <p className="small-note">{continuity.model.claim_limit}</p>
+          </details>
         </div> : <div className="result-placeholder"><strong>Project reuse result will appear here</strong><span>Run the check to review the model signal and supporting evidence.</span></div>}
       </section>
     </div>

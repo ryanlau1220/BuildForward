@@ -49,7 +49,7 @@ export function SourcesWorkspace({
 
   return <section className="view-panel" aria-labelledby="sources-title">
     <div className="view-intro"><div><p className="eyebrow">DATA SOURCES · REVIEW</p><h2 id="sources-title">Review learning and project information</h2></div>
-      <p>Imported coursework and repository scans remain candidates until reviewed. Confirming extracted details does not validate a programme sequence or prove student proficiency.</p></div>
+      <p>Review imported coursework and repository evidence before using them in forecasts.</p></div>
 
     <div className="sources-grid">
       <section className="surface source-panel" aria-labelledby="curriculum-sources-title">
