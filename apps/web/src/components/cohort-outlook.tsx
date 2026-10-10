@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { label, type Demo, type Finding, type Forecast } from "@/lib/api";
 
 function CoverageBar({ current, projected, target }: { current: number; projected: number; target: number }) {
@@ -36,13 +37,18 @@ export function CohortOutlook({
         <div className="surface-heading"><div><p className="eyebrow">RANKED FINDINGS</p><h3 id="gaps-title">Projected competency gaps</h3></div><span className="target-legend"><i />Illustrative target</span></div>
         {positiveGaps.length ? <div className="gap-list">
           {positiveGaps.map((finding, index) => <article className="gap-row" key={finding.competency}>
-            <div className="gap-heading"><span className="rank-number">{String(index + 1).padStart(2, "0")}</span><strong>{label(finding.competency)}</strong><span className={`priority ${finding.priority.toLowerCase()}`}>{finding.priority}</span></div>
+            <div className="gap-heading"><span className="rank-number">{String(index + 1).padStart(2, "0")}</span><strong>{label(finding.competency)}</strong><span className={`priority ${finding.priority_score !== null ? "market" : "gap-only"}`} title="Planning score, not a probability">{finding.priority_score !== null ? `Score ${finding.priority_score.toFixed(3)}` : "Gap only"}</span></div>
             <CoverageBar current={finding.current_coverage} projected={finding.projected_graduation_coverage} target={finding.programme_target} />
             <div className="coverage-labels"><span><b><Percent value={finding.current_coverage} /></b> current</span><span><b><Percent value={finding.projected_graduation_coverage} /></b> projected</span><span><b>{finding.future_module_opportunities}</b> future opportunities</span></div>
+            {finding.market_evidence ? <p className="market-signal">
+              <strong>{Math.round((finding.market_relevance ?? 0) * 100)}%</strong> of the selected ILMIA role profiles list a mapped skill
+              <span>Matched: {finding.market_evidence.profiles.map((profile, index) => <Fragment key={profile.code}>{index > 0 ? ", " : ""}<a href={profile.url} target="_blank" rel="noreferrer">{profile.name}</a></Fragment>)}</span>
+              <span>Mapped {label(finding.market_evidence.match_type)}: {finding.market_evidence.skill_terms}</span>
+            </p> : <p className="market-signal unavailable">No mapped market signal for this competency</p>}
             <p className="priority-reason">{finding.priority_reason}</p>
           </article>)}
         </div> : <div className="empty-state"><h4>No projected gaps in this scenario</h4><p>There are no competencies below the current illustrative target.</p></div>}
-        <div className="assumption-note"><strong>How to read this</strong><p>The priority and graduation coverage come from the current forecasting method and assumptions. The target is illustrative; no market data is included.</p></div>
+        <div className="assumption-note"><strong>How to read this</strong><p>Market-supported priorities use projected gap × role-profile coverage × curriculum-runway factor (1 ÷ (1 + remaining module opportunities)). Competencies without mapped evidence fall back to gap-only order. ILMIA role-profile skills are from Q1 2024, are a small selected sample, and are not percentages of all job ads. See <a href="https://www.ilmia.gov.my/bda-myjobprofile/" target="_blank" rel="noreferrer">ILMIA MyJobProfile</a>. The graduation target and coverage gains remain illustrative assumptions.</p></div>
       </section>
 
       <section className="surface scenario-panel" aria-labelledby="scenario-title">

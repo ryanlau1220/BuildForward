@@ -73,8 +73,24 @@ def test_sample_predictions_are_explained_and_scenario_is_labelled():
         assert after["projected_gap"] == before["projected_gap"]
         assert after["potential_gap_reduction"] > 0
         assert "assumption" in scenario["assumptions"]["intervention_gain"]
+        assert scenario["assumptions"]["market_dataset"]["period"] == "Q1 2024"
+        assert "Not a percentage of all job ads" in scenario["assumptions"]["market_dataset"]["claim_limit"]
+        database_signal = next(
+            f for f in baseline["ranked_findings"] if f["competency"] == "database-design"
+        )
+        assert database_signal["market_relevance"] == round(4 / 6, 3)
+        assert database_signal["market_evidence"]["matched_profiles"] == 4
+        unsupported = next(
+            f for f in baseline["ranked_findings"] if f["competency"] == "continuous-integration"
+        )
+        assert unsupported["market_relevance"] is None
+        assert unsupported["priority_score"] is None
         assert scenario["ranked_findings"] == sorted(
-            scenario["ranked_findings"], key=lambda f: (-f["projected_gap"], f["future_module_opportunities"], f["competency"])
+            scenario["ranked_findings"], key=lambda f: (
+                f["priority_score"] is None,
+                -(f["priority_score"] if f["priority_score"] is not None else f["projected_gap"]),
+                f["competency"],
+            )
         )
 
 

@@ -1,0 +1,4 @@
+competency,market_skill_terms,matched_profile_codes,matched_profiles,profile_sample_size,source_period,match_type
+database-design,"Database Design; Database Architecture; Database Modeling",2511;2512;2514;2521,4,6,Q1 2024,explicit_skill_tag
+unit-testing,"JUnit; Software Testing",2511;2519,2,6,Q1 2024,related_skill_tag
+deployment,Cloud Computing,2512;2522,2,6,Q1 2024,adjacent_skill_tag

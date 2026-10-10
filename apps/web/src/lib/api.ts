@@ -28,12 +28,17 @@ export type Continuity = {
 export type Finding = {
   competency: string; current_coverage: number; projected_graduation_coverage: number;
   programme_target: number; projected_gap: number; future_module_opportunities: number;
-  priority: string; priority_reason: string; with_intervention_coverage: number;
+  priority_score: number | null; market_relevance: number | null;
+  market_evidence: {
+    skill_terms: string; profiles: {code: string; name: string; url: string}[];
+    matched_profiles: number; profile_sample_size: number; match_type: string;
+  } | null;
+  runway_factor: number; priority_reason: string; with_intervention_coverage: number;
   with_intervention_gap: number; potential_gap_reduction: number;
 };
 export type Forecast = {
   cohort_id: string; provenance: string; method: string;
-  assumptions: Record<string, string | number | null>;
+  assumptions: Record<string, string | number | Record<string, unknown> | null>;
   intervention: {competency: string; assumed_gain: number; description: string} | null;
   ranked_findings: Finding[]; human_decision_required: boolean;
 };

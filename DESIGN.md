@@ -14,7 +14,7 @@ The product presents evidence and projections for human review. It does not make
 The application opens directly into the working interface. It is not a marketing site, pitch deck, LMS, or general analytics dashboard.
 
 - **Project continuity** — compare a selected repository with a later reviewed module; inspect detected evidence, learning outcomes, prerequisites, missing skills, the trained classifier output, and its heuristic baseline.
-- **Cohort outlook** — inspect ranked competency gaps through graduation and model a scenario using an explicit assumed gain.
+- **Cohort outlook** — inspect projected competency gaps ranked with a small DOSM/ILMIA role-profile signal where mapped, and model an intervention using an explicit assumed gain.
 - **Sources** — review coursework candidates, inspect repository evidence, import a public GitHub repository or ZIP, and confirm extracted information.
 
 Programme, cohort, and project selectors stay available in the workspace header. Keep navigation limited to these work areas. Add a new area only when it directly supports a core decision or its evidence.
@@ -31,7 +31,7 @@ Current CSS tokens live in `apps/web/src/app/globals.css`. Preserve the existing
 - A confirmation records that source details were reviewed; it does not prove programme alignment, project quality, successful tests, or individual proficiency.
 - Keep Degree OODJ material separate from the five Semester 1–5 briefs unless a person verifies their programme relationship. The Semester 1 visual programming brief identifies Diploma coursework.
 - Do not imply the five briefs form a verified curriculum sequence. Their semester labels are source context only; prerequisites and mappings remain provisional until verified.
-- Keep simulated cohort data, sample programme data, and synthetic continuity training labels visibly labelled. Forecast assumptions, heuristic method, and lack of market evidence must remain legible near results.
+- Keep simulated cohort data, sample programme data, synthetic continuity training labels, and DOSM/ILMIA market-data scope visibly labelled. Show market-data age, selected profile coverage, and missing signals near results. Forecast assumptions and the illustrative target must remain legible near results.
 - Show detected evidence and reasons alongside continuity outcomes. Display the model's training provenance, grouped holdout metric, and baseline. Never present model output or scores as calibrated probability.
 - Intervention comparisons are scenarios, not observed impact or validated recommendations. The educator remains responsible for the decision.
 

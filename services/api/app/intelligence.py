@@ -5,6 +5,7 @@ from pathlib import Path
 import joblib
 import numpy as np
 
+from .market import load_market_signals, market_dataset_summary
 from .models import Cohort, Module, Project
 from .schemas import Intervention
 
@@ -106,6 +107,7 @@ def forecast(cohort: Cohort, modules: list[Module], intervention: Intervention |
     )
     skills = sorted(set(cohort.coverage) | set(opportunities))
     findings = []
+    market_signals = load_market_signals()
     for skill in skills:
         current = float(cohort.coverage.get(skill, 0))
         future = min(1.0, current + opportunities[skill] * ASSUMED_MODULE_GAIN)
@@ -114,6 +116,9 @@ def forecast(cohort: Cohort, modules: list[Module], intervention: Intervention |
         if intervention and intervention.competency == skill:
             with_intervention = min(1.0, future + intervention.assumed_gain)
         remaining_gap = max(0.0, MIN_COVERAGE - with_intervention)
+        market = market_signals.get(skill)
+        runway_factor = 1 / (1 + opportunities[skill])
+        priority_score = gap * market["role_coverage"] * runway_factor if market else None
         findings.append({
             "competency": skill,
             "current_coverage": round(current, 2),
@@ -121,16 +126,35 @@ def forecast(cohort: Cohort, modules: list[Module], intervention: Intervention |
             "programme_target": MIN_COVERAGE,
             "projected_gap": round(gap, 2),
             "future_module_opportunities": opportunities[skill],
-            "priority": "HIGH" if gap >= 0.35 else "MEDIUM" if gap >= 0.15 else "LOW",
+            "priority_score": round(priority_score, 3) if priority_score is not None else None,
+            "market_relevance": round(market["role_coverage"], 3) if market else None,
+            "market_evidence": {
+                "skill_terms": market["market_skill_terms"],
+                "profiles": market["profiles"],
+                "matched_profiles": int(market["matched_profiles"]),
+                "profile_sample_size": int(market["profile_sample_size"]),
+                "match_type": market["match_type"],
+            } if market else None,
+            "runway_factor": round(runway_factor, 3),
             "priority_reason": (
-                f"Projected gap of {gap:.0%}; {opportunities[skill]} remaining module "
+                f"Market-weighted score {priority_score:.3f}: {gap:.0%} projected gap × "
+                f"{market['role_coverage']:.0%} role-profile coverage × {runway_factor:.2f} "
+                f"curriculum-runway factor."
+                if market else
+                f"No mapped market signal; shown by projected gap only ({gap:.0%}). "
+                f"{opportunities[skill]} remaining module "
                 f"{'opportunity' if opportunities[skill] == 1 else 'opportunities'}."
             ),
             "with_intervention_coverage": round(with_intervention, 2),
             "with_intervention_gap": round(remaining_gap, 2),
             "potential_gap_reduction": round(gap - remaining_gap, 2),
         })
-    findings.sort(key=lambda f: (-f["projected_gap"], f["future_module_opportunities"], f["competency"]))
+    findings.sort(key=lambda f: (
+        f["priority_score"] is None,
+        -(f["priority_score"] if f["priority_score"] is not None else f["projected_gap"]),
+        f["competency"],
+    ))
+    market_data = market_dataset_summary()
     return {
         "cohort_id": cohort.id,
         "provenance": cohort.provenance,
@@ -138,7 +162,12 @@ def forecast(cohort: Cohort, modules: list[Module], intervention: Intervention |
         "assumptions": {
             "programme_target": MIN_COVERAGE,
             "coverage_gain_per_remaining_module": ASSUMED_MODULE_GAIN,
-            "market_signal": "unavailable; no market data included in ranking",
+            "market_signal": "partial; role-profile skill tags support selected competencies",
+            "market_priority_formula": (
+                "projected curriculum gap × role-profile coverage × curriculum-runway factor"
+            ),
+            "curriculum_runway_factor": "1 / (1 + remaining module opportunities for the competency)",
+            "market_dataset": market_data,
             "intervention_gain": (
                 "user-supplied scenario assumption, not an observed effect" if intervention else None
             ),
