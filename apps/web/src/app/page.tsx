@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { api, type Continuity, type Demo, type Forecast, type Project } from "@/lib/api";
 import { ContinuityWorkspace } from "@/components/continuity-workspace";
 import { CohortOutlook } from "@/components/cohort-outlook";
@@ -292,7 +293,7 @@ export default function Home() {
 
   return <div className="app-shell">
     <aside className="app-sidebar">
-      <a className="brand" href="/" aria-label="BuildForward workspace"><span className="brand-mark">BF</span><span>BuildForward</span></a>
+      <a className="brand" href="/" aria-label="BuildForward workspace"><Image className="brand-logo" src="/brand/logo.png" alt="BuildForward" width={1606} height={709} priority /></a>
       <div className="sidebar-label">WORKSPACE</div>
       <nav className="primary-nav" aria-label="Workspace views">
         {(Object.keys(viewLabels) as View[]).map((item, index) => <button

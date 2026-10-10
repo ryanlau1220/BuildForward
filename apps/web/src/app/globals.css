@@ -29,9 +29,9 @@ button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible
 
 .app-shell { display: grid; min-height: 100vh; grid-template-columns: 228px minmax(0, 1fr); }
 .app-sidebar { position: sticky; top: 0; display: flex; min-width: 0; height: 100vh; flex-direction: column; border-right: 1px solid var(--line); background: var(--paper); padding: 22px 14px 16px; }
-.brand { display: flex; min-height: 48px; align-items: center; gap: 10px; padding: 0 9px; color: var(--ink); font-size: 16px; font-weight: 720; letter-spacing: -.35px; text-decoration: none; }
-.brand-mark { display: grid; width: 31px; height: 31px; place-items: center; border-radius: 7px; background: var(--green-dark); color: #fff; font-size: 11px; letter-spacing: -.5px; }
-.sidebar-label { margin: 42px 10px 10px; color: var(--quiet); font-size: 10px; font-weight: 750; letter-spacing: .9px; }
+.brand { display: flex; min-height: 64px; align-items: center; padding: 0 9px; text-decoration: none; }
+.brand-logo { display: block; width: 145px; height: auto; }
+.sidebar-label { margin: 28px 10px 10px; color: var(--quiet); font-size: 10px; font-weight: 750; letter-spacing: .9px; }
 .primary-nav { display: grid; gap: 4px; }
 .nav-item { display: flex; min-height: 44px; align-items: center; gap: 12px; border: 0; border-radius: 6px; background: transparent; padding: 0 10px; color: #43554f; text-align: left; font-size: 13px; font-weight: 580; }
 .nav-item:hover { background: var(--soft); }
