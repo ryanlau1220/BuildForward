@@ -68,3 +68,13 @@ export async function api<T>(path: string, options?: RequestInit): Promise<T> {
 export function label(value: string): string {
   return value.replaceAll("-", " ").replace(/\b\w/g, c => c.toUpperCase());
 }
+
+export function studentIntakeLabel(value: string): string {
+  return value.replace(/\bcohort\b/gi, "Student Intake");
+}
+
+export function projectReuseDecisionLabel(value: string): string {
+  if (value === "PARTIAL_REUSE") return "PARTIALLY REUSE";
+  if (value === "RESET") return "START NEW";
+  return value;
+}

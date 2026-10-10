@@ -1,4 +1,4 @@
-import { label, type Continuity, type Project } from "@/lib/api";
+import { label, projectReuseDecisionLabel, type Continuity, type Project } from "@/lib/api";
 
 type ModuleOption = {
   id: string;
@@ -24,9 +24,9 @@ export function ContinuityWorkspace({
   onModuleChange: (id: string) => void;
   onCompare: () => void;
 }) {
-  return <section className="view-panel" aria-labelledby="continuity-title">
-    <div className="view-intro"><div><p className="eyebrow">PROJECT × UPCOMING MODULE</p><h2 id="continuity-title">Assess whether prior work can carry forward</h2></div>
-      <p>Compare repository evidence with the selected module’s expectations. The result is a review signal for an educator.</p></div>
+  return <section className="view-panel" aria-labelledby="reuse-title">
+    <div className="view-intro"><div><p className="eyebrow">EXISTING PROJECT × FUTURE MODULE</p><h2 id="reuse-title">Can this project be meaningfully reused and extended?</h2></div>
+      <p>Compare evidence from an existing student project with a future module’s expectations. The result helps an educator review whether that project can carry forward.</p></div>
 
     <div className="continuity-grid">
       <section className="surface project-summary" aria-labelledby="project-title">
@@ -43,9 +43,9 @@ export function ContinuityWorkspace({
       </section>
 
       <section className="surface comparison-panel" aria-labelledby="comparison-title">
-        <div className="surface-heading"><div><p className="eyebrow">CONTINUITY REVIEW</p><h3 id="comparison-title">Compare with a later module</h3></div></div>
-        <label className="field"><span>Upcoming module</span><select value={moduleId} onChange={e => onModuleChange(e.target.value)}>
-          {modules.length === 0 && <option value="">No later reviewed modules available</option>}
+        <div className="surface-heading"><div><p className="eyebrow">PROJECT REUSE CHECK</p><h3 id="comparison-title">Choose the future module</h3></div></div>
+        <label className="field"><span>Future module</span><select value={moduleId} onChange={e => onModuleChange(e.target.value)}>
+          {modules.length === 0 && <option value="">No reviewed future modules available</option>}
           {modules.map(module => <option value={module.id} key={module.id}>{module.name} · Semester {module.semester}</option>)}
         </select></label>
         {selectedModule && <div className="module-context">
@@ -53,32 +53,32 @@ export function ContinuityWorkspace({
           {selectedModule.outcomes.length ? <ul>{selectedModule.outcomes.map(outcome => <li key={outcome}>{outcome}</li>)}</ul> : <p>No outcomes have been recorded for this module.</p>}
           {selectedModule.target_competencies?.length ? <p className="competency-tags">{selectedModule.target_competencies.map(item => <span key={item}>{label(item)}</span>)}</p> : null}
         </div>}
-        {project.provenance === "EXTRACTED_CANDIDATE" && <p className="inline-hint">Review and confirm this project in Sources before comparing it.</p>}
-        {!modules.length && <p className="inline-hint">Confirm curriculum data in Sources before running this comparison.</p>}
-        <button className="primary-button" type="button" disabled={busy || !selectedModule || project.provenance === "EXTRACTED_CANDIDATE"} onClick={onCompare} aria-busy={busy}>{busy ? "Comparing…" : "Run continuity comparison"}</button>
+        {project.provenance === "EXTRACTED_CANDIDATE" && <p className="inline-hint">Review and confirm this project in Data Sources before checking reuse.</p>}
+        {!modules.length && <p className="inline-hint">Review and confirm the course details in Data Sources before running this check.</p>}
+        <button className="primary-button" type="button" disabled={busy || !selectedModule || project.provenance === "EXTRACTED_CANDIDATE"} onClick={onCompare} aria-busy={busy}>{busy ? "Checking project reuse…" : "Run project reuse check"}</button>
 
         {continuity ? <div className="result-block" aria-live="polite">
-          <div className="result-topline"><div><span className="eyebrow">TRAINED MODEL OUTPUT</span><p className="model-name">{continuity.model.name.replaceAll("_", " ")} · {continuity.model.training_rows} synthetic rubric scenarios</p></div><span className={`decision-badge ${continuity.decision.toLowerCase()}`}>{continuity.decision.replaceAll("_", " ")}</span></div>
+          <div className="result-topline"><div><span className="eyebrow">PROJECT REUSE DECISION</span><p className="model-name">{continuity.model.name.replaceAll("_", " ")} · {continuity.model.training_rows} synthetic rubric scenarios</p></div><span className={`decision-badge ${continuity.decision.toLowerCase()}`}>{projectReuseDecisionLabel(continuity.decision)}</span></div>
           <p className="result-reason">{continuity.reason}</p>
           <dl className="result-details">
-            <div><dt>Prerequisite coverage</dt><dd>{Math.round(continuity.prerequisite_coverage * 100)}%</dd></div>
-            <div><dt>Already evidenced</dt><dd>{continuity.matched_prerequisites.length ? continuity.matched_prerequisites.map(label).join(", ") : "No required skills matched"}</dd></div>
-            <div><dt>Still to develop</dt><dd>{continuity.target_to_develop.length ? continuity.target_to_develop.map(label).join(", ") : "No additional targets identified"}</dd></div>
-            <div><dt>Missing prerequisites</dt><dd>{continuity.missing_prerequisites.length ? continuity.missing_prerequisites.map(label).join(", ") : "None listed"}</dd></div>
+          <div><dt>Required skills covered</dt><dd>{Math.round(continuity.prerequisite_coverage * 100)}%</dd></div>
+          <div><dt>Skills already shown</dt><dd>{continuity.matched_prerequisites.length ? continuity.matched_prerequisites.map(label).join(", ") : "No required skills matched"}</dd></div>
+          <div><dt>Skills to build in this module</dt><dd>{continuity.target_to_develop.length ? continuity.target_to_develop.map(label).join(", ") : "No additional targets identified"}</dd></div>
+          <div><dt>Required skills not shown in project</dt><dd>{continuity.missing_prerequisites.length ? continuity.missing_prerequisites.map(label).join(", ") : "None listed"}</dd></div>
           </dl>
           <div className="model-inputs">
             <strong>Classifier inputs</strong><span>Values supplied to the proof-of-concept model</span>
             <dl>
-              <div><dt>Prerequisite coverage</dt><dd>{Math.round(continuity.model_features.prerequisite_coverage * 100)}%</dd></div>
-              <div><dt>Reuse signals</dt><dd>{continuity.model_features.reuse_signal_count}</dd></div>
-              <div><dt>Target overlap</dt><dd>{Math.round(continuity.model_features.target_overlap * 100)}%</dd></div>
+              <div><dt>Required skills already covered</dt><dd>{Math.round(continuity.model_features.prerequisite_coverage * 100)}%</dd></div>
+              <div><dt>Project reuse clues</dt><dd>{continuity.model_features.reuse_signal_count}</dd></div>
+              <div><dt>Project skills matching module goals</dt><dd>{Math.round(continuity.model_features.target_overlap * 100)}%</dd></div>
               <div><dt>Evidence items</dt><dd>{continuity.model_features.evidence_count}</dd></div>
-              <div><dt>File-count input</dt><dd>{continuity.model_features.files_scanned}</dd></div>
+              <div><dt>Project files recorded</dt><dd>{continuity.model_features.files_scanned}</dd></div>
             </dl>
           </div>
-          <p className="model-baseline">Heuristic baseline: <strong>{continuity.heuristic_baseline_decision.replaceAll("_", " ")}</strong> · grouped holdout macro-F1: {continuity.model.held_out_macro_f1.toFixed(2)} (baseline {continuity.model.baseline_macro_f1.toFixed(2)}).</p>
+          <p className="model-baseline">Simple rule-based comparison: <strong>{projectReuseDecisionLabel(continuity.heuristic_baseline_decision)}</strong> · grouped test macro-F1: {continuity.model.held_out_macro_f1.toFixed(2)} (simple baseline {continuity.model.baseline_macro_f1.toFixed(2)}).</p>
           <p className="small-note">{continuity.model.claim_limit} An educator makes the final decision.</p>
-        </div> : <div className="result-placeholder"><strong>Comparison result will appear here</strong><span>Run the comparison to review the signal and supporting evidence.</span></div>}
+        </div> : <div className="result-placeholder"><strong>Project reuse result will appear here</strong><span>Run the check to review the model signal and supporting evidence.</span></div>}
       </section>
     </div>
   </section>;

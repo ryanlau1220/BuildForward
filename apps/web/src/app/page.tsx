@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { api, type Continuity, type Demo, type Forecast, type Project } from "@/lib/api";
+import { api, studentIntakeLabel, type Continuity, type Demo, type Forecast, type Project } from "@/lib/api";
 import { ContinuityWorkspace } from "@/components/continuity-workspace";
 import { CohortOutlook } from "@/components/cohort-outlook";
 import { SourcesWorkspace } from "@/components/sources-workspace";
@@ -41,9 +41,9 @@ type CurriculumCandidate = {
 };
 
 const viewLabels: Record<View, string> = {
-  cohort: "Cohort outlook",
-  continuity: "Project continuity",
-  sources: "Sources",
+  continuity: "Project Reuse Check",
+  cohort: "Graduation Skills Forecast",
+  sources: "Data Sources",
 };
 
 export default function Home() {
@@ -152,7 +152,7 @@ export default function Home() {
       const data = await api<Demo>(`/api/v1/workspace?${new URLSearchParams(workspaceIds)}`);
       applyWorkspace(data);
       window.localStorage.setItem("buildforward-workspace", JSON.stringify(workspaceIds));
-      setMessage("Decision inputs updated.");
+      setMessage("Student intake and project selection updated.");
       setError("");
     } catch (e) { setError((e as Error).message); }
     finally { setBusy(false); }
@@ -171,7 +171,7 @@ export default function Home() {
       const suggested = positiveGaps.find(f => result.target_to_develop.includes(f.competency)
         && selectedModule.target_competencies?.includes(f.competency))?.competency;
       if (suggested) setInterventionSkill(suggested);
-      setMessage("Comparison updated. Review the evidence and decide whether reuse is appropriate.");
+      setMessage("Project reuse check complete. Review the evidence and decide whether to reuse the project.");
       setError("");
     } catch (e) { setError((e as Error).message); }
     finally { setBusy(false); }
@@ -191,7 +191,7 @@ export default function Home() {
         } }),
       });
       setForecast(result);
-      setMessage("Scenario recalculated using the stated assumption.");
+      setMessage("Graduation skills forecast recalculated using your stated action assumption.");
       setError("");
     } catch (e) { setError((e as Error).message); }
     finally { setBusy(false); }
@@ -211,7 +211,7 @@ export default function Home() {
       await api(`/api/v1/programmes/${curriculumCandidate.id}/confirm`, { method: "POST" });
       setCurriculumCandidate(null);
       await refreshChoices();
-      setMessage("Curriculum source confirmed. It is available as reviewed programme data.");
+      setMessage("Coursework details marked reviewed and available as programme input. Check the programme sequence separately.");
       setError("");
     } catch (e) { setError((e as Error).message); }
     finally { setBusy(false); }
@@ -231,7 +231,7 @@ export default function Home() {
       form.append("file", file);
       setCandidateProject(await api<Project>("/api/v1/projects/analyze", { method: "POST", body: form }));
       await refreshChoices();
-      setMessage("Repository scanned. Review its evidence before confirming it.");
+      setMessage("Repository inspected. Review the extracted evidence before confirming it.");
       setError("");
     } catch (e) { setError((e as Error).message); }
     finally { setBusy(false); }
@@ -246,7 +246,7 @@ export default function Home() {
         body: JSON.stringify({ url: repoUrl }),
       }));
       await refreshChoices();
-      setMessage("Repository scanned. Review its evidence before confirming it.");
+      setMessage("Repository inspected. Review the extracted evidence before confirming it.");
       setError("");
     } catch (e) { setError((e as Error).message); }
     finally { setBusy(false); }
@@ -271,7 +271,7 @@ export default function Home() {
     try {
       setCandidateProject(await api<Project>(`/api/v1/projects/${candidateProject.id}/confirm`, { method: "POST" }));
       await refreshChoices();
-      setMessage("Project evidence confirmed. It remains separate from the active scenario until selected.");
+      setMessage("Project evidence marked reviewed. It stays separate from the active project until selected.");
       setError("");
     } catch (e) { setError((e as Error).message); }
     finally { setBusy(false); }
@@ -286,7 +286,7 @@ export default function Home() {
     && (!p.originating_module_id || compatibleModules.some(m => m.id === p.originating_module_id
       && m.provenance !== "EXTRACTED_CANDIDATE")));
   const provenanceStatus = demo?.cohort.provenance === "SIMULATED" || demo?.programme.provenance === "SAMPLE"
-    ? "Demo data · simulated cohort"
+    ? "Demo data · simulated student intake"
     : "Reviewed sources · assumptions remain";
 
   if (loading) return <main className="loading-screen" aria-live="polite"><span className="loading-mark" />Loading decision workspace…</main>;
@@ -319,7 +319,7 @@ export default function Home() {
                 && m.programme_id === programmeId && m.provenance !== "EXTRACTED_CANDIDATE")));
             setWorkspaceIds({ programme_id: programmeId, cohort_id: cohort?.id || "", project_id: projectChoice?.id || "" });
           }}>{programmes.filter(p => p.provenance !== "EXTRACTED_CANDIDATE").map(p => <option value={p.id} key={p.id}>{p.name}</option>)}</select></label>
-          <label><span>COHORT</span><select aria-label="Select cohort" value={workspaceIds.cohort_id} onChange={e => setWorkspaceIds(w => ({ ...w, cohort_id: e.target.value }))}>{compatibleCohorts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
+          <label><span>STUDENT INTAKE</span><select aria-label="Select student intake" value={workspaceIds.cohort_id} onChange={e => setWorkspaceIds(w => ({ ...w, cohort_id: e.target.value }))}>{compatibleCohorts.map(c => <option key={c.id} value={c.id}>{studentIntakeLabel(c.name)}</option>)}</select></label>
           <label><span>PROJECT</span><select aria-label="Select project" value={workspaceIds.project_id} onChange={e => setWorkspaceIds(w => ({ ...w, project_id: e.target.value }))}>{compatibleProjects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
           <button className="load-button" type="button" disabled={busy || !workspaceIds.cohort_id || !workspaceIds.project_id} onClick={() => void loadWorkspace()} aria-busy={busy}>Load</button>
         </div>
@@ -329,7 +329,7 @@ export default function Home() {
         {error && <div className="notice notice-error" role="alert"><span>{error}</span><button type="button" onClick={() => setError("")} aria-label="Dismiss error">×</button></div>}
         {message && <div className="notice notice-success" role="status"><span>{message}</span><button type="button" onClick={() => setMessage("")} aria-label="Dismiss message">×</button></div>}
         {!demo || !forecast || !project ? <section className="empty-workspace"><h2>Decision inputs are unavailable</h2><p>Check that the API is running, then reload this workspace.</p></section> : <>
-          <div className="data-status"><span className="status-dot" /><span>{provenanceStatus}</span><span className="status-divider" />{demo.programme.name} <span>·</span> {demo.cohort.name}</div>
+          <div className="data-status"><span className="status-dot" /><span>{provenanceStatus}</span><span className="status-divider" />{demo.programme.name} <span>·</span> {studentIntakeLabel(demo.cohort.name)}</div>
           {view === "continuity" && <ContinuityWorkspace
             project={project}
             modules={programmeModules}

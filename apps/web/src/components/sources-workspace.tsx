@@ -36,12 +36,12 @@ export function SourcesWorkspace({
   onConfirmProject: () => void;
 }) {
   return <section className="view-panel" aria-labelledby="sources-title">
-    <div className="view-intro"><div><p className="eyebrow">DATA REVIEW</p><h2 id="sources-title">Inspect inputs before using them</h2></div>
+    <div className="view-intro"><div><p className="eyebrow">DATA SOURCES · REVIEW</p><h2 id="sources-title">Review learning and project information</h2></div>
       <p>Imported coursework and repository scans remain candidates until reviewed. Confirming extracted details does not validate a programme sequence or prove student proficiency.</p></div>
 
     <div className="sources-grid">
       <section className="surface source-panel" aria-labelledby="curriculum-sources-title">
-        <div className="surface-heading"><div><p className="eyebrow">PROGRAMME INPUTS</p><h3 id="curriculum-sources-title">Coursework candidates</h3></div><span className="count-pill">{candidateProgrammes.length} to review</span></div>
+        <div className="surface-heading"><div><p className="eyebrow">PROGRAMME INPUTS</p><h3 id="curriculum-sources-title">Coursework to review</h3></div><span className="count-pill">{candidateProgrammes.length} to review</span></div>
         {candidateProgrammes.length ? <div className="candidate-list">{candidateProgrammes.map(item => <article className="candidate-row" key={item.id}>
           <div className="candidate-row-main"><strong>{item.name}</strong><Provenance value={item.provenance} /></div>
           <button type="button" className="secondary-button" onClick={() => onInspectCurriculum(item.id)}>Review materials</button>
@@ -59,16 +59,16 @@ export function SourcesWorkspace({
       </section>
 
       <section className="surface source-panel" aria-labelledby="project-sources-title">
-        <div className="surface-heading"><div><p className="eyebrow">PROJECT INPUTS</p><h3 id="project-sources-title">Submissions and repositories</h3></div><span className="count-pill">{candidateProjects.length} to review</span></div>
-        {candidateProjects.length > 0 && <div className="candidate-list">{candidateProjects.map(item => <article className="candidate-row" key={item.id}>
+        <div className="surface-heading"><div><p className="eyebrow">PROJECT INPUTS</p><h3 id="project-sources-title">Student projects and repositories</h3></div><span className="count-pill">{candidateProjects.length} to review</span></div>
+        {candidateProjects.length > 0 ? <div className="candidate-list">{candidateProjects.map(item => <article className="candidate-row" key={item.id}>
           <div className="candidate-row-main"><strong>{item.name}</strong><Provenance value={item.provenance} /></div>
           <button type="button" className="secondary-button" onClick={() => onInspectProject(item.id)}>Review evidence</button>
-        </article>)}</div>}
+        </article>)}</div> : <div className="empty-state compact-empty"><h4>No project evidence to review</h4><p>Submitted project reports and analyzed repositories will appear here for review.</p></div>}
         <form className="import-form" onSubmit={e => { e.preventDefault(); onAnalyzeGithub(); }}>
-          <label className="field" htmlFor="repo-url"><span>Public GitHub repository</span><input id="repo-url" type="url" autoComplete="url" placeholder="https://github.com/owner/repository" value={repoUrl} onChange={e => onRepoUrlChange(e.target.value)} /></label>
-          <button type="submit" className="secondary-button" disabled={busy || !repoUrl}>Analyze repository</button>
+          <label className="field" htmlFor="repo-url"><span>Public GitHub project repository</span><input id="repo-url" type="url" autoComplete="url" placeholder="https://github.com/owner/repository" value={repoUrl} onChange={e => onRepoUrlChange(e.target.value)} /></label>
+          <button type="submit" className="secondary-button" disabled={busy || !repoUrl}>Inspect repository</button>
         </form>
-        <label className="field upload-field"><span>Or upload a source ZIP</span><input type="file" accept=".zip,application/zip" disabled={busy} onChange={e => { const file = e.target.files?.[0]; if (file) onImportZip(file); }} /></label>
+        <label className="field upload-field"><span>Or upload a project ZIP</span><input type="file" accept=".zip,application/zip" disabled={busy} onChange={e => { const file = e.target.files?.[0]; if (file) onImportZip(file); }} /></label>
         {candidateProject && <div className="candidate-detail">
           <div className="candidate-detail-heading"><div><span className="eyebrow">SOURCE REVIEW</span><h4>{candidateProject.name}</h4></div><Provenance value={candidateProject.provenance} /></div>
           <p className="source-label">{candidateProject.source_label} · {candidateProject.files_scanned ? `${candidateProject.files_scanned} source files scanned` : "No repository files scanned"}</p>
@@ -78,7 +78,7 @@ export function SourcesWorkspace({
           </select></label>}
           {candidateProject.evidence.length ? <div className="candidate-evidence-list">{candidateProject.evidence.map((item, index) => <article key={`${item.source}-${index}`}><strong>{label(item.competency)}</strong><span>{item.detail}</span><code>{item.source}</code></article>)}</div>
             : <p className="empty-note">No supported signals were found. Review the repository manually before drawing a conclusion.</p>}
-          <p className="small-note">Evidence is from the labeled report summary or static repository scan. Code was not run; evidence does not prove quality, successful tests or individual proficiency.</p>
+          <p className="small-note">Evidence comes from the report summary or a static repository inspection. Code was not run; evidence does not prove quality, passing tests, or a student’s skill level.</p>
           {candidateProject.provenance === "EXTRACTED_CANDIDATE" && <button type="button" className="secondary-button" disabled={busy} onClick={onConfirmProject}>Confirm reviewed evidence</button>}
         </div>}
       </section>
