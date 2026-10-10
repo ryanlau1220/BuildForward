@@ -12,5 +12,8 @@ AI SLIDES .pdf
 # The API loads data/sample_demo.json and tracked, paraphrased data/candidates/*.json.
 data/materials
 data/submissions
+data/validation
+data/imports
 PITCH_DECK.html
 PITCH_DECK*.html
+.git

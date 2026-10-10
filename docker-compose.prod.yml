@@ -2,29 +2,20 @@
 #
 #   docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
 #
-# NPM (running separately) terminates TLS and reverse-proxies to the ports
-# published below. Ports are bound to 127.0.0.1 so they are NOT reachable
-# directly from the public internet -- only NPM (on the same host) proxies them.
+# NPM (running separately) terminates TLS and reaches web/api through its
+# existing Docker network. Host ports remain bound to 127.0.0.1 for local checks.
 #
-# Point NPM at these upstreams (host = the VPS, or host.docker.internal if NPM
-# is itself a container with host-gateway access):
+# Point NPM at these upstreams on proxy-manager_default:
 #
 #   Option A (single hostname, same-origin -- recommended):
-#     Proxy host  <DOMAIN>  ->  127.0.0.1:3000   (the web app)
+#     Proxy host  <DOMAIN>  ->  buildforward-web:3000
 #     Add a Custom Location in NPM:
-#       location  /api        ->  127.0.0.1:8000
-#       location  /docs       ->  127.0.0.1:8000
-#       location  /openapi.json -> 127.0.0.1:8000
+#       location  /api        ->  buildforward-api:8000
+#       location  /docs       ->  buildforward-api:8000
+#       location  /openapi.json -> buildforward-api:8000
 #     Set NEXT_PUBLIC_API_URL=https://<DOMAIN>  (same origin, no CORS).
 #
-#   Option B (two hostnames):
-#     Proxy host  <DOMAIN>       ->  127.0.0.1:3000
-#     Proxy host  api.<DOMAIN>   ->  127.0.0.1:8000
-#     Set NEXT_PUBLIC_API_URL=https://api.<DOMAIN>  and make sure
-#     CORS_ORIGINS allows https://<DOMAIN>.
-#
-# WEB_BIND / API_BIND default to 127.0.0.1 but can be overridden (e.g. to a
-# private Docker-network IP) in .env.production.
+# WEB_BIND / API_BIND default to 127.0.0.1.
 
 services:
   db:
@@ -60,7 +51,10 @@ services:
       db:
         condition: service_healthy
     networks:
-      - internal
+      internal:
+      proxy:
+        aliases:
+          - buildforward-api
 
   web:
     build:
@@ -76,10 +70,16 @@ services:
       api:
         condition: service_healthy
     networks:
-      - internal
+      internal:
+      proxy:
+        aliases:
+          - buildforward-web
 
 volumes:
   postgres_data:
 
 networks:
   internal:
+  proxy:
+    external: true
+    name: proxy-manager_default
