@@ -22,7 +22,7 @@ The selected estimator is refit on the synthetic scenarios. The real-project CSV
 
 `datasets/real_validation_manifest.json` records the five repositories selected by the user and three module candidates: Software Testing, Capstone Project, and Degree Semester 2 Data Structure (CT077-3-2-DSTR). `datasets/continuity_pairs.real.csv` contains 15 exploratory project-module candidates. The full matrix broadens review coverage; it does not claim every pairing is suitable. Labels are empty by design, and each row calls for confirmation of module fit, intake context, ownership/reuse permission, and educational value. Project origins retain uncertainty where sources do not establish context.
 
-The CSV contains computed analyzer evidence (reuse-signal count, target overlap, evidence count, files scanned, and detected skills). Unknown prerequisite mappings produce a blank `prerequisite_coverage`; they are not treated as 100%. An explicitly reviewed empty requirement list means no required skills and yields 100%. The Data Structure target skills are provisional mappings from the supplied brief and should be checked by a subject educator. A row is not ready for real-data scoring until its module pairing and skill mappings are reviewed and the missing feature is computed.
+The CSV contains computed analyzer evidence (required-skill coverage, reuse-signal count, target overlap, evidence count, files scanned, and detected skills). The user reviewed `testable-code` as the minimum requirement for reusing a project in Software Testing and `cpp-programming` for Data Structure. These are project-reuse criteria, not official module entry requirements. Capstone has no approved automatic required-skill map: its coverage remains blank, and substantive business logic must be inspected manually. An unknown map is not treated as 100%; an explicitly reviewed empty requirement list means no required skills and yields 100%. The module target skills remain provisional mappings from the supplied briefs and should be checked by a subject educator. A row is not ready for real-data scoring until its module pairing and educational fit are reviewed and any missing feature is resolved.
 
 To regenerate feature rows, make local checkouts under a directory named by each manifest project ID, for example `repositories/oodj-apuasc/`. Then run:
 
@@ -35,7 +35,9 @@ The preparation script reads only source files and supported build metadata acce
 
 ## Human review and labels
 
-Review each project-module pair independently. Check that the module is genuinely a plausible future learning context for the project, inspect its supplied brief, confirm the prerequisite mapping, then assign exactly one label and record the reviewer/source in `label_source` and the rationale in `review_notes`:
+Review each project-module pair independently. Check that the module is genuinely a plausible future learning context for the project, inspect its supplied brief, confirm the required-skill map, then assign exactly one label and record the reviewer/source in `label_source` and the rationale in `review_notes`. For Software Testing, confirm whether its fixed ShopEasy case study permits using an earlier project. For Capstone, inspect substantive business logic and suitability for the documented system hierarchy and design diagrams; the brief names DFDs and an ERD, not UML. For Data Structure, confirm the project's fit with the specified C++ patient-record assignment.
+
+Use these labels:
 
 - `CONTINUE`: key prerequisites and project structure support meaningful extension aligned with the module’s learning goals.
 - `PARTIAL_REUSE`: useful parts carry forward, but important gaps or changes remain.
