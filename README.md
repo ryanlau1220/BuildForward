@@ -4,7 +4,7 @@ BuildForward is a predictive curriculum decision-support app for educators. It c
 
 ## Current data status
 
-The workbench opens with an **illustrative programme** and a **simulated student intake**. A student intake means a group or batch progressing through a programme together; it is not a semester. User-provided coursework is available in `data/materials/`; the five briefs are normalized in their user-labeled Semester 1–5 order as an unconfirmed candidate in `data/imports/apu-curriculum-candidate.json`. The Semester 1 brief identifies itself as Diploma coursework, so this remains a user-provided sequence rather than an officially verified programme specification. The separate OODJ brief is from a Degree Semester 1 folder and stays separate. No real student-intake data has been supplied; forecast values are not validated institutional predictions. A small DOSM/ILMIA role-profile sample contributes a limited market signal; its age and scope are documented in [docs/market-data.md](docs/market-data.md).
+The workbench opens with an **illustrative programme** and a **simulated student intake**. A student intake means a group or batch progressing through a programme together; it is not a semester. Safe, paraphrased coursework candidates are tracked in `data/candidates/`. Original coursework and submission documents are local-only and are not included in this repository. The five-file user-labeled Semester 1–5 sequence remains unverified as an official programme: its Semester 1 brief identifies itself as Diploma coursework. The separate OODJ brief is from a Degree Semester 1 folder. No real student-intake data has been supplied; forecast values are not validated institutional predictions. A small DOSM/ILMIA role-profile sample contributes a limited market signal; its age and scope are documented in [docs/market-data.md](docs/market-data.md).
 
 ## Run locally
 
@@ -44,13 +44,15 @@ The demo data is seeded on first startup. Deleting the local `services/api/build
 - Evidence review and confirmation before new project data enters predictions.
 - Project reuse check between an existing project and a future module, using a trained classifier with its simple baseline, reasons, and missing prerequisites.
 - Predicted skill gaps at graduation and a with/without recommended-action scenario using a gain assumption set by the educator.
+- A deterministic educator action suggestion when a forecast gap, future-module target, and project-reuse result support the same skill. The action requires human review; the scenario slider does not predict its effect.
 - Source provenance and uncertainty labels throughout the interface.
 
-The project-reuse model is a proof of concept trained on synthetic rubric scenarios, not historical student data. The interface reports that source and its grouped holdout macro-F1; this measures agreement with the scenario rubric rather than institutional predictive validity. A separate real-project review set contains 12 unlabeled candidate pairs from six user-provided repositories and two supplied module briefs. These pairs are not training data, and no real-data validation metric is available until an educator confirms each pairing, maps missing prerequisites, and supplies labels. See [ml/README.md](ml/README.md) for the dataset method and reproducible commands.
+The project-reuse model is a proof of concept trained on synthetic rubric scenarios, not historical student data. The interface reports that source and its grouped holdout macro-F1; this measures agreement with the scenario rubric rather than institutional predictive validity. A separate real-project review set contains 15 unlabeled candidate pairs from five user-selected repositories and three module candidates. These pairs are not training data, and no real-data validation metric is available until an educator confirms each pairing, resolves prerequisite-skill mappings, and supplies labels. See [ml/README.md](ml/README.md) for the dataset method and reproducible commands.
 
 The Graduation Skills Forecast ranks skills with mapped ILMIA role-profile evidence by expected graduation gap, selected-profile coverage, and future learning opportunities. Skills without mapped evidence are marked unavailable and ordered by expected gap alone. These role-profile shares are not percentages of all job ads; see [docs/market-data.md](docs/market-data.md).
 
 For a short, reproducible walkthrough of the connected project-reuse, market-priority, and action-scenario flow, see [docs/golden-demo.md](docs/golden-demo.md).
+For the specific noise, missing-data, and outlier checks and their limits, see [docs/model-robustness.md](docs/model-robustness.md).
 For a visual explanation of how the three pages connect, open [docs/buildforward-explainer.html](docs/buildforward-explainer.html).
 
 The interface has three focused work areas: **Project Reuse Check**, **Graduation Skills Forecast**, and **Data Sources**. See [DESIGN.md](DESIGN.md) for the interaction and scope rules.
@@ -59,12 +61,12 @@ The sample scenario assumes a 70% skill-coverage target and a 22-point gain for 
 
 ## Importing real material
 
-1. The five semester-labeled materials are normalized in `data/imports/apu-curriculum-candidate.json`; the OODJ example and the newly supplied CT077-3-2-DSTR brief are separate extracted candidates. The Data Structure record carries provisional skill tags mapped from the assignment tasks, while prerequisites stay unmapped. Fresh databases receive these review-only records automatically.
-2. Open **Data Sources**. Inspect the candidate module outcomes and assignment summaries against files in `data/materials/`. Confirm only after educator review. The API equivalent is `POST /api/v1/programmes/{id}/confirm`.
+1. Candidate summaries are tracked in `data/candidates/`. The OODJ reference and CT077-3-2-DSTR brief remain separate from the user-labeled five-semester sequence. Data Structure skill tags are provisional; required-skill mappings remain unknown. Fresh databases receive these review-only records automatically.
+2. Open **Data Sources**. Review each candidate summary and consult the original coursework locally if available. Confirm only after educator review. The API equivalent is `POST /api/v1/programmes/{id}/confirm`.
 3. In Data Sources, inspect the supplied OODJ repository evidence or analyze a public GitHub repository / ZIP. Review extracted evidence and confirm it only after human review.
 4. If actual student-intake skill coverage is available, import it through the existing `POST /api/v1/cohorts/import` endpoint, review, and confirm. Otherwise, keep the student intake labelled as simulated.
 
-Imported candidates are blocked from prediction until confirmed. The materials do not specify prerequisites, so none are inferred. The OODJ assignment and public repo are a separate coursework example; their relationship to the five-module sequence needs educator confirmation. Static repository inspection never runs uploaded code and skips data folders, database files, CSV/JSONL, environment files, and arbitrary text files.
+Imported candidates are blocked from prediction until reviewed. An unknown required-skill map is distinct from an explicitly reviewed empty map; a programme with unknown maps cannot be confirmed for prediction. The supplied materials do not establish those maps, so they remain unknown. The OODJ assignment and public repo are a separate coursework example; their relationship to the five-module sequence needs educator confirmation. Static repository inspection never runs uploaded code and skips data folders, database files, CSV/JSONL, environment files, and arbitrary text files.
 
 ## Verification
 

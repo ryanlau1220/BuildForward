@@ -3,7 +3,8 @@ export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000
 export type Evidence = { competency: string; source: string; detail: string };
 export type Module = {
   id: string; name: string; semester: number; prerequisites: string[];
-  required_competencies: string[]; target_competencies: string[]; reuse_signals: string[];
+  required_competencies: string[] | null; prerequisite_mapping_status: string;
+  target_competencies: string[]; reuse_signals: string[];
   outcomes: string[]; assignment: string; provenance: string;
 };
 export type Project = {

@@ -37,6 +37,8 @@ type CurriculumCandidate = {
     outcomes: string[];
     assignment: string;
     provenance: string;
+    required_competencies: string[] | null;
+    prerequisite_mapping_status: string;
   }[];
 };
 
@@ -75,7 +77,8 @@ export default function Home() {
   const programmeModules = useMemo(() => {
     if (!demo) return [];
     return modules
-      .filter(m => m.programme_id === demo.programme.id && m.provenance !== "EXTRACTED_CANDIDATE")
+      .filter(m => m.programme_id === demo.programme.id
+        && (m.provenance === "SAMPLE" || m.provenance === "CONFIRMED_FACT"))
       .filter(m => m.semester > demo.cohort.current_semester)
       .sort((a, b) => a.semester - b.semester);
   }, [demo, modules]);
@@ -207,10 +210,12 @@ export default function Home() {
     if (!curriculumCandidate) return;
     setBusy(true);
     try {
-      await api(`/api/v1/programmes/${curriculumCandidate.id}/confirm`, { method: "POST" });
+      const result = await api<{ next_step: string }>(
+        `/api/v1/programmes/${curriculumCandidate.id}/confirm`, { method: "POST" },
+      );
       setCurriculumCandidate(null);
       await refreshChoices();
-      setMessage("Coursework details marked reviewed and available as programme input. Check the programme sequence separately.");
+      setMessage(`${result.next_step}. Check the programme sequence separately.`);
       setError("");
     } catch (e) { setError((e as Error).message); }
     finally { setBusy(false); }
@@ -346,6 +351,9 @@ export default function Home() {
             busy={busy}
             linkedFocus={linkedFocus}
             activeIntervention={activeIntervention}
+            continuity={continuity}
+            selectedModule={selectedModule}
+            project={project}
             onSkillChange={skill => { setInterventionSkill(skill); setForecast(current => current ? { ...current, intervention: null } : current); }}
             onGainChange={value => { setGain(value); setForecast(current => current ? { ...current, intervention: null } : current); }}
             onCompare={() => void runScenario()}

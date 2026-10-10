@@ -154,6 +154,10 @@ button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible
 .assumption-note strong { font-size: 11px; }
 .assumption-note p { margin: 3px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
 .scenario-panel { display: grid; gap: 12px; }
+.recommendation-card { border-left: 3px solid var(--green); border-radius: 4px; background: var(--green-soft); padding: 11px 12px; }
+.recommendation-card h3 { margin: 4px 0 6px; font-size: 14px; font-weight: 690; }
+.recommendation-card p:not(.eyebrow) { margin: 5px 0 0; color: #3f554b; font-size: 11px; line-height: 1.5; }
+.recommendation-card .recommendation-basis { color: var(--muted); }
 .scenario-panel > h3 { margin: -7px 0 0; font-size: 17px; font-weight: 670; letter-spacing: -.3px; }
 .scenario-copy { margin: -5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
 .field > span strong { float: right; color: var(--green-dark); font-size: 11px; letter-spacing: 0; }

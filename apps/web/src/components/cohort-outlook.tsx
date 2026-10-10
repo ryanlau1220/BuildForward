@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { label, studentIntakeLabel, type Demo, type Finding } from "@/lib/api";
+import { label, projectReuseDecisionLabel, studentIntakeLabel, type Continuity, type Demo, type Finding, type Project } from "@/lib/api";
 
 function CoverageBar({ current, projected, target }: { current: number; projected: number; target: number }) {
   return <div className="coverage-track" role="img" aria-label={`Current skill coverage ${Math.round(current * 100)} percent, expected skill coverage at graduation ${Math.round(projected * 100)} percent, illustrative target ${Math.round(target * 100)} percent`}>
@@ -18,6 +18,7 @@ function chooseScenarioSkill(skill: string, onSkillChange: (skill: string) => vo
 
 export function CohortOutlook({
   demo, positiveGaps, interventionSkill, gain, busy, linkedFocus, activeIntervention,
+  continuity, selectedModule, project,
   onSkillChange, onGainChange, onCompare,
 }: {
   demo: Demo;
@@ -27,10 +28,22 @@ export function CohortOutlook({
   busy: boolean;
   linkedFocus?: string;
   activeIntervention?: Finding;
+  continuity: Continuity | null;
+  selectedModule: { id: string; name: string; target_competencies?: string[] } | undefined;
+  project: Project;
   onSkillChange: (skill: string) => void;
   onGainChange: (gain: number) => void;
   onCompare: () => void;
 }) {
+  const recommendationGap = positiveGaps.find(item => item.competency === interventionSkill);
+  const recommendation = recommendationGap && continuity && selectedModule
+    && continuity.module_id === selectedModule.id
+    && continuity.project_id === project.id
+    && ["CONTINUE", "PARTIAL_REUSE"].includes(continuity.decision)
+    && continuity.target_to_develop.includes(interventionSkill)
+    && selectedModule.target_competencies?.includes(interventionSkill)
+      ? { gap: recommendationGap, continuity, module: selectedModule }
+      : null;
   return <section className="view-panel" aria-labelledby="forecast-title">
     <div className="view-intro"><div><p className="eyebrow">STUDENT INTAKE SKILL FORECAST</p><h2 id="forecast-title">Predicted Skill Gaps at Graduation</h2></div>
       <p>See expected skill coverage at graduation, which future modules can build each skill, and how a possible action changes the scenario.</p></div>
@@ -63,8 +76,18 @@ export function CohortOutlook({
       </section>
 
       <section className="surface scenario-panel" aria-labelledby="scenario-title">
+        <div className="recommendation-card" aria-live="polite">
+          <p className="eyebrow">EDUCATOR ACTION TO REVIEW</p>
+          {!recommendationGap ? <p>Select a predicted skill gap to see whether the current project and future module support a concrete action.</p>
+            : !recommendation ? <p>No matching project-to-module result currently supports recommending reuse to build {label(interventionSkill)}. Run the Project Reuse Check for the selected project and future module; an educator can also choose a different learning activity.</p>
+              : <>
+                <h3>Consider developing {label(interventionSkill)} through project work</h3>
+                <p>Consider extending <strong>{project.name}</strong> in <strong>{recommendation.module.name}</strong> with assessed work that demonstrates {label(interventionSkill)}. The project reuse model returned <strong>{projectReuseDecisionLabel(recommendation.continuity.decision)}</strong>; its evidence shows {recommendation.continuity.reuse_signals.length ? recommendation.continuity.reuse_signals.map(label).join(", ") : "the classifier supports reusing this project"}, while {label(interventionSkill)} is not yet demonstrated.</p>
+                <p className="recommendation-basis">Review basis: {label(interventionSkill)} is {Math.round(recommendation.gap.projected_gap * 100)} points below the illustrative target at graduation{recommendation.gap.market_evidence ? `, and related skill terms appear in ${recommendation.gap.market_evidence.matched_profiles} of ${recommendation.gap.market_evidence.profile_sample_size} selected ILMIA role profiles` : ""}. The future module lists this skill as a target. An educator must check the module fit and decide whether to act.</p>
+              </>}
+        </div>
         <p className="eyebrow">RECOMMENDED ACTION SCENARIO</p><h3 id="scenario-title">Explore a possible action</h3>
-        <p className="scenario-copy">Set an assumed skill gain to explore a possible action. This is a planning scenario you control, not an action BuildForward recommends or an observed result.</p>
+        <p className="scenario-copy">The action above is a deterministic suggestion for educator review. Set an assumed skill gain below to explore a scenario; it is not a predicted effect.</p>
         {positiveGaps.length ? <>
           <label className="field" htmlFor="scenario-skill"><span>Skill to strengthen</span><select id="scenario-skill" value={interventionSkill} onChange={e => onSkillChange(e.target.value)}>
             {positiveGaps.map(item => <option value={item.competency} key={item.competency}>{label(item.competency)}</option>)}

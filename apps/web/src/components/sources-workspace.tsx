@@ -7,7 +7,10 @@ type CurriculumCandidate = {
   name: string;
   source_label: string;
   provenance: string;
-  modules: { id: string; name: string; semester: number; outcomes: string[]; assignment: string; provenance: string }[];
+  modules: {
+    id: string; name: string; semester: number; outcomes: string[]; assignment: string;
+    provenance: string; required_competencies: string[] | null; prerequisite_mapping_status: string;
+  }[];
 };
 
 function Provenance({ value }: { value: string }) {
@@ -61,6 +64,13 @@ export function SourcesWorkspace({
           <div className="programme-warning"><strong>User-provided semester order</strong><span>These briefs follow your Semester 1–5 labels. The Semester 1 brief identifies Diploma coursework, so this sequence remains a candidate rather than an officially verified programme specification. Degree-level OODJ material stays separate.</span></div>
           <div className="module-review-list">{curriculumCandidate.modules.map(item => <article key={item.id}>
             <div><span>SEMESTER {item.semester}</span><strong>{item.name}</strong></div><p>{item.assignment}</p>
+            <p><strong>Required-skill mapping:</strong> {item.prerequisite_mapping_status === "UNKNOWN"
+              ? "Unknown; map required skills or explicitly confirm none before curriculum confirmation."
+              : item.required_competencies?.length
+                ? item.required_competencies.map(label).join(", ")
+                : item.prerequisite_mapping_status === "CONFIRMED_NONE"
+                  ? "Reviewed: no required skills."
+                  : "No required skills recorded in the candidate source."}</p>
             {item.outcomes.length > 0 && <ul>{item.outcomes.map(outcome => <li key={outcome}>{outcome}</li>)}</ul>}
           </article>)}</div>
           {curriculumCandidate.provenance === "EXTRACTED_CANDIDATE" && <button type="button" className="secondary-button" disabled={busy} onClick={onConfirmCurriculum}>Confirm reviewed source</button>}

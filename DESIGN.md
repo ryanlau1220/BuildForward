@@ -33,7 +33,8 @@ Current CSS tokens live in `apps/web/src/app/globals.css`. Preserve the existing
 - Do not imply the five briefs form a verified curriculum sequence. Their semester labels are source context only; prerequisites and mappings remain provisional until verified.
 - Keep simulated student-intake data, sample programme data, synthetic project-reuse training labels, and DOSM/ILMIA market-data scope visibly labelled. Show market-data age, selected profile coverage, and missing signals near results. Forecast assumptions and the illustrative target must remain legible near results.
 - Show project evidence and reasons alongside reuse decisions. Display the model's training provenance, grouped holdout metric, and baseline. Never present model output or scores as calibrated probability.
-- Recommended-action comparisons are user-set scenarios, not observed impact or validated recommendations. The educator remains responsible for the decision.
+- Show a deterministic educator action suggestion only when a ranked skill gap is targeted by the selected future module, the matching project-reuse result supports reuse, and the project does not yet demonstrate that skill. Explain the evidence and model result. The educator remains responsible for deciding whether to act.
+- Keep an assumed coverage gain separate from the action suggestion. The slider explores a user-set scenario, not a predicted or observed intervention effect.
 
 ## Interaction and states
 
