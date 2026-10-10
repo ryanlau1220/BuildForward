@@ -16,6 +16,17 @@ function chooseScenarioSkill(skill: string, onSkillChange: (skill: string) => vo
   document.getElementById("scenario-skill")?.focus({ preventScroll: true });
 }
 
+function suggestedProjectWork(skill: string): string {
+  const work: Record<string, string> = {
+    "unit-testing": "write unit tests for core business rules and include them in the project's test run",
+    "automated-tests": "add automated checks for key project behaviour and run them with the project checks",
+    "test-automation": "automate execution of the module's test cases and record the results",
+    "functional-testing": "write and execute test cases for the project's main user workflows",
+    "continuous-integration": "add a CI workflow that builds the project and runs its tests",
+  };
+  return work[skill] ?? `add an assessed project extension that demonstrates ${label(skill)}`;
+}
+
 export function CohortOutlook({
   demo, positiveGaps, interventionSkill, gain, busy, linkedFocus, activeIntervention,
   continuity, selectedModule, project,
@@ -82,7 +93,7 @@ export function CohortOutlook({
             : !recommendation ? <p>No matching project-to-module result currently supports recommending reuse to build {label(interventionSkill)}. Run the Project Reuse Check for the selected project and future module; an educator can also choose a different learning activity.</p>
               : <>
                 <h3>Consider developing {label(interventionSkill)} through project work</h3>
-                <p>Consider extending <strong>{project.name}</strong> in <strong>{recommendation.module.name}</strong> with assessed work that demonstrates {label(interventionSkill)}. The project reuse model returned <strong>{projectReuseDecisionLabel(recommendation.continuity.decision)}</strong>; its evidence shows {recommendation.continuity.reuse_signals.length ? recommendation.continuity.reuse_signals.map(label).join(", ") : "the classifier supports reusing this project"}, while {label(interventionSkill)} is not yet demonstrated.</p>
+                <p>Consider extending <strong>{project.name}</strong> in <strong>{recommendation.module.name}</strong>: {suggestedProjectWork(interventionSkill)}. The project reuse model returned <strong>{projectReuseDecisionLabel(recommendation.continuity.decision)}</strong>; its evidence shows {recommendation.continuity.reuse_signals.length ? recommendation.continuity.reuse_signals.map(label).join(", ") : "the classifier supports reusing this project"}, while {label(interventionSkill)} is not yet demonstrated.</p>
                 <p className="recommendation-basis">Review basis: {label(interventionSkill)} is {Math.round(recommendation.gap.projected_gap * 100)} points below the illustrative target at graduation{recommendation.gap.market_evidence ? `, and related skill terms appear in ${recommendation.gap.market_evidence.matched_profiles} of ${recommendation.gap.market_evidence.profile_sample_size} selected ILMIA role profiles` : ""}. The future module lists this skill as a target. An educator must check the module fit and decide whether to act.</p>
               </>}
         </div>
