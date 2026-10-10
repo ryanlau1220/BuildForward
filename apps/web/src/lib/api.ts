@@ -21,8 +21,9 @@ export type Continuity = {
     held_out_macro_f1: number; baseline_macro_f1: number; claim_limit: string;
     real_validation: {
       dataset: string | null; candidate_pairs: number; reviewed_pairs: number;
+      scored_pairs: number; unscored_reviewed_pairs: number; ineligible_pairs: number;
       pending_pairs: number; project_groups: number; status: string;
-      metrics: { reviewed_pairs: number; model_macro_f1: number; baseline_macro_f1: number } | null;
+      metrics: { scored_pairs: number; model_macro_f1: number; baseline_macro_f1: number } | null;
     };
   };
   heuristic_baseline_decision: string;
