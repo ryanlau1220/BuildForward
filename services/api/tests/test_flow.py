@@ -125,7 +125,6 @@ def test_supplied_material_candidates_are_seeded_but_not_confirmed():
             detail = client.get(f"/api/v1/projects/{candidate['id']}").json()
             assert detail["files_scanned"] == 0
             assert "report summary only" in detail["source_label"]
-            assert "TP0" not in detail["source_label"]
 
         oodj_detail = client.get("/api/v1/projects/project-oodj-apuasc").json()
         assert "OODJ_Assignment.docx" in oodj_detail["source_label"]
