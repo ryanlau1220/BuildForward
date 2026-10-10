@@ -36,6 +36,16 @@ docker compose up --build
 
 The demo data is seeded on first startup. Deleting the local `services/api/buildforward.db` recreates that illustrative seed; do not delete a database containing imported work.
 
+## Deploy to production
+
+Push the release to `origin/main`, then run this from a local Bash terminal:
+
+```bash
+./deploy.sh
+```
+
+The script uses your existing `ssh oracle` alias. On the VPS it updates `/home/ubuntu/BuildForward` with a fast-forward pull, validates the existing `.env.production`, rebuilds the Docker Compose production stack, waits for the services, and checks the local and public URLs. It stops if the VPS checkout is on another branch or has uncommitted changes. Keep `.env.production` on the VPS; the script does not create or print it. After deployment, run the [golden demo](docs/golden-demo.md) in the browser to verify the full educator flow.
+
 ## What works
 
 - Curriculum JSON import and explicit confirmation.
