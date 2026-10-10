@@ -7,7 +7,7 @@ import { ContinuityWorkspace } from "@/components/continuity-workspace";
 import { CohortOutlook } from "@/components/cohort-outlook";
 import { SourcesWorkspace } from "@/components/sources-workspace";
 
-type View = "continuity" | "cohort" | "sources";
+type View = "cohort" | "continuity" | "sources";
 type Choice = {
   id: string;
   name: string;
@@ -41,13 +41,13 @@ type CurriculumCandidate = {
 };
 
 const viewLabels: Record<View, string> = {
-  continuity: "Project continuity",
   cohort: "Cohort outlook",
+  continuity: "Project continuity",
   sources: "Sources",
 };
 
 export default function Home() {
-  const [view, setView] = useState<View>("continuity");
+  const [view, setView] = useState<View>("cohort");
   const [demo, setDemo] = useState<Demo | null>(null);
   const [project, setProject] = useState<Project | null>(null);
   const [continuity, setContinuity] = useState<Continuity | null>(null);

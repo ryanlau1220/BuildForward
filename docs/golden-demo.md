@@ -4,11 +4,20 @@ Use the default **illustrative sample** to show one decision path across the two
 
 ## Walkthrough
 
-1. In **Project continuity**, keep **Software Testing · Semester 2** selected and run the comparison. The sample assumes the earlier project contains reusable object-oriented code, modular structure, persistence, and testable business logic. The trained classifier returns **CONTINUE** and the screen shows the five feature values passed to the model, its evidence, the heuristic baseline, and the synthetic-rubric limitation. Explain that this demonstrates runtime inference; its 1.00 rubric holdout score is not real-world validation. “File-count input: 0” is the sample metadata value, not a claim that a repository scan found zero files.
-2. Open **Cohort outlook**. The first market-supported gap is **Unit Testing**. The simulated cohort starts at 18% coverage; one remaining module adds the illustrative 22-point gain, leaving a 30-point gap to the illustrative 70% target. ILMIA's selected role-profile sample lists JUnit or Software Testing for 2 of 6 profiles (33%). This is a role-profile coverage signal, not a share of Malaysian job ads.
-3. The score is `0.30 × 0.333 × 0.5 = 0.050`, where `0.5` is the runway factor for one remaining module opportunity. It is an ordering aid, not a probability. Competencies without a mapped market signal remain labeled **Gap only**.
-4. Leave the scenario assumption at **+18 percentage points** and recalculate. The illustrative graduation gap falls from 30% to 12%. Describe this as a hypothetical scenario, not an observed intervention effect.
-5. Close with the educator decision: review whether a later assessment should deliberately extend and test the prior project. BuildForward presents evidence and a scenario; educators decide whether reuse is pedagogically appropriate.
+1. Start in **Cohort outlook**. The first market-supported gap is **Unit Testing**: 18% current coverage, 40% projected by graduation, and a 30-point gap to the illustrative 70% target. Two of the six selected ILMIA role profiles list a mapped testing skill (33%). This is role-profile coverage, not a share of Malaysian job ads.
+2. Explain the ordering score: `0.30 × 0.333 × 0.5 = 0.050`, where `0.5` is the runway factor for one remaining module opportunity. It is an ordinal planning aid, not a probability. Competencies without a mapped market signal are labeled **Gap only**.
+3. Open **Project continuity** and keep **Software Testing · Semester 2** selected. The illustrative project assumes reusable object-oriented code, modular structure, persistence and testable business logic. Run the comparison to show the trained classifier’s **CONTINUE** result, the five input values, supporting evidence, heuristic baseline and synthetic-rubric limitation. The default workspace also loads this result before interaction; pressing the button demonstrates a fresh inference. Its 1.00 rubric holdout score is not real-world validation. “File-count input: 0” is sample metadata, not a repository scan result.
+4. Return to **Cohort outlook**. Keep **Unit Testing** selected and the assumed gain at **+18 percentage points**, then recalculate. The illustrative gap changes from 30% to 12%. Describe this as a hypothetical scenario, not an observed intervention effect or an automatic recommendation.
+5. Close with the educator decision: consider whether a later assessment should extend and test prior project work. BuildForward presents evidence and a scenario; educators decide whether reuse is pedagogically appropriate.
+
+## Presenter preflight
+
+- Start the API and web app using the commands in [README.md](../README.md), then open a fresh browser session to remove uncertainty from prior workspace selections.
+- Confirm the header shows **Software Engineering pathway — illustrative sample**, **Simulated cohort A**, and **Record management application — illustrative sample**.
+- Confirm **Cohort outlook** opens first, the first ranked gap is **Unit Testing**, and the market signal reads 33% from 2 of 6 profiles.
+- Run the continuity comparison once and check for **CONTINUE**. Return to **Cohort outlook** and recalculate the +18-point scenario; verify the result is 30% to 12%.
+- The user-supplied coursework reports and degree materials are review candidates; they are not the active pitch dataset. The live three-minute demo uses the labeled illustrative project and simulated cohort.
+- Keep both local servers running during the pitch. The demo prediction and market data are local; the walkthrough does not depend on live extraction or network calls.
 
 ## Keep the story accurate
 
