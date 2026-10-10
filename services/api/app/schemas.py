@@ -1,14 +1,4 @@
-from enum import StrEnum
-
 from pydantic import BaseModel, Field
-
-
-class Provenance(StrEnum):
-    SAMPLE = "SAMPLE"
-    SOURCE_FACT = "SOURCE_FACT"
-    EXTRACTED_CANDIDATE = "EXTRACTED_CANDIDATE"
-    CONFIRMED_FACT = "CONFIRMED_FACT"
-    SIMULATED = "SIMULATED"
 
 
 class ModuleIn(BaseModel):
