@@ -11,50 +11,67 @@ MAX_TEXT_BYTES = 512 * 1024
 IGNORED_PARTS = {".git", "node_modules", ".next", "dist", "build", "__pycache__",
                  "data", "database", "databases", "uploads", "storage"}
 SOURCE_EXTENSIONS = {".java": "Java", ".py": "Python", ".ts": "TypeScript", ".tsx": "TypeScript",
-                     ".js": "JavaScript", ".jsx": "JavaScript", ".cpp": "C++", ".cs": "C#"}
+                     ".js": "JavaScript", ".jsx": "JavaScript", ".cpp": "C++", ".hpp": "C++",
+                     ".h": "C++", ".cs": "C#", ".dart": "Dart"}
 
 
-def analyze_zip(content: bytes) -> dict:
-    if len(content) > MAX_ARCHIVE_BYTES:
-        raise ValueError("Archive exceeds the 20 MB upload limit")
-    try:
-        archive = zipfile.ZipFile(io.BytesIO(content))
-    except zipfile.BadZipFile as exc:
-        raise ValueError("Upload a valid ZIP archive") from exc
-    with archive:
-        infos = [i for i in archive.infolist() if not i.is_dir()]
-        if len(infos) > MAX_FILES or sum(i.file_size for i in infos) > MAX_UNCOMPRESSED_BYTES:
-            raise ValueError("Archive has too many files or too much uncompressed content")
-        paths: list[str] = []
-        contents: dict[str, str] = {}
-        languages: Counter[str] = Counter()
-        for info in infos:
-            path = PurePosixPath(info.filename)
-            # Repositories can contain exported student/user records or credentials.
-            # Only inspect source and explicitly supported build metadata; never read
-            # data files, environment files, or arbitrary text into the analyzer.
-            if (path.is_absolute() or ".." in path.parts
-                    or any(p.lower() in IGNORED_PARTS for p in path.parts)
-                    or path.name.lower().startswith(".env")
-                    or (path.suffix.lower() in {".txt", ".csv", ".jsonl", ".db", ".sqlite"}
-                        and path.name.lower() != "requirements.txt")):
-                continue
-            name = str(path).lower()
-            language = SOURCE_EXTENSIONS.get(path.suffix.lower())
-            is_config = path.name.lower() in {
-                "pom.xml", "build.gradle", "package.json", "pyproject.toml",
-                "requirements.txt", "dockerfile",
-            } or (".github/workflows/" in name and path.suffix.lower() in {".yml", ".yaml"})
-            if not (language or is_config):
-                continue
-            paths.append(name)
-            if language:
-                languages[language] += 1
-            if info.file_size <= MAX_TEXT_BYTES and (language or path.name.lower() in {
-                "pom.xml", "build.gradle", "package.json", "pyproject.toml", "requirements.txt",
-                "dockerfile",
-            } or ".github/workflows/" in name):
-                contents[name] = archive.read(info).decode("utf-8", errors="replace")
+def is_test_source(path: str) -> bool:
+    """Recognize conventional test locations/names without matching ordinary routes."""
+    parts = PurePosixPath(path).parts
+    filename = PurePosixPath(path).name
+    name = filename.lower()
+    if any(part.lower() in {"test", "tests", "spec", "specs", "__tests__"} for part in parts[:-1]):
+        return True
+    stem = PurePosixPath(filename).stem
+    lower_stem = stem.lower()
+    return (
+        name.startswith("test_")
+        or lower_stem in {"test", "_test", "tests", "_tests"}
+        or lower_stem.endswith(("_test", "_tests"))
+        or ".test." in name
+        or ".spec." in name
+        or (PurePosixPath(name).suffix in {".java", ".cs"}
+            and (stem.startswith("Test") or stem.endswith(("Test", "Tests"))))
+    )
+
+
+def should_scan_path(filename: str) -> bool:
+    path = PurePosixPath(filename)
+    if (path.is_absolute() or ".." in path.parts
+            or any(part.lower() in IGNORED_PARTS for part in path.parts)
+            or path.name.lower().startswith(".env")
+            or (path.suffix.lower() in {".txt", ".csv", ".jsonl", ".db", ".sqlite"}
+                and path.name.lower() != "requirements.txt")):
+        return False
+    name = str(path).lower()
+    is_config = path.name.lower() in {
+        "pom.xml", "build.gradle", "package.json", "pyproject.toml",
+        "requirements.txt", "dockerfile",
+    } or (".github/workflows/" in name and path.suffix.lower() in {".yml", ".yaml"})
+    return bool(SOURCE_EXTENSIONS.get(path.suffix.lower()) or is_config)
+
+
+def analyze_files(files: dict[str, bytes]) -> dict:
+    """Extract static project evidence from already bounded repository files."""
+    if len(files) > MAX_FILES or sum(map(len, files.values())) > MAX_UNCOMPRESSED_BYTES:
+        raise ValueError("Repository has too many files or too much uncompressed content")
+    paths: list[str] = []
+    contents: dict[str, str] = {}
+    languages: Counter[str] = Counter()
+    for filename, content in files.items():
+        path = PurePosixPath(filename)
+        if not should_scan_path(filename):
+            continue
+        name = str(path).lower()
+        language = SOURCE_EXTENSIONS.get(path.suffix.lower())
+        paths.append(name)
+        if language:
+            languages[language] += 1
+        if len(content) <= MAX_TEXT_BYTES and (language or path.name.lower() in {
+            "pom.xml", "build.gradle", "package.json", "pyproject.toml", "requirements.txt",
+            "dockerfile",
+        } or ".github/workflows/" in name):
+            contents[name] = content.decode("utf-8", errors="replace")
 
     evidence: list[dict] = []
     def add(skill: str, source: str, detail: str) -> None:
@@ -67,9 +84,12 @@ def analyze_zip(content: bytes) -> dict:
     if any("service" in p or "domain" in p for p in source_paths):
         add("testable-code", "repository structure", "Service or domain code is separated into files")
         add("domain-model", "repository structure", "Domain or service files found")
-    if any(p.endswith(".java") for p in source_paths) and re.search(r"\b(class|interface)\s+\w+", joined):
-        add("object-oriented-design", "Java source", "Class or interface declaration found")
-    if any("/test" in p or p.startswith("test") for p in source_paths):
+    if any(PurePosixPath(p).suffix in {".java", ".dart"} for p in source_paths) and re.search(
+        r"\b(class|interface)\s+\w+", joined
+    ):
+        add("object-oriented-design", "Java or Dart source", "Class or interface declaration found")
+    test_paths = [p for p in source_paths if is_test_source(p)]
+    if test_paths:
         add("unit-testing", "repository structure", "Test source files found; test execution not verified")
         add("automated-tests", "repository structure", "Test source files found; test execution not verified")
     workflows = [p for p in paths if ".github/workflows/" in p and p.endswith((".yml", ".yaml"))]
@@ -93,3 +113,21 @@ def analyze_zip(content: bytes) -> dict:
             "A detected file or dependency is evidence of use, not proof of proficiency",
         ],
     }
+
+
+def analyze_zip(content: bytes) -> dict:
+    if len(content) > MAX_ARCHIVE_BYTES:
+        raise ValueError("Archive exceeds the 20 MB upload limit")
+    try:
+        archive = zipfile.ZipFile(io.BytesIO(content))
+    except zipfile.BadZipFile as exc:
+        raise ValueError("Upload a valid ZIP archive") from exc
+    with archive:
+        infos = [i for i in archive.infolist() if not i.is_dir()]
+        if len(infos) > MAX_FILES or sum(i.file_size for i in infos) > MAX_UNCOMPRESSED_BYTES:
+            raise ValueError("Archive has too many files or too much uncompressed content")
+        files: dict[str, bytes] = {}
+        for info in infos:
+            if should_scan_path(info.filename):
+                files[info.filename] = archive.read(info)
+    return analyze_files(files)

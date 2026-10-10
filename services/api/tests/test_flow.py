@@ -53,6 +53,9 @@ def test_sample_predictions_are_explained_and_scenario_is_labelled():
         assert continuity["model"]["name"] == "random_forest"
         assert continuity["model"]["training_data_source"] == "synthetic_rubric_scenarios"
         assert continuity["model"]["training_rows"] == 72
+        assert continuity["model"]["real_validation"]["candidate_pairs"] == 12
+        assert continuity["model"]["real_validation"]["reviewed_pairs"] == 0
+        assert continuity["model"]["real_validation"]["metrics"] is None
         assert continuity["heuristic_baseline_decision"] == "CONTINUE"
         assert continuity["model_features"] == {
             "prerequisite_coverage": 1.0,
@@ -193,6 +196,31 @@ def test_repository_analysis_skips_data_files_and_scans_source_only():
     assert analysis["files_scanned"] == 3
     assert analysis["languages"] == ["Java"]
     assert all("do-not-scan" not in str(item) for item in analysis["evidence"])
+
+
+def test_repository_analysis_recognizes_cpp_headers_and_conventional_tests_only():
+    analysis = analyze_zip(archive({
+        "repo/include/ArrayList.hpp": "class ArrayList {};",
+        "repo/src/main.cpp": "int main() { return 0; }",
+        "repo/src/model.cpp": "struct Model {};",
+        "repo/tests/smoke.cpp": "int smoke() { return 1; }",
+        "repo/app/api/test-update/route.ts": "export function POST() {}",
+        "repo/src/testing.java": "class Testing {}",
+        "repo/src/latest.java": "class Latest {}",
+        "repo/frontend/main.dart": "class MainApp {}",
+    }))
+    assert analysis["files_scanned"] == 8
+    assert "C++" in analysis["languages"]
+    assert "Dart" in analysis["languages"]
+    assert "object-oriented-design" in analysis["competencies"]
+    assert {"unit-testing", "automated-tests"} <= set(analysis["competencies"])
+    assert "object-oriented-design" in analysis["competencies"]
+
+    without_tests = analyze_zip(archive({
+        "repo/app/api/test-update/route.ts": "export function POST() {}",
+        "repo/src/testing.java": "class Testing {}",
+    }))
+    assert "unit-testing" not in without_tests["competencies"]
 
 
 def test_imported_curriculum_and_cohort_are_blocked_until_reviewed():
