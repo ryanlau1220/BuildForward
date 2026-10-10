@@ -1,7 +1,6 @@
 import json
 
 import joblib
-
 from training.generate_synthetic_scenarios import write_dataset
 from training.train_continuity import train
 
