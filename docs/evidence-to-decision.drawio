@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mxfile host="app.diagrams.net">
+  <diagram name="Evidence to decision">
+    <mxGraphModel adaptiveColors="auto" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1168" pageHeight="330">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="project_lane" value="PROJECT REUSE · TRAINED CLASSIFIER" style="rounded=1;whiteSpace=wrap;container=1;pointerEvents=0;verticalAlign=top;align=left;spacingLeft=14;spacingTop=10;fontStyle=1;fontSize=14;fillColor=#f4faf7;strokeColor=#d8e9e0;fontColor=#0b5d55;" vertex="1" parent="1">
+          <mxGeometry x="1" y="10" width="945" height="156" as="geometry" />
+        </mxCell>
+        <mxCell id="forecast_lane" value="SKILL FORECAST · STATED ASSUMPTIONS" style="rounded=1;whiteSpace=wrap;container=1;pointerEvents=0;verticalAlign=top;align=left;spacingLeft=14;spacingTop=10;fontStyle=1;fontSize=14;fillColor=#f4f8fb;strokeColor=#dae6ed;fontColor=#0b5d55;" vertex="1" parent="1">
+          <mxGeometry x="1" y="176" width="945" height="149" as="geometry" />
+        </mxCell>
+        <mxCell id="project_inputs" value="PROJECT INPUTS&#10;Project repository&#10;Future module goals" style="rounded=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;fontSize=14;fontColor=#142b32;fillColor=#ffffff;strokeColor=#cbded7;" vertex="1" parent="project_lane">
+          <mxGeometry x="13" y="41" width="180" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="evidence" value="EVIDENCE PROCESSING&#10;Static repository scan&#10;Skill mapping&#10;Source review / confirmation" style="rounded=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;fontSize=14;fontColor=#142b32;fillColor=#ffffff;strokeColor=#cbded7;" vertex="1" parent="project_lane">
+          <mxGeometry x="213" y="41" width="220" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="features" value="MODEL FEATURES&#10;Prerequisite coverage&#10;Reuse signals · target overlap&#10;Evidence count · files scanned" style="rounded=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;fontSize=14;fontColor=#142b32;fillColor=#ffffff;strokeColor=#cbded7;" vertex="1" parent="project_lane">
+          <mxGeometry x="453" y="41" width="234" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="classifier" value="ML CLASSIFIER&#10;Random Forest&#10;Continue · Partially reuse · Start new" style="rounded=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;fontSize=14;fontColor=#142b32;fillColor=#ffffff;strokeColor=#cbded7;" vertex="1" parent="project_lane">
+          <mxGeometry x="707" y="41" width="220" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="forecast_inputs" value="FORECAST INPUTS&#10;Student-intake coverage&#10;Future modules · DOSM counts" style="rounded=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;fontSize=14;fontColor=#142b32;fillColor=#ffffff;strokeColor=#cbdce8;" vertex="1" parent="forecast_lane">
+          <mxGeometry x="13" y="41" width="250" height="96" as="geometry" />
+        </mxCell>
+        <mxCell id="forecast" value="SKILL FORECAST&#10;Projected gaps and priority&#10;Stated module-gain assumption" style="rounded=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;fontSize=14;fontColor=#142b32;fillColor=#ffffff;strokeColor=#cbdce8;" vertex="1" parent="forecast_lane">
+          <mxGeometry x="283" y="41" width="280" height="96" as="geometry" />
+        </mxCell>
+        <mxCell id="scenario" value="ACTION SCENARIO&#10;Suggested activity for review&#10;Compare a hypothetical gain" style="rounded=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;fontSize=14;fontColor=#142b32;fillColor=#ffffff;strokeColor=#cbdce8;" vertex="1" parent="forecast_lane">
+          <mxGeometry x="583" y="41" width="344" height="96" as="geometry" />
+        </mxCell>
+        <mxCell id="educator" value="EDUCATOR&#10;DECISION&#10;Review the evidence&#10;Compare both signals&#10;Choose whether to act&#10;Human review required" style="rounded=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;fontSize=14;fontColor=#142b32;fillColor=#e8f5f0;strokeColor=#78b5a6;" vertex="1" parent="1">
+          <mxGeometry x="968" y="79" width="186" height="211" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" value="" edge="1" parent="1" source="project_inputs" target="evidence" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#78988d;strokeWidth=2;endArrow=block;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" value="" edge="1" parent="1" source="evidence" target="features" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#78988d;strokeWidth=2;endArrow=block;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" value="" edge="1" parent="1" source="features" target="classifier" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#78988d;strokeWidth=2;endArrow=block;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" value="" edge="1" parent="1" source="classifier" target="educator" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#78988d;strokeWidth=2;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.13;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" value="" edge="1" parent="1" source="forecast_inputs" target="forecast" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#78988d;strokeWidth=2;endArrow=block;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" value="" edge="1" parent="1" source="forecast" target="scenario" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#78988d;strokeWidth=2;endArrow=block;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" value="" edge="1" parent="1" source="scenario" target="educator" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#78988d;strokeWidth=2;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.88;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" value="reuse result" edge="1" parent="1" source="classifier" target="scenario" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#78988d;strokeWidth=2;endArrow=block;exitX=0.5;exitY=1;entryX=0.68;entryY=0;dashed=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

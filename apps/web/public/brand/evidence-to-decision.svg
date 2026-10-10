@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1168" height="330" viewBox="0 0 1168 330" role="img" aria-labelledby="pipeline-title pipeline-desc">
+<title id="pipeline-title">BuildForward evidence-to-decision pipeline</title>
+<desc id="pipeline-desc">Project repository and module goals pass through static inspection and source review into five features for a Random Forest project reuse classifier. Separately, student-intake coverage, future modules, and a DOSM occupation signal feed an assumption-based skill forecast and action scenario. Both paths support an educator's final decision.</desc>
+<defs><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#78988d"/></marker></defs>
+<style>
+text { font-family: Arial, Helvetica, sans-serif; }
+.lane-title { font-size: 14px; font-weight: 800; letter-spacing: 1.2px; }
+.card-title { font-size: 14px; font-weight: 800; fill: #142b32; }
+.card-copy { font-size: 13.5px; fill: #455b61; }
+.classifier-output { font-size: 12px; fill: #455b61; }
+.decision-copy { font-size: 15px; fill: #284349; }
+.edge { fill: none; stroke: #78988d; stroke-width: 2.5; marker-end: url(#arrow); }
+.edge.reuse { stroke-dasharray: 5 5; }
+</style>
+<rect x="1" y="10" width="945" height="156" rx="17" fill="#f4faf7" stroke="#d8e9e0"/>
+<rect x="1" y="176" width="945" height="149" rx="17" fill="#f4f8fb" stroke="#dae6ed"/>
+<text x="15" y="35" class="lane-title" fill="#0b5d55">PROJECT REUSE · TRAINED CLASSIFIER</text>
+<text x="15" y="201" class="lane-title" fill="#426d91">SKILL FORECAST · STATED ASSUMPTIONS</text>
+<path class="edge" d="M194 101H211"/><path class="edge" d="M434 101H451"/><path class="edge" d="M688 101H705"/><path class="edge" d="M928 101H965"/>
+<path class="edge" d="M264 265H281"/><path class="edge" d="M564 265H581"/><path class="edge" d="M928 265H965"/>
+<path class="edge reuse" d="M818 151V213"/><text x="830" y="188" font-size="11" fill="#61757a">reuse result</text>
+
+<g id="project_inputs"><rect x="14" y="51" width="180" height="100" rx="12" fill="#ffffff" stroke="#cbded7" stroke-width="1.5"/>
+<text x="27" y="76" class="card-title">PROJECT INPUTS</text>
+<text x="27" y="102" class="card-copy">Project repository</text>
+<text x="27" y="124" class="card-copy">Future module goals</text>
+</g>
+<g id="evidence"><rect x="214" y="51" width="220" height="100" rx="12" fill="#ffffff" stroke="#cbded7" stroke-width="1.5"/>
+<text x="227" y="76" class="card-title">EVIDENCE PROCESSING</text>
+<text x="227" y="96" class="card-copy">Static repository scan</text>
+<text x="227" y="117" class="card-copy">Skill mapping</text>
+<text x="227" y="138" class="card-copy">Source review / confirmation</text>
+</g>
+<g id="features"><rect x="454" y="51" width="234" height="100" rx="12" fill="#ffffff" stroke="#cbded7" stroke-width="1.5"/>
+<text x="467" y="76" class="card-title">MODEL FEATURES</text>
+<text x="467" y="96" class="card-copy">Prerequisite coverage</text>
+<text x="467" y="117" class="card-copy">Reuse signals · target overlap</text>
+<text x="467" y="138" class="card-copy">Evidence count · files scanned</text>
+</g>
+<g id="classifier"><rect x="708" y="51" width="220" height="100" rx="12" fill="#ffffff" stroke="#cbded7" stroke-width="1.5"/>
+<text x="721" y="76" class="card-title">ML CLASSIFIER</text>
+<text x="721" y="102" class="card-copy">Random Forest</text>
+<text x="721" y="124" class="classifier-output">Continue · Partially reuse · Start new</text>
+</g>
+<g id="forecast_inputs"><rect x="14" y="217" width="250" height="96" rx="12" fill="#ffffff" stroke="#cbdce8" stroke-width="1.5"/>
+<text x="27" y="242" class="card-title">FORECAST INPUTS</text>
+<text x="27" y="268" class="card-copy">Student-intake coverage</text>
+<text x="27" y="290" class="card-copy">Future modules · DOSM counts</text>
+</g>
+<g id="forecast"><rect x="284" y="217" width="280" height="96" rx="12" fill="#ffffff" stroke="#cbdce8" stroke-width="1.5"/>
+<text x="297" y="242" class="card-title">SKILL FORECAST</text>
+<text x="297" y="268" class="card-copy">Projected gaps and priority</text>
+<text x="297" y="290" class="card-copy">Stated module-gain assumption</text>
+</g>
+<g id="scenario"><rect x="584" y="217" width="344" height="96" rx="12" fill="#ffffff" stroke="#cbdce8" stroke-width="1.5"/>
+<text x="597" y="242" class="card-title">ACTION SCENARIO</text>
+<text x="597" y="268" class="card-copy">Suggested activity for review</text>
+<text x="597" y="290" class="card-copy">Compare a hypothetical gain</text>
+</g>
+<g id="educator"><rect x="968" y="79" width="186" height="211" rx="12" fill="#e8f5f0" stroke="#78b5a6" stroke-width="1.5"/>
+<text x="981" y="104" class="card-title">EDUCATOR</text>
+<text x="981" y="124" class="card-title">DECISION</text>
+<text x="981" y="156" class="decision-copy">Review the evidence</text>
+<text x="981" y="181" class="decision-copy">Compare both signals</text>
+<text x="981" y="206" class="decision-copy">Choose whether to act</text>
+<text x="981" y="273" font-size="12" font-weight="700" fill="#0b5d55">Human review required</text>
+</g>
+</svg>

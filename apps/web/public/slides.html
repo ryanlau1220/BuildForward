@@ -71,16 +71,7 @@
     .scenario-value strong { display: block; margin-top: 8px; color: var(--ink); font-size: 60px; line-height: 1; }
     .scenario-arrow { color: var(--green); text-align: center; font-size: 64px; }
     .scenario-note { margin-top: 22px !important; color: var(--green-dark); font-size: 19px; font-weight: 700; }
-    .system-grid { display: grid; grid-template-columns: 1.12fr .88fr; gap: 24px; margin-top: 31px; }
-    .system-list { display: grid; gap: 10px; }
-    .system-item { display: grid; grid-template-columns: 43px 1fr; gap: 13px; align-items: center; min-height: 76px; padding: 10px 15px; border: 1px solid var(--line); border-radius: 11px; background: #fbfdfc; }
-    .system-item b { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 9px; background: var(--green-soft); color: var(--green-dark); font-size: 18px; }
-    .system-item strong { display: block; font-size: 18px; }
-    .system-item span { display: block; margin-top: 3px; color: var(--muted); font-size: 15px; }
-    .limit-panel { padding: 23px 25px; border: 1px solid #e4d5b1; border-radius: 16px; background: #fffaf0; }
-    .limit-panel h3 { margin-bottom: 17px; }
-    .limit-panel p { margin-top: 14px; color: #5c5340; font-size: 18px; line-height: 1.42; }
-    .limit-panel p:first-of-type { margin-top: 0; }
+    .pipeline-diagram { display: block; width: 100%; height: auto; margin-top: 20px; }
     .evaluation-note { display: grid; gap: 3px; margin-top: 15px; padding-left: 13px; border-left: 3px solid var(--green); }
     .evaluation-note strong { color: var(--green-dark); font-size: 18px; }
     .evaluation-note span { color: var(--muted); font-size: 14px; }
@@ -193,16 +184,8 @@
       <section class="slide" id="slide-6" aria-label="Slide 6 of 7">
         <header class="slide-header"><img class="brand-logo" src="/brand/logo.png" alt="BuildForward" /><span class="section-label">How it works</span></header>
         <div class="slide-body">
-          <div class="heading-block"><p class="eyebrow">Evidence first, limits visible</p><h2>A small, auditable decision-support pipeline.</h2></div>
-          <div class="system-grid">
-            <div class="system-list">
-              <div class="system-item"><b>1</b><div><strong>Source review</strong><span>Illustrative records and review-only coursework candidates</span></div></div>
-              <div class="system-item"><b>2</b><div><strong>Static project inspection</strong><span>Supported source files and build metadata; no code execution</span></div></div>
-              <div class="system-item"><b>3</b><div><strong>Project reuse model</strong><span>Classifier trained on synthetic rubric scenarios</span></div></div>
-              <div class="system-item"><b>4</b><div><strong>Skill forecast</strong><span>Coverage assumptions and a limited DOSM occupation signal</span></div></div>
-            </div>
-            <div class="limit-panel"><h3>What the result cannot prove</h3><p>No real student-intake data has been supplied. Forecast values are not institutionally validated.</p><p>Repository signals do not prove code quality or student proficiency.</p><p>Educators review assignment fit and make the final decision.</p></div>
-          </div>
+          <div class="heading-block"><p class="eyebrow">Evidence-to-decision pipeline</p><h2>Two paths. One educator decision.</h2></div>
+          <img class="pipeline-diagram" src="/brand/evidence-to-decision.svg" alt="Project path: a repository and module goals become reviewed evidence, five features, and a Random Forest reuse result. Forecast path: student-intake coverage, future modules, and a DOSM occupation signal become skill gaps and an action scenario. Both paths support the educator's decision." />
           <div class="evaluation-note"><strong>Real-repository descriptive check: macro-F1 0.62 vs 0.46 simple baseline · 9 scored pairs</strong><span>Owner-approved hypothetical labels; descriptive only, not institutional validation.</span></div>
         </div>
         <footer class="slide-footer"><span>DOSM counts online offerings by occupation, not demand for individual skills</span><strong>06 / 07</strong></footer>
