@@ -9,9 +9,10 @@ The event slides require a public GitHub repository, a deployed application, and
 ### Implementation checkpoint
 
 - Next.js dashboard and FastAPI service are implemented locally, including review screens for seeded curriculum and repository candidates, human confirmation gates, a confirmed-module selector, and explicit continuity comparison.
+- Scalar now serves the interactive API reference at `/docs`; `/openapi.json` remains available, and the default Swagger UI and ReDoc routes are disabled. Scalar telemetry and its optional agent are disabled.
 - Repository analysis is static and excludes data directories, database files, environment files, CSV/JSONL and arbitrary text. The supplied Java repository currently yields four candidate signals across 98 Java source files; tests and code were not executed.
 - `data/imports/` contains normalized candidates and source mapping notes. The local API seeds them on startup as `EXTRACTED_CANDIDATE` so a fresh database retains the review workflow.
-- Verified: API tests (6 passed), Ruff, `pnpm install --frozen-lockfile`, frontend typecheck/build, JSON validity, and `docker compose config`. The npm registry TLS failure was resolved after reinstalling Ubuntu's `ca-certificates` package and running `update-ca-certificates`; no certificate file was generated and TLS verification remains enabled. pnpm reported that it ignored sharp's build script; the frontend production build nevertheless completed successfully.
+- Verified: API tests (7 passed), Ruff, `pnpm install --frozen-lockfile`, frontend typecheck/build, JSON validity, and `docker compose config`. Scalar is included in the API dependency lock. The npm registry TLS failure was resolved after reinstalling Ubuntu's `ca-certificates` package and running `update-ca-certificates`; no certificate file was generated and TLS verification remains enabled. pnpm reported that it ignored sharp's build script; the frontend production build nevertheless completed successfully.
 
 ### Next source decision
 
