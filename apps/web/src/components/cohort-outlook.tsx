@@ -43,7 +43,7 @@ export function CohortOutlook({
             {finding.market_evidence ? <p className="market-signal">
               <strong>{Math.round((finding.market_relevance ?? 0) * 100)}%</strong> of the selected ILMIA role profiles list a mapped skill
               <span>Matched: {finding.market_evidence.profiles.map((profile, index) => <Fragment key={profile.code}>{index > 0 ? ", " : ""}<a href={profile.url} target="_blank" rel="noreferrer">{profile.name}</a></Fragment>)}</span>
-              <span>Mapped {label(finding.market_evidence.match_type)}: {finding.market_evidence.skill_terms}</span>
+              <span>Mapped {label(finding.market_evidence.match_type.replaceAll("_", "-"))}: {finding.market_evidence.skill_terms}</span>
             </p> : <p className="market-signal unavailable">No mapped market signal for this competency</p>}
             <p className="priority-reason">{finding.priority_reason}</p>
           </article>)}

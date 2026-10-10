@@ -50,6 +50,8 @@ The continuity model is a proof of concept trained on synthetic rubric scenarios
 
 The cohort outlook ranks competencies with mapped ILMIA role-profile skills by projected gap, selected-profile coverage, and remaining curriculum opportunities. Skills without mapped evidence are marked unavailable and use gap-only ordering. These role-profile shares are not percentages of all job ads; see [docs/market-data.md](docs/market-data.md).
 
+For a short, reproducible walkthrough of the connected continuity, market-priority, and intervention flow, see [docs/golden-demo.md](docs/golden-demo.md).
+
 The interface has three focused work areas: **Project continuity**, **Cohort outlook**, and **Sources**. See [DESIGN.md](DESIGN.md) for the interaction and scope rules.
 
 The sample scenario assumes a 70% programme coverage target and a 22-point gain for each remaining module targeting a competency. The slider adds an editable hypothetical gain to one skill. All three figures are demonstration assumptions, **not observed effects**.
