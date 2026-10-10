@@ -24,7 +24,7 @@ Use the default **illustrative sample** to show one decision path through the Pr
 
 - The programme, project evidence, and student-intake values are illustrative or simulated.
 - Project Reuse Check training labels are synthetic and generated from the same rubric used in evaluation.
-- The separate candidate set is based on five source repositories paired with Software Testing, Capstone Project, and Data Structure. Pair suitability and labels remain unreviewed, while Capstone's required-skill map is still unknown; it is not real validation yet.
+- The separate candidate set pairs five real source repositories with Software Testing, Capstone Project, and Data Structure for hypothetical fit checks across intakes. These are not observed student progressions or confirmed assignment substitutions. Pair suitability and labels remain unreviewed, while Capstone's required-skill map is still unknown; it is not real validation yet.
 - DOSM provides the Q2 2026 Software Developer occupation count. BuildForward separately maps selected curriculum skills to that occupation. See [market-data.md](market-data.md) for the mapping and limits.
 - The 70% target, 22-point per-module coverage gain, and +18-point action gain are demo assumptions.
 - Do not claim that CI/CD has 46% demand or that the market dataset measures all Malaysian software job advertisements.
