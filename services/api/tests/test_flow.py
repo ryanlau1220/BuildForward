@@ -72,6 +72,7 @@ def test_sample_predictions_are_explained_and_scenario_is_labelled():
         baseline = client.post(
             "/api/v1/predictions/cohort-gap", json={"cohort_id": "sample-cohort"}
         ).json()
+        assert baseline["ranked_findings"][0]["competency"] == "unit-testing"
         scenario = client.post(
             "/api/v1/predictions/cohort-gap",
             json={"cohort_id": "sample-cohort", "intervention": {
@@ -84,13 +85,17 @@ def test_sample_predictions_are_explained_and_scenario_is_labelled():
         assert after["projected_gap"] == before["projected_gap"]
         assert after["potential_gap_reduction"] > 0
         assert "assumption" in scenario["assumptions"]["intervention_gain"]
-        assert scenario["assumptions"]["market_dataset"]["period"] == "Q1 2024"
-        assert "Not a percentage of all job ads" in scenario["assumptions"]["market_dataset"]["claim_limit"]
+        market_dataset = scenario["assumptions"]["market_dataset"]
+        assert market_dataset["period"] == "Q2 2026"
+        assert market_dataset["source"].startswith("https://www.dosm.gov.my/")
+        assert "not demand for individual skills" in market_dataset["claim_limit"]
         database_signal = next(
             f for f in baseline["ranked_findings"] if f["competency"] == "database-design"
         )
-        assert database_signal["market_relevance"] == round(4 / 6, 3)
-        assert database_signal["market_evidence"]["matched_profiles"] == 4
+        assert database_signal["market_relevance"] == round(19899 / 555509, 4)
+        assert database_signal["market_evidence"]["occupation"]["online_offerings"] == 19899
+        assert database_signal["market_evidence"]["occupation"]["total_online_offerings"] == 555509
+        assert database_signal["market_evidence"]["mapping_type"] == "adjacent"
         unsupported = next(
             f for f in baseline["ranked_findings"] if f["competency"] == "continuous-integration"
         )

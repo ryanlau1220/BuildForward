@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import { label, projectReuseDecisionLabel, studentIntakeLabel, type Continuity, type Demo, type Finding, type Project } from "@/lib/api";
 
 function CoverageBar({ current, projected, target }: { current: number; projected: number; target: number }) {
@@ -66,24 +65,23 @@ export function CohortOutlook({
         <div className="surface-heading"><div><p className="eyebrow">SKILLS TO REVIEW</p><h3 id="gaps-title">Predicted Skill Gaps at Graduation</h3></div><span className="target-legend"><i />Illustrative target</span></div>
         {positiveGaps.length ? <div className="gap-list">
           {positiveGaps.map((finding, index) => <article className="gap-row" key={finding.competency}>
-            <div className="gap-heading"><span className="rank-number">{String(index + 1).padStart(2, "0")}</span><button className="skill-select-link" type="button" onClick={() => chooseScenarioSkill(finding.competency, onSkillChange)} aria-label={`Use ${label(finding.competency)} in the recommended action scenario`}>{label(finding.competency)}</button><span className={`priority ${finding.priority_score !== null ? "market" : "gap-only"}`} title="Planning score, not a probability">{finding.priority_score !== null ? `Score ${finding.priority_score.toFixed(3)}` : "Gap only"}</span></div>
+            <div className="gap-heading"><span className="rank-number">{String(index + 1).padStart(2, "0")}</span><button className="skill-select-link" type="button" onClick={() => chooseScenarioSkill(finding.competency, onSkillChange)} aria-label={`Use ${label(finding.competency)} in the recommended action scenario`}>{label(finding.competency)}</button><span className={`priority ${finding.priority_score !== null ? "market" : "gap-only"}`} title="Planning score, not a probability">{finding.priority_score !== null ? `Score ${finding.priority_score.toFixed(4)}` : "Gap only"}</span></div>
             <CoverageBar current={finding.current_coverage} projected={finding.projected_graduation_coverage} target={finding.programme_target} />
             <div className="coverage-labels"><span><b><Percent value={finding.current_coverage} /></b> current</span><span><b><Percent value={finding.projected_graduation_coverage} /></b> expected skill coverage at graduation</span><span><b>{finding.future_module_opportunities}</b> future learning opportunities</span></div>
             {finding.market_evidence ? <p className="market-signal">
-              <strong>{Math.round((finding.market_relevance ?? 0) * 100)}%</strong> of the selected ILMIA role profiles list a related skill
-              <span>Matched: {finding.market_evidence.profiles.map((profile, index) => <Fragment key={profile.code}>{index > 0 ? ", " : ""}<a href={profile.url} target="_blank" rel="noreferrer">{profile.name}</a></Fragment>)}</span>
-              <span>Mapped {label(finding.market_evidence.match_type.replaceAll("_", "-"))}: {finding.market_evidence.skill_terms}</span>
+              <strong>{finding.market_evidence.occupation.online_offerings.toLocaleString()}</strong> DOSM online job offerings for <a href={finding.market_evidence.occupation.source} target="_blank" rel="noreferrer">{finding.market_evidence.occupation.name}</a> in Q2 2026
+              <span>{((finding.market_relevance ?? 0) * 100).toFixed(1)}% of {finding.market_evidence.occupation.total_online_offerings.toLocaleString()} online offerings were for this occupation, not this skill.</span>
+              <span>BuildForward mapping ({finding.market_evidence.mapping_type}): {finding.market_evidence.mapping_note}</span>
             </p> : <p className="market-signal unavailable">No mapped market signal for this skill</p>}
             <p className="priority-reason">{finding.priority_reason
               .replaceAll("projected gap", "expected skill gap at graduation")
-              .replaceAll("role-profile coverage", "selected role-profile coverage")
               .replaceAll("curriculum-runway factor", "future learning opportunities factor")
               .replaceAll("remaining module opportunities", "future learning opportunities")
               .replaceAll("remaining module opportunity", "future learning opportunity")
               .replaceAll("competency", "skill")}</p>
           </article>)}
         </div> : <div className="empty-state"><h4>No predicted skill gaps in this scenario</h4><p>No skills are below the illustrative graduation target.</p></div>}
-        <div className="assumption-note"><strong>How to read this</strong><p>Skills with market evidence are ordered using the expected skill gap, selected role-profile coverage, and future learning opportunities. Other skills are ordered by expected gap alone. ILMIA role-profile skills are from Q1 2024, are a small selected sample, and are not percentages of all job ads. See <a href="https://www.ilmia.gov.my/bda-myjobprofile/" target="_blank" rel="noreferrer">ILMIA MyJobProfile</a>. The graduation target and coverage gains are illustrative assumptions.</p></div>
+        <div className="assumption-note"><strong>How to read this</strong><p>Skills with a BuildForward occupation mapping are ordered using the expected skill gap, DOSM occupation share, and future learning opportunities. Other skills are ordered by expected gap alone. DOSM reports online job offerings by occupation, not how many employers request each skill. See <a href="https://www.dosm.gov.my/portal-main/release-content/big-data-analytics-job-market-insights-q22026" target="_blank" rel="noreferrer">DOSM Job Market Insights, Q2 2026</a>. The graduation target and coverage gains are illustrative assumptions.</p></div>
       </section>
 
       <section className="surface scenario-panel" aria-labelledby="scenario-title">
@@ -94,7 +92,7 @@ export function CohortOutlook({
               : <>
                 <h3>Consider developing {label(interventionSkill)} through project work</h3>
                 <p>Consider extending <strong>{project.name}</strong> in <strong>{recommendation.module.name}</strong>: {suggestedProjectWork(interventionSkill)}. The project reuse model returned <strong>{projectReuseDecisionLabel(recommendation.continuity.decision)}</strong>; its evidence shows {recommendation.continuity.reuse_signals.length ? recommendation.continuity.reuse_signals.map(label).join(", ") : "the classifier supports reusing this project"}, while {label(interventionSkill)} is not yet demonstrated.</p>
-                <p className="recommendation-basis">Review basis: {label(interventionSkill)} is {Math.round(recommendation.gap.projected_gap * 100)} points below the illustrative target at graduation{recommendation.gap.market_evidence ? `, and related skill terms appear in ${recommendation.gap.market_evidence.matched_profiles} of ${recommendation.gap.market_evidence.profile_sample_size} selected ILMIA role profiles` : ""}. The future module lists this skill as a target. An educator must check the module fit and decide whether to act.</p>
+                <p className="recommendation-basis">Review basis: {label(interventionSkill)} is {Math.round(recommendation.gap.projected_gap * 100)} points below the illustrative target at graduation{recommendation.gap.market_evidence ? `, and BuildForward maps it to ${recommendation.gap.market_evidence.occupation.name}, with ${recommendation.gap.market_evidence.occupation.online_offerings.toLocaleString()} DOSM online offerings in Q2 2026` : ""}. The future module lists this skill as a target. An educator must check the module fit and decide whether to act.</p>
               </>}
         </div>
         <p className="eyebrow">RECOMMENDED ACTION SCENARIO</p><h3 id="scenario-title">Explore a possible action</h3>

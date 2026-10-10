@@ -1,0 +1,4 @@
+competency,occupation_code,mapping_type,mapping_note
+unit-testing,2512,related,"BuildForward maps the occupation's software testing work to the narrower unit-testing curriculum skill."
+database-design,2512,adjacent,"BuildForward treats database design as related to data-backed software development; DOSM does not measure this skill in the occupation count."
+deployment,2512,adjacent,"BuildForward treats deployment as related to delivering software; DOSM does not measure this skill in the occupation count."

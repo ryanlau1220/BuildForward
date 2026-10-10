@@ -126,7 +126,7 @@ def forecast(cohort: Cohort, modules: list[Module], intervention: Intervention |
         remaining_gap = max(0.0, MIN_COVERAGE - with_intervention)
         market = market_signals.get(skill)
         runway_factor = 1 / (1 + opportunities[skill])
-        priority_score = gap * market["role_coverage"] * runway_factor if market else None
+        priority_score = gap * market["occupation_share"] * runway_factor if market else None
         findings.append({
             "competency": skill,
             "current_coverage": round(current, 2),
@@ -134,19 +134,17 @@ def forecast(cohort: Cohort, modules: list[Module], intervention: Intervention |
             "programme_target": MIN_COVERAGE,
             "projected_gap": round(gap, 2),
             "future_module_opportunities": opportunities[skill],
-            "priority_score": round(priority_score, 3) if priority_score is not None else None,
-            "market_relevance": round(market["role_coverage"], 3) if market else None,
+            "priority_score": round(priority_score, 4) if priority_score is not None else None,
+            "market_relevance": round(market["occupation_share"], 4) if market else None,
             "market_evidence": {
-                "skill_terms": market["market_skill_terms"],
-                "profiles": market["profiles"],
-                "matched_profiles": int(market["matched_profiles"]),
-                "profile_sample_size": int(market["profile_sample_size"]),
-                "match_type": market["match_type"],
+                "occupation": market["occupation"],
+                "mapping_type": market["mapping_type"],
+                "mapping_note": market["mapping_note"],
             } if market else None,
             "runway_factor": round(runway_factor, 3),
             "priority_reason": (
-                f"Market-weighted score {priority_score:.3f}: {gap:.0%} projected gap × "
-                f"{market['role_coverage']:.0%} role-profile coverage × {runway_factor:.2f} "
+                f"Market-weighted score {priority_score:.4f}: {gap:.0%} projected gap × "
+                f"{market['occupation_share']:.1%} DOSM occupation share × {runway_factor:.2f} "
                 f"curriculum-runway factor."
                 if market else
                 f"No mapped market signal; shown by projected gap only ({gap:.0%}). "
@@ -170,9 +168,9 @@ def forecast(cohort: Cohort, modules: list[Module], intervention: Intervention |
         "assumptions": {
             "programme_target": MIN_COVERAGE,
             "coverage_gain_per_remaining_module": ASSUMED_MODULE_GAIN,
-            "market_signal": "partial; role-profile skill tags support selected competencies",
+            "market_signal": "partial; DOSM occupation counts linked to selected skills by BuildForward",
             "market_priority_formula": (
-                "projected curriculum gap × role-profile coverage × curriculum-runway factor"
+                "projected curriculum gap × DOSM occupation share × curriculum-runway factor"
             ),
             "curriculum_runway_factor": "1 / (1 + remaining module opportunities for the competency)",
             "market_dataset": market_data,

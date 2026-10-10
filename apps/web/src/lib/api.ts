@@ -40,8 +40,11 @@ export type Finding = {
   programme_target: number; projected_gap: number; future_module_opportunities: number;
   priority_score: number | null; market_relevance: number | null;
   market_evidence: {
-    skill_terms: string; profiles: {code: string; name: string; url: string}[];
-    matched_profiles: number; profile_sample_size: number; match_type: string;
+    occupation: {
+      code: string; name: string; online_offerings: number;
+      total_online_offerings: number; source: string;
+    };
+    mapping_type: string; mapping_note: string;
   } | null;
   runway_factor: number; priority_reason: string; with_intervention_coverage: number;
   with_intervention_gap: number; potential_gap_reduction: number;

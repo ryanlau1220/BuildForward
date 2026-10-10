@@ -1,62 +1,53 @@
+"""DOSM occupation demand and BuildForward's separate curriculum-skill links."""
+
 import csv
 from functools import lru_cache
 from pathlib import Path
 
-MARKET_DATA = Path(__file__).resolve().parents[1] / "data" / "malaysia_role_skill_signals.csv"
-ROLE_PROFILE_SAMPLE_SIZE = 6
-MARKET_DATASET_NAME = "ILMIA selected Malaysian software and ICT role profiles"
-MARKET_DATASET_PERIOD = "Q1 2024"
-MARKET_DATASET_SOURCE = "https://www.ilmia.gov.my/bda-myjobprofile/"
-ROLE_PROFILES = {
-    "2511": {
-        "name": "Computer Systems Analysts",
-        "url": f"{MARKET_DATASET_SOURCE}job/2511/computer-systems-analysts",
-    },
-    "2512": {
-        "name": "Software Developers",
-        "url": f"{MARKET_DATASET_SOURCE}job/2512/software-developers",
-    },
-    "2514": {
-        "name": "Application Programmers",
-        "url": f"{MARKET_DATASET_SOURCE}job/2514/application-programmers",
-    },
-    "2519": {
-        "name": "Software and Application Developers and Analysts n.e.c.",
-        "url": (
-            f"{MARKET_DATASET_SOURCE}job/2519/"
-            "software-and-application-developers-and-analysts-not-elsewhere-classified"
-        ),
-    },
-    "2521": {
-        "name": "Database Designers and Administrators",
-        "url": f"{MARKET_DATASET_SOURCE}job/2521/database-designers-and-administrators",
-    },
-    "2522": {
-        "name": "Information Technology System Administrators",
-        "url": f"{MARKET_DATASET_SOURCE}job/2522/information-technology-system-administrators",
-    },
-}
+DATA_DIR = Path(__file__).resolve().parents[1] / "data"
+DEMAND_DATA = DATA_DIR / "dosm_occupation_demand.csv"
+SKILL_MAP = DATA_DIR / "buildforward_skill_occupation_map.csv"
+MARKET_DATASET_NAME = "DOSM Job Market Insights: online job offerings"
+MARKET_DATASET_PERIOD = "Q2 2026"
+MARKET_DATASET_SOURCE = (
+    "https://www.dosm.gov.my/portal-main/release-content/"
+    "big-data-analytics-job-market-insights-q22026"
+)
 
 
 @lru_cache(maxsize=1)
 def load_market_signals() -> dict[str, dict]:
-    signals = {}
-    with MARKET_DATA.open(newline="", encoding="utf-8") as source:
+    occupations = {}
+    with DEMAND_DATA.open(newline="", encoding="utf-8") as source:
         for row in csv.DictReader(source):
-            count = int(row["matched_profiles"])
-            sample_size = int(row["profile_sample_size"])
-            if not 0 < count <= sample_size <= ROLE_PROFILE_SAMPLE_SIZE:
-                raise ValueError(f"Invalid role coverage in market data for {row['competency']}")
-            if row["competency"] in signals:
-                raise ValueError(f"Duplicate market signal for {row['competency']}")
-            signals[row["competency"]] = {
-                **row,
-                "matched_profile_codes": row["matched_profile_codes"].split(";"),
-                "profiles": [
-                    {"code": code, **ROLE_PROFILES[code]}
-                    for code in row["matched_profile_codes"].split(";")
-                ],
-                "role_coverage": count / sample_size,
+            count = int(row["online_offerings"])
+            total = int(row["total_online_offerings"])
+            if not 0 < count <= total or row["period"] != MARKET_DATASET_PERIOD:
+                raise ValueError(f"Invalid DOSM demand row for {row['occupation_code']}")
+            if row["occupation_code"] in occupations:
+                raise ValueError(f"Duplicate DOSM occupation {row['occupation_code']}")
+            occupations[row["occupation_code"]] = {
+                "code": row["occupation_code"],
+                "name": row["occupation_name"],
+                "online_offerings": count,
+                "total_online_offerings": total,
+                "source": row["source_url"],
+            }
+
+    signals = {}
+    with SKILL_MAP.open(newline="", encoding="utf-8") as source:
+        for row in csv.DictReader(source):
+            skill = row["competency"]
+            if skill in signals:
+                raise ValueError(f"Duplicate BuildForward skill mapping for {skill}")
+            occupation = occupations[row["occupation_code"]]
+            signals[skill] = {
+                "occupation": occupation,
+                "occupation_share": (
+                    occupation["online_offerings"] / occupation["total_online_offerings"]
+                ),
+                "mapping_type": row["mapping_type"],
+                "mapping_note": row["mapping_note"],
             }
     return signals
 
@@ -65,11 +56,12 @@ def market_dataset_summary() -> dict:
     return {
         "name": MARKET_DATASET_NAME,
         "period": MARKET_DATASET_PERIOD,
-        "sampled_role_profiles": ROLE_PROFILE_SAMPLE_SIZE,
         "source": MARKET_DATASET_SOURCE,
-        "measure": "share of selected role profiles listing a mapped skill tag",
+        "measure": "share of DOSM online job offerings in a selected occupation",
+        "mapping_source": "BuildForward's documented occupation-to-skill mapping",
         "claim_limit": (
-            "Not a percentage of all job ads or skill prevalence. Selected profiles are a small, "
-            "non-representative Q1 2024 sample; related skill tags are mapped to canonical competencies."
+            "DOSM counts online offerings by occupation, not demand for individual skills. "
+            "BuildForward's occupation-to-skill links are editorial and do not measure skill prevalence. "
+            "Online offerings are not all Malaysian jobs."
         ),
     }
