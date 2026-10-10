@@ -135,8 +135,6 @@ button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible
 .rank-number { color: #74857c; font-size: 10px; font-variant-numeric: tabular-nums; }
 .gap-heading strong { font-size: 12px; font-weight: 680; }
 .priority { margin-left: auto; border-radius: 99px; background: var(--amber-soft); padding: 3px 7px; color: #67470e; font-size: 10px; font-weight: 690; text-transform: capitalize; }
-.priority.high, .priority.urgent { background: var(--red-soft); color: var(--red); }
-.priority.low { background: var(--green-soft); color: #24523f; }
 .priority.market { background: #e5f0ea; color: #24523f; }
 .priority.gap-only { background: #eef0ed; color: var(--muted); }
 .coverage-track { position: relative; height: 8px; margin: 12px 0 7px; border-radius: 99px; background: #e8eeea; }
@@ -147,7 +145,7 @@ button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible
 .coverage-labels { display: flex; flex-wrap: wrap; gap: 5px 15px; color: var(--muted); font-size: 10px; }
 .coverage-labels b { color: var(--ink); font-weight: 700; }
 .priority-reason { margin: 7px 0 0; color: var(--muted); font-size: 11px; line-height: 1.45; }
-.market-signal { display: flex; flex-wrap: wrap; gap: 3px 6px; margin: 7px 0 0; color: var(--ink-soft); font-size: 11px; line-height: 1.4; }
+.market-signal { display: flex; flex-wrap: wrap; gap: 3px 6px; margin: 7px 0 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
 .market-signal strong { color: var(--green); }
 .market-signal span { flex-basis: 100%; color: var(--muted); }
 .market-signal a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
