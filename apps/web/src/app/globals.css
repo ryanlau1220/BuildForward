@@ -181,6 +181,7 @@ button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible
 .candidate-row { display: flex; min-height: 54px; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid #e7ede9; padding: 7px 0; }
 .candidate-row-main { display: grid; min-width: 0; gap: 5px; justify-items: start; }
 .candidate-row-main > strong { font-size: 12px; font-weight: 650; }
+.candidate-semester { color: var(--muted); font-size: 10px; line-height: 1.4; }
 .secondary-button { border-color: #b8c8bf; background: var(--paper); color: #285442; }
 .secondary-button:hover:not(:disabled) { border-color: var(--green); background: var(--green-soft); }
 .candidate-row .secondary-button { flex: 0 0 auto; }

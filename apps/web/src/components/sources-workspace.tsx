@@ -1,7 +1,7 @@
 import { label, type Project } from "@/lib/api";
 
-type Choice = { id: string; name: string; provenance: string };
-type ModuleChoice = { id: string; name: string; programme_name: string; provenance: string };
+type Choice = { id: string; name: string; provenance: string; originating_module_id?: string | null };
+type ModuleChoice = { id: string; name: string; semester: number; programme_id: string; programme_name: string; provenance: string };
 type CurriculumCandidate = {
   id: string;
   name: string;
@@ -35,6 +35,15 @@ export function SourcesWorkspace({
   onProjectOrigin: (id: string) => void;
   onConfirmProject: () => void;
 }) {
+  const moduleById = new Map(modules.map(module => [module.id, module]));
+  const orderedCandidateProjects = [...candidateProjects].sort((a, b) => {
+    const moduleA = a.originating_module_id ? moduleById.get(a.originating_module_id) : undefined;
+    const moduleB = b.originating_module_id ? moduleById.get(b.originating_module_id) : undefined;
+    return (moduleA?.programme_name ?? "").localeCompare(moduleB?.programme_name ?? "")
+      || (moduleA?.semester ?? Number.MAX_SAFE_INTEGER) - (moduleB?.semester ?? Number.MAX_SAFE_INTEGER)
+      || a.name.localeCompare(b.name);
+  });
+
   return <section className="view-panel" aria-labelledby="sources-title">
     <div className="view-intro"><div><p className="eyebrow">DATA SOURCES · REVIEW</p><h2 id="sources-title">Review learning and project information</h2></div>
       <p>Imported coursework and repository scans remain candidates until reviewed. Confirming extracted details does not validate a programme sequence or prove student proficiency.</p></div>
@@ -60,8 +69,8 @@ export function SourcesWorkspace({
 
       <section className="surface source-panel" aria-labelledby="project-sources-title">
         <div className="surface-heading"><div><p className="eyebrow">PROJECT INPUTS</p><h3 id="project-sources-title">Student projects and repositories</h3></div><span className="count-pill">{candidateProjects.length} to review</span></div>
-        {candidateProjects.length > 0 ? <div className="candidate-list">{candidateProjects.map(item => <article className="candidate-row" key={item.id}>
-          <div className="candidate-row-main"><strong>{item.name}</strong><Provenance value={item.provenance} /></div>
+        {candidateProjects.length > 0 ? <div className="candidate-list">{orderedCandidateProjects.map(item => <article className="candidate-row" key={item.id}>
+          <div className="candidate-row-main"><strong>{item.name}</strong>{item.originating_module_id && moduleById.get(item.originating_module_id) && <span className="candidate-semester">{moduleById.get(item.originating_module_id)?.programme_name} · Semester {moduleById.get(item.originating_module_id)?.semester} · {moduleById.get(item.originating_module_id)?.name}</span>}<Provenance value={item.provenance} /></div>
           <button type="button" className="secondary-button" onClick={() => onInspectProject(item.id)}>Review evidence</button>
         </article>)}</div> : <div className="empty-state compact-empty"><h4>No project evidence to review</h4><p>Submitted project reports and analyzed repositories will appear here for review.</p></div>}
         <form className="import-form" onSubmit={e => { e.preventDefault(); onAnalyzeGithub(); }}>
