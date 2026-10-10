@@ -46,6 +46,9 @@ ml/artifacts/
 
 # Local-only project reference deck (large source PDF)
 /AI SLIDES .pdf
+*.pdf
+*.docx
+data/imports/*
 
 # Operating system files
 .DS_Store
