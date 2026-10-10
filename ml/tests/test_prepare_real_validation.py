@@ -73,9 +73,15 @@ def test_review_manifest_uses_five_user_selected_repositories(tmp_path):
     assert len({row["project_id"] for row in rows}) == 5
     assert len({row["module_id"] for row in rows}) == 3
     assert all(row["label"] == "" for row in rows)
+    testing = next(row for row in rows if row["module_id"] == "apu-software-testing")
+    assert testing["prerequisite_coverage"] == 0
+    assert "ShopEasy" in testing["review_notes"]
     dstr = next(row for row in rows if row["module_id"] == "apu-degree-sem2-data-structure")
-    assert dstr["prerequisite_coverage"] == ""
+    assert dstr["prerequisite_coverage"] == 0
     assert dstr["pairing_rationale"]
+    capstone = next(row for row in rows if row["module_id"] == "apu-sem5-capstone")
+    assert capstone["prerequisite_coverage"] == ""
+    assert "business logic" in capstone["review_notes"]
 
 
 def test_external_validation_rejects_labels_without_computed_features(tmp_path):

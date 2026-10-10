@@ -34,7 +34,7 @@
       "prerequisites": [
         "apu-oodj-assignment"
       ],
-      "required_competencies": null,
+      "required_competencies": ["testable-code"],
       "target_competencies": [
         "software-testing",
         "test-planning",
@@ -42,12 +42,12 @@
         "nonfunctional-testing",
         "equivalence-partitioning",
         "boundary-value-analysis",
-        "test-case-design",
+        "test-design",
+        "test-tools",
         "regression-testing",
         "test-automation"
       ],
       "reuse_signals": [
-        "testable-code",
         "automated-tests",
         "unit-testing"
       ],

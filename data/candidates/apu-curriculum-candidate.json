@@ -96,6 +96,8 @@
       "target_competencies": [
         "requirements-analysis",
         "system-design",
+        "system-hierarchy",
+        "design-diagrams",
         "software-development",
         "testing",
         "documentation",

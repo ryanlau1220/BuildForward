@@ -147,7 +147,7 @@
   "claim_limit": "Synthetic rubric labels measure agreement with the scenario rubric, not institutional predictive validity.",
   "real_validation": {
     "dataset": "continuity_pairs.real.csv",
-    "dataset_sha256": "4039c196392f885e4971aeafdbfffaa5ee9acece1b19d4097da171cddf92b615",
+    "dataset_sha256": "8b616f9bfbbf7a3068ad05902966d5db57c45365253d3d5f3da2e3547478d2a8",
     "candidate_pairs": 15,
     "reviewed_pairs": 0,
     "pending_pairs": 15,

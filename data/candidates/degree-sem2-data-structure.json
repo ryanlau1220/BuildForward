@@ -8,7 +8,7 @@
       "name": "Data Structure (CT077-3-2-DSTR)",
       "semester": 2,
       "prerequisites": [],
-      "required_competencies": null,
+      "required_competencies": ["cpp-programming"],
       "target_competencies": [
         "cpp-programming",
         "custom-array",
@@ -19,6 +19,7 @@
         "cost-calculation",
         "performance-measurement",
         "algorithm-comparison",
+        "complexity-analysis",
         "console-reporting"
       ],
       "reuse_signals": [],

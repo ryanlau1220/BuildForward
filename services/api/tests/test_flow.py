@@ -149,13 +149,23 @@ def test_supplied_material_candidates_are_seeded_but_not_confirmed():
         dstr_module = next(m for m in dstr["modules"]
                            if m["id"] == "apu-degree-sem2-data-structure")
         assert dstr_module["semester"] == 2
-        assert dstr_module["required_competencies"] is None
-        assert dstr_module["prerequisite_mapping_status"] == "UNKNOWN"
+        assert dstr_module["required_competencies"] == ["cpp-programming"]
+        assert dstr_module["prerequisite_mapping_status"] == "MAPPED"
         assert "custom-array" in dstr_module["target_competencies"]
         assert "singly-linked-list" in dstr_module["target_competencies"]
+        assert "complexity-analysis" in dstr_module["target_competencies"]
         assert [module["semester"] for module in oodj["modules"]] == [1, 2]
-        assert oodj["modules"][1]["id"] == "apu-software-testing"
-        assert "No submission has been supplied" in oodj["modules"][1]["assignment"]
+        testing_module = oodj["modules"][1]
+        assert testing_module["id"] == "apu-software-testing"
+        assert testing_module["required_competencies"] == ["testable-code"]
+        assert testing_module["prerequisite_mapping_status"] == "MAPPED"
+        assert "testable-code" not in testing_module["reuse_signals"]
+        assert {"test-design", "test-tools"} <= set(testing_module["target_competencies"])
+        assert "No submission has been supplied" in testing_module["assignment"]
+        capstone = next(module for module in curriculum["modules"] if module["id"] == "apu-sem5-capstone")
+        assert capstone["required_competencies"] is None
+        assert capstone["prerequisite_mapping_status"] == "UNKNOWN"
+        assert {"system-hierarchy", "design-diagrams"} <= set(capstone["target_competencies"])
         assert project["provenance"] == "EXTRACTED_CANDIDATE"
         assert project["originating_module_id"] == "apu-oodj-assignment"
 

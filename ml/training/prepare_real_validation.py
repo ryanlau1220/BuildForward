@@ -95,6 +95,19 @@ def prepare(manifest_path: Path, repositories_dir: Path, output: Path) -> list[d
     for project in projects:
         analysis = analyses[project["id"]]
         for module in modules:
+            review_note = (
+                "Human review required; confirm same or comparable module, intake context, "
+                "project ownership/reuse permission, and educational value before labeling."
+            )
+            if module["id"] == "apu-software-testing":
+                review_note += " Confirm whether the ShopEasy case study permits an earlier project."
+            elif module["id"] == "apu-sem5-capstone":
+                review_note += (
+                    " Manually inspect substantive business logic and whether the project can "
+                    "support the required system hierarchy and design diagrams."
+                )
+            elif module["id"] == "apu-degree-sem2-data-structure":
+                review_note += " Confirm fit with the specified C++ patient-record assignment."
             row = {
                 "project_id": project["id"],
                 "anchor_project_id": project["id"],
@@ -113,7 +126,7 @@ def prepare(manifest_path: Path, repositories_dir: Path, output: Path) -> list[d
                 "evidence_skills": ";".join(analysis["competencies"]),
                 "label": "",
                 "label_source": "",
-                "review_notes": "Human review required; confirm same or comparable module, intake context, project ownership/reuse permission, and educational value before labeling.",
+                "review_notes": review_note,
             }
             rows.append(row)
     output.parent.mkdir(parents=True, exist_ok=True)
