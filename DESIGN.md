@@ -33,6 +33,7 @@ Current CSS tokens live in `apps/web/src/app/globals.css`. Preserve the existing
 - Do not imply the five briefs form a verified curriculum sequence. Their semester labels are source context only; prerequisites and mappings remain provisional until verified.
 - Keep simulated student-intake data, sample programme data, synthetic project-reuse training labels, and DOSM market-data scope visibly labelled. Show the market-data period, occupation count, BuildForward mapping, and missing signals near results. Forecast assumptions and the illustrative target must remain legible near results.
 - Show project evidence and reasons alongside reuse decisions. Display the model's training provenance, grouped holdout metric, and baseline. Never present model output or scores as calibrated probability.
+- Show the selected module’s assignment context beside its learning outcomes. The reuse decision estimates educational fit; assignment eligibility and any change to an activity require educator review. A START NEW result does not judge the quality of the module or brief.
 - Show a deterministic educator action suggestion only when a ranked skill gap is targeted by the selected future module, the matching project-reuse result supports reuse, and the project does not yet demonstrate that skill. Explain the evidence and model result. The educator remains responsible for deciding whether to act.
 - Keep an assumed coverage gain separate from the action suggestion. The slider explores a user-set scenario, not a predicted or observed intervention effect.
 
