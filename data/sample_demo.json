@@ -1,0 +1,82 @@
+{
+  "programme": {
+    "id": "sample-se",
+    "name": "Software Engineering pathway — illustrative sample"
+  },
+  "modules": [
+    {
+      "id": "oop",
+      "name": "Object-Oriented Programming",
+      "semester": 1,
+      "prerequisites": [],
+      "required_competencies": [],
+      "target_competencies": ["object-oriented-design", "modularity", "persistence"],
+      "reuse_signals": [],
+      "outcomes": ["Design programs with classes and interfaces", "Persist application data"],
+      "assignment": "Build a small record-management application"
+    },
+    {
+      "id": "testing",
+      "name": "Software Testing",
+      "semester": 2,
+      "prerequisites": ["oop"],
+      "required_competencies": ["object-oriented-design", "modularity"],
+      "target_competencies": ["unit-testing", "integration-testing", "continuous-integration"],
+      "reuse_signals": ["testable-code"],
+      "outcomes": ["Test existing business logic", "Automate a repeatable test workflow"],
+      "assignment": "Extend and test an existing application"
+    },
+    {
+      "id": "web",
+      "name": "Web and Enterprise Development",
+      "semester": 3,
+      "prerequisites": ["oop"],
+      "required_competencies": ["object-oriented-design", "persistence"],
+      "target_competencies": ["web-api", "database-design", "authentication"],
+      "reuse_signals": ["domain-model", "persistence"],
+      "outcomes": ["Expose domain logic through an API", "Store data in a relational database"],
+      "assignment": "Evolve a domain application into a web service"
+    },
+    {
+      "id": "devops",
+      "name": "DevOps and Cloud",
+      "semester": 4,
+      "prerequisites": ["testing", "web"],
+      "required_competencies": ["unit-testing", "web-api"],
+      "target_competencies": ["continuous-integration", "containerisation", "deployment"],
+      "reuse_signals": ["web-api", "automated-tests"],
+      "outcomes": ["Package an application", "Run tests in CI", "Deploy a service"],
+      "assignment": "Deploy and observe an existing service"
+    }
+  ],
+  "project": {
+    "id": "sample-record-app",
+    "name": "Record management application — illustrative sample",
+    "source_label": "Illustrative metadata, not a submitted student project",
+    "originating_module_id": "oop",
+    "competencies": ["object-oriented-design", "modularity", "persistence", "testable-code", "domain-model"],
+    "evidence": [
+      {"competency": "object-oriented-design", "source": "sample metadata", "detail": "Classes and interfaces are assumed for this example"},
+      {"competency": "persistence", "source": "sample metadata", "detail": "File persistence is assumed for this example"},
+      {"competency": "testable-code", "source": "sample metadata", "detail": "Business logic is separable from the user interface"}
+    ],
+    "languages": ["Java"],
+    "files_scanned": 0
+  },
+  "cohort": {
+    "id": "sample-cohort",
+    "name": "Simulated cohort A",
+    "current_semester": 1,
+    "coverage": {
+      "object-oriented-design": 0.72,
+      "unit-testing": 0.18,
+      "integration-testing": 0.03,
+      "continuous-integration": 0.07,
+      "web-api": 0.20,
+      "containerisation": 0.20,
+      "deployment": 0.20,
+      "database-design": 0.35,
+      "authentication": 0.35
+    }
+  }
+}

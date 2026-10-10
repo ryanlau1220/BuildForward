@@ -1,0 +1,15 @@
+{
+  "id": "project-oodj-apuasc",
+  "name": "oodj-apuasc",
+  "source_label": "https://github.com/jasonwong1025/oodj-apuasc (public source; scanned archive contents only)",
+  "originating_module_id": "apu-oodj-assignment",
+  "competencies": ["domain-model", "modularity", "object-oriented-design", "testable-code"],
+  "evidence": [
+    {"competency": "modularity", "source": "repository structure", "detail": "98 Java source files found"},
+    {"competency": "testable-code", "source": "repository structure", "detail": "Service or domain code is separated into files"},
+    {"competency": "domain-model", "source": "repository structure", "detail": "Domain or service files found"},
+    {"competency": "object-oriented-design", "source": "Java source", "detail": "Class or interface declaration found"}
+  ],
+  "languages": ["Java"],
+  "files_scanned": 98
+}

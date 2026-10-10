@@ -1,0 +1,18 @@
+{
+  "id": "apu-oodj-coursework-reference",
+  "name": "APU OODJ coursework reference",
+  "source_label": "Extracted candidate from user-provided 2602-OODJ assignment brief and public repository https://github.com/jasonwong1025/oodj-apuasc; kept separate from the supplied Semesters 1–5 sequence",
+  "modules": [
+    {
+      "id": "apu-oodj-assignment",
+      "name": "Object Oriented Development with Java (OODJ)",
+      "semester": 1,
+      "prerequisites": [],
+      "required_competencies": [],
+      "target_competencies": ["java-programming", "object-oriented-design", "swing-ui", "text-file-persistence", "input-validation", "requirements-analysis", "documentation", "teamwork"],
+      "reuse_signals": [],
+      "outcomes": ["Design and implement a Java application using object-oriented programming concepts", "Build a graphical interface and persist application data using text files", "Validate user input and document the design"],
+      "assignment": "Group assignment brief for an automotive service centre system; the supplied brief requires a Java GUI and text-file storage. This summary omits detailed assessment instructions."
+    }
+  ]
+}

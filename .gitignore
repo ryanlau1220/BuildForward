@@ -1,0 +1,53 @@
+# Dependencies
+**/node_modules/
+
+# Next.js and frontend build output
+**/.next/
+**/out/
+**/build/
+**/dist/
+**/.turbo/
+**/.vercel/
+**/coverage/
+**/playwright-report/
+**/test-results/
+*.tsbuildinfo
+
+# Python environments, caches, and package builds
+**/.venv/
+**/venv/
+**/__pycache__/
+**/.pytest_cache/
+**/.ruff_cache/
+**/.mypy_cache/
+**/.tox/
+*.py[cod]
+*.egg-info/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Local databases and logs
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.log
+
+# User uploads and generated model artifacts
+/data/submissions/*
+!data/submissions/.gitkeep
+ml/models/
+ml/artifacts/
+
+# Local-only project reference deck (large source PDF)
+/AI SLIDES .pdf
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
