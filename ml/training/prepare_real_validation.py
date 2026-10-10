@@ -100,7 +100,10 @@ def prepare(manifest_path: Path, repositories_dir: Path, output: Path) -> list[d
                 "project ownership/reuse permission, and educational value before labeling."
             )
             if module["id"] == "apu-software-testing":
-                review_note += " Confirm whether the ShopEasy case study permits an earlier project."
+                review_note += (
+                    " The ShopEasy brief does not establish permission to substitute an earlier "
+                    "project; review only hypothetical fit until that permission is known."
+                )
             elif module["id"] == "apu-sem5-capstone":
                 review_note += (
                     " Manually inspect substantive business logic and whether the project can "
@@ -108,6 +111,14 @@ def prepare(manifest_path: Path, repositories_dir: Path, output: Path) -> list[d
                 )
             elif module["id"] == "apu-degree-sem2-data-structure":
                 review_note += " Confirm fit with the specified C++ patient-record assignment."
+            if (project["id"], module["id"]) in {
+                ("data-structure", "apu-degree-sem2-data-structure"),
+                ("nextgen-fitness-capstone", "apu-sem5-capstone"),
+            }:
+                review_note += (
+                    " This appears to be a submission for the same module; check for a genuinely "
+                    "earlier project version before treating it as future reuse."
+                )
             row = {
                 "project_id": project["id"],
                 "anchor_project_id": project["id"],
@@ -117,10 +128,10 @@ def prepare(manifest_path: Path, repositories_dir: Path, output: Path) -> list[d
                 "module_id": module["id"],
                 "module_name": module["name"],
                 "module_source": module["source_label"],
-                "module_pair_status": "CANDIDATE_PAIR_REVIEW_REQUIRED",
+                "module_pair_status": "HYPOTHETICAL_FIT_REVIEW_REQUIRED",
                 "pairing_rationale": (
-                    "Exploratory candidate: repository and module were selected for review coverage; "
-                    "module fit, intake alignment, and permission to reuse require human confirmation."
+                    "Hypothetical cross-intake fit check using a real repository and module brief; "
+                    "this is not an observed student progression or proof of assignment permission."
                 ),
                 **feature_values(module, analysis),
                 "evidence_skills": ";".join(analysis["competencies"]),

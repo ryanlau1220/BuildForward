@@ -1,5 +1,5 @@
 {
-  "description": "Five user-selected public repositories are exploratory evidence candidates. Every repository is paired with the three available module briefs for review coverage, not because each pairing is known to be educationally suitable. Pair labels remain blank until a human reviewer confirms fit and applies the rubric.",
+  "description": "Five user-selected public repositories are evidence candidates for hypothetical future-module fit checks across intakes. Every repository is paired with the three available module briefs for review coverage, not because each pairing reflects an actual student pathway or a permitted assignment substitution. Pair labels remain blank until a human reviewer confirms fit and applies the rubric.",
   "projects": [
     {
       "id": "data-structure",
