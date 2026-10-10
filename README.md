@@ -26,7 +26,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open http://localhost:3000. API documentation is at http://localhost:8000/docs.
+Open http://localhost:3000. Interactive API documentation is served by Scalar at http://localhost:8000/docs; the OpenAPI schema remains available at http://localhost:8000/openapi.json.
 
 Local runs use SQLite by default. To run the same API against PostgreSQL, use:
 

@@ -6,6 +6,7 @@ from uuid import uuid4
 import httpx
 from fastapi import Depends, FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from scalar_fastapi import AgentScalarConfig, add_scalar_reference
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -26,7 +27,19 @@ async def lifespan(_: FastAPI):
     yield
 
 
-app = FastAPI(title="BuildForward API", version="0.1.0", lifespan=lifespan)
+app = FastAPI(
+    title="BuildForward API",
+    version="0.1.0",
+    lifespan=lifespan,
+    docs_url=None,
+    redoc_url=None,
+)
+add_scalar_reference(
+    app,
+    route="/docs",
+    telemetry=False,
+    agent=AgentScalarConfig(disabled=True),
+)
 cors_origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
 cors_origins.extend(origin.strip() for origin in os.getenv("CORS_ORIGINS", "").split(",") if origin.strip())
 app.add_middleware(

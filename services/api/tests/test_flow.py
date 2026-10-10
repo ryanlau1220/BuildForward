@@ -16,6 +16,17 @@ from app.analyze import analyze_zip
 from app.main import app
 
 
+def test_scalar_docs_replace_swagger_and_redoc():
+    with TestClient(app) as client:
+        docs = client.get("/docs")
+        assert docs.status_code == 200
+        assert docs.headers["content-type"].startswith("text/html")
+        assert "BuildForward API" in docs.text
+        assert "/openapi.json" in docs.text
+        assert client.get("/redoc").status_code == 404
+        assert "/docs" not in client.get("/openapi.json").json()["paths"]
+
+
 def archive(files: dict[str, str]) -> bytes:
     output = io.BytesIO()
     with zipfile.ZipFile(output, "w") as zipped:
