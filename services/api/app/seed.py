@@ -20,6 +20,9 @@ def seed_sample(session: Session) -> None:
         source_label="Illustrative sample; awaiting real university material",
         provenance="SAMPLE",
     ))
+    # Flush the parent row before adding children so databases that enforce
+    # foreign keys (PostgreSQL) see the programme before its modules/cohort.
+    session.flush()
     for item in data["modules"]:
         session.add(Module(**item, programme_id=programme["id"], provenance="SAMPLE"))
     session.add(Project(**data["project"], provenance="SAMPLE"))
