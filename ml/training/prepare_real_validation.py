@@ -21,7 +21,7 @@ FEATURES = (
 )
 FIELDS = (
     "project_id", "anchor_project_id", "project_name", "project_source", "project_origin",
-    "module_id", "module_name", "module_source", "module_pair_status",
+    "module_id", "module_name", "module_source", "module_pair_status", "pairing_rationale",
     *FEATURES, "evidence_skills", "label", "label_source", "review_notes",
 )
 
@@ -104,16 +104,20 @@ def prepare(manifest_path: Path, repositories_dir: Path, output: Path) -> list[d
                 "module_name": module["name"],
                 "module_source": module["source_label"],
                 "module_pair_status": "CANDIDATE_PAIR_REVIEW_REQUIRED",
+                "pairing_rationale": (
+                    "Exploratory candidate: repository and module were selected for review coverage; "
+                    "module fit, intake alignment, and permission to reuse require human confirmation."
+                ),
                 **feature_values(module, analysis),
                 "evidence_skills": ";".join(analysis["competencies"]),
                 "label": "",
                 "label_source": "",
-                "review_notes": "Human review required; confirm module fit and educational value before labeling.",
+                "review_notes": "Human review required; confirm same or comparable module, intake context, project ownership/reuse permission, and educational value before labeling.",
             }
             rows.append(row)
     output.parent.mkdir(parents=True, exist_ok=True)
     with output.open("w", newline="") as destination:
-        writer = csv.DictWriter(destination, fieldnames=FIELDS)
+        writer = csv.DictWriter(destination, fieldnames=FIELDS, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
     return rows

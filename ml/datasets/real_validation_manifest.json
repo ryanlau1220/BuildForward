@@ -1,5 +1,5 @@
 {
-  "description": "Curated source-code candidates from user-provided public repositories. Pair labels are intentionally blank until a reviewer confirms the project-module fit and applies the rubric.",
+  "description": "Five user-selected public repositories are exploratory evidence candidates. Every repository is paired with the three available module briefs for review coverage, not because each pairing is known to be educationally suitable. Pair labels remain blank until a human reviewer confirms fit and applies the rubric.",
   "projects": [
     {
       "id": "data-structure",
@@ -26,12 +26,6 @@
       "origin": "University coursework; repository README identifies a web development assignment"
     },
     {
-      "id": "sdp-diploma",
-      "name": "Counting Strike - SDP Diploma",
-      "source_url": "https://github.com/JV-GG/SDP-DIPLOMA",
-      "origin": "Diploma coursework candidate; repository README identifies SDP Diploma"
-    },
-    {
       "id": "java-sem5-hrms",
       "name": "Human Resource Management System - Java Sem 5",
       "source_url": "https://github.com/JV-GG/Java_sem5",
@@ -50,6 +44,12 @@
       "name": "Capstone Project",
       "source_label": "User-provided Capstone Project brief; reuse policy and programme alignment require educator confirmation",
       "definition_file": "data/imports/apu-curriculum-candidate.json"
+    },
+    {
+      "id": "apu-degree-sem2-data-structure",
+      "name": "Data Structure (CT077-3-2-DSTR)",
+      "source_label": "User-provided 2602 assignment brief; degree and Semester 2 alignment are user-labeled candidates.",
+      "definition_file": "data/candidates/degree-sem2-data-structure.json"
     }
   ]
 }
