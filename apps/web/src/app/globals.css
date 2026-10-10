@@ -43,11 +43,8 @@ button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible
 
 .main-area { display: flex; min-width: 0; flex-direction: column; }
 .workspace-header { display: flex; min-height: 92px; align-items: center; justify-content: space-between; gap: 26px; border-bottom: 1px solid var(--line); background: var(--paper); padding: 15px clamp(20px, 3vw, 42px); }
-.current-view { min-width: 172px; }
-.breadcrumb { color: var(--quiet); font-size: 10px; font-weight: 720; letter-spacing: .75px; }
-.current-view h1 { margin: 4px 0 0; font-size: 21px; font-weight: 660; letter-spacing: -.55px; line-height: 1.2; }
-.workspace-switcher { display: flex; min-width: 0; align-items: end; gap: 9px; }
-.workspace-switcher label { display: grid; min-width: 118px; gap: 3px; }
+.workspace-switcher { display: flex; min-width: 0; flex: 1; align-items: end; gap: 9px; }
+.workspace-switcher label { display: grid; min-width: 118px; flex: 1 1 0; gap: 3px; }
 .workspace-switcher label:first-child { min-width: 180px; }
 .workspace-switcher label span, .field > span { color: var(--quiet); font-size: 10px; font-weight: 720; letter-spacing: .45px; }
 .workspace-switcher select, .field select, .field input { width: 100%; min-width: 0; min-height: 39px; border: 1px solid #cbd7d1; border-radius: 5px; background: var(--paper); padding: 7px 9px; color: var(--ink); font-size: 12px; }

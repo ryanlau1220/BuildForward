@@ -308,7 +308,6 @@ export default function Home() {
 
     <main className="main-area">
       <header className="workspace-header">
-        <div className="current-view"><span className="breadcrumb">BUILDFORWARD / WORKSPACE</span><h1>{viewLabels[view]}</h1></div>
         <div className="workspace-switcher" aria-label="Active decision inputs">
           <label><span>PROGRAMME</span><select aria-label="Select programme" value={workspaceIds.programme_id} onChange={e => {
             const programmeId = e.target.value;
