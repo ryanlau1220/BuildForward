@@ -10,6 +10,12 @@
 - OpenAPI Docs: [https://buildforward.duckdns.org/docs](https://buildforward.duckdns.org/docs)
 - Presentation Slides: [https://buildforward.duckdns.org/slides.html](https://buildforward.duckdns.org/slides.html)
 
+<p align="center">
+  <img src="apps/web/public/brand/buildforward-demo.gif"
+       alt="BuildForward demo showing skill-gap forecasting and project reuse decisions"
+       width="900" />
+</p>
+
 > **Proof of concept:** The default programme and project are illustrative, the student intake is simulated, and the forecast uses stated assumptions. BuildForward does not validate an institution's curriculum or predict an intervention's real effect.
 
 ## Why BuildForward?
