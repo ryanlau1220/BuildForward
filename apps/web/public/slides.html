@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BuildForward | Pitch Slides</title>
+  <style>
+    :root { color-scheme: light; --ink: #142b32; --muted: #50656a; --green: #117e70; --green-dark: #0b5d55; --green-soft: #e8f5f0; --line: #d9e5e0; --paper: #fff; --canvas: #e8efec; font-family: Arial, Helvetica, sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100dvh; display: flex; flex-direction: column; background: var(--canvas); color: var(--ink); }
+    button { font: inherit; }
+    button:focus-visible, a:focus-visible { outline: 3px solid var(--green); outline-offset: 3px; }
+    .presenter { flex: 1; display: grid; place-items: center; min-height: 0; }
+    .stage { position: relative; flex: none; box-shadow: 0 22px 64px rgba(15, 43, 44, .18); }
+    .slide { position: absolute; inset: 0 auto auto 0; display: none; width: 1280px; height: 720px; flex-direction: column; overflow: hidden; padding: 40px 56px 42px; border: 1px solid var(--line); background: var(--paper); transform: scale(var(--deck-scale, 1)); transform-origin: top left; }
+    .slide.active { display: flex; }
+    .slide-header { display: flex; height: 52px; flex: none; align-items: center; justify-content: space-between; }
+    .brand-logo { display: block; width: 205px; height: 64px; object-fit: contain; object-position: left center; }
+    .section-label, .eyebrow { color: var(--green-dark); font-size: 16px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    .slide h1, .slide h2, .slide h3, .slide p { margin: 0; }
+    .slide h1 { max-width: 710px; font-size: 65px; line-height: 1.03; letter-spacing: -.055em; }
+    .slide h2 { max-width: 1080px; font-size: 49px; line-height: 1.08; letter-spacing: -.045em; }
+    .slide h3 { font-size: 25px; line-height: 1.15; letter-spacing: -.025em; }
+    .slide-lead { max-width: 850px; margin-top: 15px !important; color: var(--muted); font-size: 22px; line-height: 1.4; }
+    .slide-body { flex: 1; min-height: 0; }
+    .slide-footer { display: flex; flex: none; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); color: #61757a; font-size: 14px; }
+    .slide-footer strong { color: var(--green-dark); }
+    .hero-layout { display: grid; grid-template-columns: 1.15fr .85fr; gap: 62px; align-items: center; }
+    .hero-copy .eyebrow { margin-bottom: 20px; }
+    .hero-copy .slide-lead { max-width: 620px; margin-top: 26px !important; font-size: 25px; }
+    .hero-visual { display: grid; gap: 14px; }
+    .path-card { display: flex; align-items: center; gap: 17px; min-height: 100px; padding: 19px 22px; border: 1px solid var(--line); border-radius: 18px; background: #f8fbf9; box-shadow: 0 9px 28px rgba(16, 61, 54, .06); }
+    .path-card span { display: grid; width: 48px; height: 48px; flex: none; place-items: center; border-radius: 13px; background: var(--green-soft); color: var(--green-dark); font-size: 22px; font-weight: 800; }
+    .path-card div { display: grid; gap: 4px; }
+    .path-card strong { font-size: 21px; }
+    .path-card small { color: var(--muted); font-size: 16px; }
+    .path-line { width: 3px; height: 20px; margin: -7px 0 -7px 44px; background: var(--green); }
+    .heading-block { margin-top: 29px; }
+    .heading-block .eyebrow { margin-bottom: 10px; }
+    .card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 35px; }
+    .card { min-width: 0; min-height: 275px; padding: 28px; border: 1px solid var(--line); border-radius: 19px; background: #fbfdfc; }
+    .card .number { color: var(--green); font-size: 18px; font-weight: 800; letter-spacing: .08em; }
+    .card h3 { margin-top: 22px; }
+    .card p { margin-top: 14px; color: var(--muted); font-size: 20px; line-height: 1.4; }
+    .takeaway { margin-top: 25px !important; color: var(--green-dark); font-size: 23px; font-weight: 750; }
+    .process-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 34px; }
+    .process-card { min-height: 290px; padding: 28px; border: 1px solid var(--line); border-radius: 19px; background: #f8fbf9; }
+    .process-card .number { display: grid; width: 48px; height: 48px; place-items: center; border-radius: 12px; background: var(--green); color: white; font-size: 21px; font-weight: 800; }
+    .process-card h3 { margin-top: 20px; }
+    .process-card p { margin-top: 15px; color: var(--muted); font-size: 20px; line-height: 1.4; }
+    .decision-note { margin-top: 22px; padding: 16px 21px; border-left: 4px solid var(--green); border-radius: 0 10px 10px 0; background: var(--green-soft); color: var(--green-dark); font-size: 19px; font-weight: 700; }
+    .proof-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 31px; }
+    .proof-panel { min-height: 362px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: #fbfdfc; }
+    .proof-panel h3 { margin-bottom: 14px; }
+    .proof-panel > p { color: var(--muted); font-size: 18px; line-height: 1.4; }
+    .coverage-line { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 20px; font-size: 17px; }
+    .coverage-line strong { color: var(--green-dark); }
+    .bar-track { height: 13px; margin-top: 8px; border-radius: 99px; background: #e4ede8; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 99px; background: var(--green); }
+    .gap-callout { margin-top: 20px; padding: 14px 17px; border-radius: 11px; background: var(--green-soft); color: var(--green-dark); font-size: 19px; font-weight: 750; }
+    .decision-badge { display: inline-block; margin: 4px 0 17px; padding: 8px 13px; border-radius: 9px; background: var(--green-soft); color: var(--green-dark); font-size: 26px; font-weight: 850; }
+    .proof-list { display: grid; gap: 13px; margin: 0; padding: 0; list-style: none; color: var(--ink); font-size: 18px; line-height: 1.35; }
+    .proof-list li::before { margin-right: 9px; color: var(--green); content: "✓"; font-weight: 850; }
+    .proof-caveat { margin-top: 20px !important; font-size: 16px !important; }
+    .action-card { margin-top: 31px; padding: 26px 30px; border: 1px solid var(--line); border-left: 5px solid var(--green); border-radius: 16px; background: #f8fbf9; }
+    .action-card h3 { color: var(--green-dark); }
+    .action-card p { margin-top: 11px; color: var(--muted); font-size: 20px; line-height: 1.4; }
+    .scenario-grid { display: grid; grid-template-columns: 1fr 150px 1fr; gap: 16px; align-items: center; margin-top: 26px; }
+    .scenario-value { padding: 25px; border: 1px solid var(--line); border-radius: 16px; background: white; }
+    .scenario-value span { color: var(--muted); font-size: 17px; }
+    .scenario-value strong { display: block; margin-top: 8px; color: var(--ink); font-size: 60px; line-height: 1; }
+    .scenario-arrow { color: var(--green); text-align: center; font-size: 64px; }
+    .scenario-note { margin-top: 22px !important; color: var(--green-dark); font-size: 19px; font-weight: 700; }
+    .system-grid { display: grid; grid-template-columns: 1.12fr .88fr; gap: 24px; margin-top: 31px; }
+    .system-list { display: grid; gap: 10px; }
+    .system-item { display: grid; grid-template-columns: 43px 1fr; gap: 13px; align-items: center; min-height: 76px; padding: 10px 15px; border: 1px solid var(--line); border-radius: 11px; background: #fbfdfc; }
+    .system-item b { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 9px; background: var(--green-soft); color: var(--green-dark); font-size: 18px; }
+    .system-item strong { display: block; font-size: 18px; }
+    .system-item span { display: block; margin-top: 3px; color: var(--muted); font-size: 15px; }
+    .limit-panel { padding: 23px 25px; border: 1px solid #e4d5b1; border-radius: 16px; background: #fffaf0; }
+    .limit-panel h3 { margin-bottom: 17px; }
+    .limit-panel p { margin-top: 14px; color: #5c5340; font-size: 18px; line-height: 1.42; }
+    .limit-panel p:first-of-type { margin-top: 0; }
+    .stack-line { margin-top: 19px !important; color: var(--muted); font-size: 17px; }
+    .value-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 28px; }
+    .value-card { min-height: 127px; padding: 21px 23px; border: 1px solid var(--line); border-radius: 15px; background: #f8fbf9; }
+    .value-card strong { color: var(--green-dark); font-size: 19px; }
+    .value-card p { margin-top: 8px; color: var(--muted); font-size: 17px; line-height: 1.33; }
+    .closing-row { display: grid; grid-template-columns: 1fr auto auto; gap: 18px; align-items: center; margin-top: 22px; }
+    .closing-copy { max-width: 515px; color: var(--ink); font-size: 26px; font-weight: 750; line-height: 1.22; }
+    .qr-card { width: 230px; min-height: 266px; padding: 12px; border: 1px solid var(--line); border-radius: 16px; text-align: center; background: white; }
+    .qr-card img { display: block; width: 200px; height: 200px; margin: auto; image-rendering: pixelated; }
+    .qr-card strong { display: block; margin-top: 5px; color: var(--green-dark); font-size: 15px; }
+    .qr-card small { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; }
+    #slide-7 .value-grid { margin-top: 20px; }
+    #slide-7 .value-card { min-height: 105px; padding: 16px 20px; }
+    #slide-7 .closing-row { margin-top: 14px; }
+    .nav-button { position: absolute; z-index: 2; top: 50%; width: 44px; height: 64px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255, 255, 255, .94); color: var(--green-dark); font-size: 30px; cursor: pointer; opacity: 0; transform: translateY(-50%); transition: opacity .15s; }
+    .nav-button:hover, .nav-button:focus-visible { opacity: 1; }
+    .nav-button:disabled { visibility: hidden; }
+    #previous { left: 8px; }
+    #next { right: 8px; }
+    @media (prefers-reduced-motion: reduce) { .nav-button { transition: none; } }
+    @media print {
+      @page { size: 16in 9in; margin: 0; }
+      body, .presenter { display: block; width: 100%; min-height: 0; margin: 0; padding: 0; background: white; }
+      .stage { width: auto !important; height: auto !important; box-shadow: none; }
+      .slide, .slide.active { position: relative; display: flex !important; width: 16in; height: 9in; margin: 0; padding: 38px 52px; border: 0; border-radius: 0; transform: none !important; break-after: page; page-break-after: always; }
+      .nav-button { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="presenter" aria-label="BuildForward presentation">
+    <div class="stage" id="stage">
+      <section class="slide active" id="slide-1" aria-label="Slide 1 of 7">
+        <header class="slide-header"><img class="brand-logo" src="/brand/logo.png" alt="BuildForward" /><span class="section-label">The idea</span></header>
+        <div class="slide-body hero-layout">
+          <div class="hero-copy"><p class="eyebrow">Predict early · decide better</p><h1>Students move forward. Why do their projects restart?</h1><p class="slide-lead">BuildForward helps educators carry useful project work into future learning and spot possible skill gaps before graduation.</p></div>
+          <div class="hero-visual" aria-hidden="true">
+            <div class="path-card"><span>1</span><div><strong>Existing project</strong><small>Evidence of work already done</small></div></div><div class="path-line"></div>
+            <div class="path-card"><span>2</span><div><strong>Future module</strong><small>New learning goals and skills</small></div></div><div class="path-line"></div>
+            <div class="path-card"><span>3</span><div><strong>Educator decision</strong><small>Reuse, adapt, or start new</small></div></div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span>Predictive curriculum decision support</span><strong>01 / 07</strong></footer>
+      </section>
+
+      <section class="slide" id="slide-2" aria-label="Slide 2 of 7">
+        <header class="slide-header"><img class="brand-logo" src="/brand/logo.png" alt="BuildForward" /><span class="section-label">The problem</span></header>
+        <div class="slide-body">
+          <div class="heading-block"><p class="eyebrow">Disconnected evidence</p><h2>Learning is sequential. Project evidence often is not.</h2></div>
+          <div class="card-grid">
+            <div class="card"><span class="number">01</span><h3>Work is left behind</h3><p>A student builds an application, submits it, and moves to the next module.</p></div>
+            <div class="card"><span class="number">02</span><h3>Fit is hard to judge</h3><p>The next lecturer may lack a clear view of what that project demonstrates.</p></div>
+            <div class="card"><span class="number">03</span><h3>Gaps surface late</h3><p>Programme leaders need earlier signals about skills that may remain under-covered.</p></div>
+          </div>
+          <p class="takeaway">The opportunity: review the evidence before deciding whether to start again.</p>
+        </div>
+        <footer class="slide-footer"><span>Build on prior learning when it fits the next module</span><strong>02 / 07</strong></footer>
+      </section>
+
+      <section class="slide" id="slide-3" aria-label="Slide 3 of 7">
+        <header class="slide-header"><img class="brand-logo" src="/brand/logo.png" alt="BuildForward" /><span class="section-label">The solution</span></header>
+        <div class="slide-body">
+          <div class="heading-block"><p class="eyebrow">One connected review flow</p><h2>Three work areas turn evidence into a decision.</h2></div>
+          <div class="process-grid">
+            <div class="process-card"><span class="number">1</span><h3>Review sources</h3><p>Inspect coursework and project evidence. Confirm candidate data before it informs a prediction.</p></div>
+            <div class="process-card"><span class="number">2</span><h3>Check project reuse</h3><p>Compare an existing project with a future module's goals, required skills, and assignment context.</p></div>
+            <div class="process-card"><span class="number">3</span><h3>Forecast skill gaps</h3><p>See illustrative graduation coverage, then explore a possible action under an explicit gain assumption.</p></div>
+          </div>
+          <div class="decision-note">BuildForward presents evidence and a suggestion. The educator decides what to do.</div>
+        </div>
+        <footer class="slide-footer"><span>Data Sources → Project Reuse Check → Graduation Skills Forecast</span><strong>03 / 07</strong></footer>
+      </section>
+
+      <section class="slide" id="slide-4" aria-label="Slide 4 of 7">
+        <header class="slide-header"><img class="brand-logo" src="/brand/logo.png" alt="BuildForward" /><span class="section-label">Default demo</span></header>
+        <div class="slide-body">
+          <div class="heading-block"><p class="eyebrow">Illustrative programme · simulated student intake</p><h2>Two signals point to one learning opportunity.</h2></div>
+          <div class="proof-grid">
+            <div class="proof-panel"><h3>Unit Testing skill gap</h3><p>Current coverage and expected graduation coverage in the sample intake:</p>
+              <div class="coverage-line"><span>Current</span><strong>18%</strong></div><div class="bar-track"><div class="bar-fill" style="width:18%"></div></div>
+              <div class="coverage-line"><span>Expected at graduation</span><strong>40%</strong></div><div class="bar-track"><div class="bar-fill" style="width:40%"></div></div>
+              <div class="gap-callout">30 points below the illustrative 70% target</div>
+            </div>
+            <div class="proof-panel"><h3>Project Reuse Check</h3><p>Sample record-management project → future Software Testing module</p><span class="decision-badge">Continue</span>
+              <ul class="proof-list"><li>Object-oriented structure and testable business logic</li><li>Required sample skills already shown</li><li>Unit Testing still needs development</li></ul>
+              <p class="proof-caveat">The classifier is trained on synthetic rubric scenarios. This result estimates learning-goal fit, not assignment permission.</p>
+            </div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span>Sample values are illustrative, not observed student outcomes</span><strong>04 / 07</strong></footer>
+      </section>
+
+      <section class="slide" id="slide-5" aria-label="Slide 5 of 7">
+        <header class="slide-header"><img class="brand-logo" src="/brand/logo.png" alt="BuildForward" /><span class="section-label">Possible action</span></header>
+        <div class="slide-body">
+          <div class="heading-block"><p class="eyebrow">From finding to educator review</p><h2>Could the existing project become testing practice?</h2></div>
+          <div class="action-card"><h3>Suggested action to review</h3><p>Consider extending the sample project with unit tests in the future Software Testing module. Check the real assignment before changing any activity.</p></div>
+          <div class="scenario-grid">
+            <div class="scenario-value"><span>Gap without this action</span><strong>30 points</strong></div>
+            <div class="scenario-arrow" aria-hidden="true">→</div>
+            <div class="scenario-value"><span>Gap with +18 assumed gain</span><strong>12 points</strong></div>
+          </div>
+          <p class="scenario-note">The +18-point gain is chosen for a scenario; BuildForward does not predict the action's real effect.</p>
+        </div>
+        <footer class="slide-footer"><span>Evidence informs a human decision; no curriculum change is automatic</span><strong>05 / 07</strong></footer>
+      </section>
+
+      <section class="slide" id="slide-6" aria-label="Slide 6 of 7">
+        <header class="slide-header"><img class="brand-logo" src="/brand/logo.png" alt="BuildForward" /><span class="section-label">How it works</span></header>
+        <div class="slide-body">
+          <div class="heading-block"><p class="eyebrow">Evidence first, limits visible</p><h2>A small, auditable decision-support pipeline.</h2></div>
+          <div class="system-grid">
+            <div class="system-list">
+              <div class="system-item"><b>1</b><div><strong>Source review</strong><span>Illustrative records and review-only coursework candidates</span></div></div>
+              <div class="system-item"><b>2</b><div><strong>Static project inspection</strong><span>Supported source files and build metadata; no code execution</span></div></div>
+              <div class="system-item"><b>3</b><div><strong>Project reuse model</strong><span>Classifier trained on synthetic rubric scenarios</span></div></div>
+              <div class="system-item"><b>4</b><div><strong>Skill forecast</strong><span>Coverage assumptions and a limited DOSM occupation signal</span></div></div>
+            </div>
+            <div class="limit-panel"><h3>What the result cannot prove</h3><p>No real student-intake data has been supplied. Forecast values are not institutionally validated.</p><p>Repository signals do not prove code quality or student proficiency.</p><p>Educators review assignment fit and make the final decision.</p></div>
+          </div>
+          <p class="stack-line">Next.js · FastAPI · SQLAlchemy · PostgreSQL · scikit-learn</p>
+        </div>
+        <footer class="slide-footer"><span>DOSM counts online offerings by occupation, not demand for individual skills</span><strong>06 / 07</strong></footer>
+      </section>
+
+      <section class="slide" id="slide-7" aria-label="Slide 7 of 7">
+        <header class="slide-header"><img class="brand-logo" src="/brand/logo.png" alt="BuildForward" /><span class="section-label">Close</span></header>
+        <div class="slide-body">
+          <div class="heading-block"><p class="eyebrow">Predict early · decide better</p><h2>Keep useful learning moving forward.</h2></div>
+          <div class="value-grid">
+            <div class="value-card"><strong>Students</strong><p>Build on earlier project work when it supports new goals.</p></div>
+            <div class="value-card"><strong>Lecturers</strong><p>See the evidence before choosing reuse or a new start.</p></div>
+            <div class="value-card"><strong>Programme leaders</strong><p>Review possible skill gaps while there is time to act.</p></div>
+          </div>
+          <div class="closing-row">
+            <p class="closing-copy">Explore the live demo and its evidence. Then decide what you would carry forward.</p>
+            <a class="qr-card" href="https://buildforward.duckdns.org/"><img src="/brand/live-demo-qr.svg" alt="QR code for the BuildForward live demo" /><strong>Live demo</strong><small>buildforward.duckdns.org</small></a>
+            <a class="qr-card" href="https://github.com/ryanlau1220/BuildForward"><img src="/brand/repository-qr.svg" alt="QR code for the BuildForward GitHub repository" /><strong>Source code</strong><small>GitHub · BuildForward</small></a>
+          </div>
+        </div>
+        <footer class="slide-footer"><span>Proof of concept · educator decision required</span><strong>07 / 07</strong></footer>
+      </section>
+      <button class="nav-button" id="previous" type="button" aria-label="Previous slide" title="Previous slide">&#8249;</button>
+      <button class="nav-button" id="next" type="button" aria-label="Next slide" title="Next slide">&#8250;</button>
+    </div>
+  </main>
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const stage = document.getElementById("stage");
+    const previous = document.getElementById("previous");
+    const next = document.getElementById("next");
+    let index = 0;
+
+    function fitSlide() {
+      const width = Math.max(1, window.innerWidth);
+      const height = Math.max(1, window.innerHeight);
+      const scale = Math.min(width / 1280, height / 720, 1.5);
+      stage.style.width = (1280 * scale) + "px";
+      stage.style.height = (720 * scale) + "px";
+      stage.style.setProperty("--deck-scale", String(scale));
+    }
+
+    function showSlide(nextIndex) {
+      index = Math.max(0, Math.min(nextIndex, slides.length - 1));
+      slides.forEach((slide, slideIndex) => {
+        const active = slideIndex === index;
+        slide.classList.toggle("active", active);
+        slide.setAttribute("aria-hidden", active ? "false" : "true");
+        slide.inert = !active;
+      });
+      previous.disabled = index === 0;
+      next.disabled = index === slides.length - 1;
+      history.replaceState(null, "", "#slide-" + (index + 1));
+    }
+
+    previous.addEventListener("click", () => showSlide(index - 1));
+    next.addEventListener("click", () => showSlide(index + 1));
+    let touchStart = null;
+    stage.addEventListener("touchstart", (event) => {
+      if (event.touches.length === 1 && !event.target.closest("a, button")) {
+        touchStart = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+      }
+    }, { passive: true });
+    stage.addEventListener("touchend", (event) => {
+      if (!touchStart || event.changedTouches.length !== 1) return;
+      const dx = event.changedTouches[0].clientX - touchStart.x;
+      const dy = event.changedTouches[0].clientY - touchStart.y;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) showSlide(index + (dx < 0 ? 1 : -1));
+      touchStart = null;
+    }, { passive: true });
+    document.addEventListener("keydown", (event) => {
+      if (["ArrowRight", "PageDown", " "].includes(event.key)) { event.preventDefault(); showSlide(index + 1); }
+      if (["ArrowLeft", "PageUp"].includes(event.key)) { event.preventDefault(); showSlide(index - 1); }
+      if (event.key === "Home") { event.preventDefault(); showSlide(0); }
+      if (event.key === "End") { event.preventDefault(); showSlide(slides.length - 1); }
+    });
+    window.addEventListener("resize", fitSlide);
+    window.addEventListener("hashchange", () => {
+      const match = location.hash.match(/^#slide-([1-7])$/);
+      if (match) showSlide(Number(match[1]) - 1);
+    });
+    const start = location.hash.match(/^#slide-([1-7])$/);
+    showSlide(start ? Number(start[1]) - 1 : 0);
+    fitSlide();
+  </script>
+</body>
+</html>
