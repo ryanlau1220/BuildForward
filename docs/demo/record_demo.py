@@ -115,11 +115,21 @@ def run_recording(base_url: str, chrome: str, video_dir: Path) -> tuple[Path, fl
         page.wait_for_timeout(2500)
 
         page.locator("#scenario-skill").select_option("unit-testing")
-        assert page.locator("#scenario-gain").input_value() == "0.18"
+        slider = page.locator("#scenario-gain")
+        assert slider.input_value() == "0.18"
         button = page.get_by_role("button", name="Update forecast scenario")
         button_top = button.evaluate("element => element.getBoundingClientRect().top + window.scrollY")
         smooth_scroll(page, button_top - 500)
         page.wait_for_timeout(400)
+        slider.press("Home")
+        assert slider.input_value() == "0"
+        page.wait_for_timeout(350)
+        for _ in range(18):
+            slider.press("ArrowRight")
+            page.wait_for_timeout(80)
+        assert slider.input_value() == "0.18"
+        expect(page.locator(".range-field strong")).to_have_text("+18 percentage points")
+        page.wait_for_timeout(350)
         button.click()
         expect(page.locator(".scenario-result .scenario-values")).to_contain_text("30%")
         expect(page.locator(".scenario-result .scenario-values")).to_contain_text("12%")
